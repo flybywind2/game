@@ -1,0 +1,1550 @@
+{
+  "extra001": {
+    "title": "빨강 톡톡 찾기",
+    "icon": "🔴",
+    "category": "look",
+    "cardColor": "coral",
+    "description": "빨간색 친구를 눈으로 찾아봐요.",
+    "duration": "2분",
+    "preview": ["🔴", "🍎", "❤️"],
+    "skill": "색 구별",
+    "insight": "익숙한 사물에서 빨간색을 구별해요.",
+    "offline": {
+      "title": "집 안 빨강 산책",
+      "text": "아이와 집 안을 천천히 걸으며 빨간 물건 세 가지를 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "색을 천천히 살펴봐요.",
+        "prompt": "빨간 동그라미는 어디에 있을까?",
+        "speech": "빨간 동그라미를 톡 눌러 보자.",
+        "success": "맞아, 반짝이는 빨강이야!",
+        "scene": ["🔴", "🟡", "🔵"],
+        "options": [
+          {"label": "노란 동그라미", "visual": "🟡"},
+          {"label": "빨간 동그라미", "visual": "🔴", "correct": true},
+          {"label": "파란 동그라미", "visual": "🔵"}
+        ]
+      },
+      {
+        "helper": "과일의 색을 자세히 봐요.",
+        "prompt": "빨간 사과를 찾아 줄래?",
+        "speech": "빨갛게 익은 사과를 찾아 보자.",
+        "success": "사과처럼 빨간색을 잘 찾았어!",
+        "scene": ["🍌", "🍎", "🫐"],
+        "options": [
+          {"label": "바나나", "visual": "🍌"},
+          {"label": "블루베리", "visual": "🫐"},
+          {"label": "빨간 사과", "visual": "🍎", "correct": true}
+        ]
+      },
+      {
+        "helper": "하트의 색을 하나씩 말해 봐요.",
+        "prompt": "빨간 하트에게 인사해 볼까?",
+        "speech": "빨간 하트를 골라 보자.",
+        "success": "사랑스러운 빨간 하트를 찾았네!",
+        "scene": ["💙", "❤️", "💛"],
+        "options": [
+          {"label": "파란 하트", "visual": "💙"},
+          {"label": "노란 하트", "visual": "💛"},
+          {"label": "빨간 하트", "visual": "❤️", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra002": {
+    "title": "노랑 반짝 찾기",
+    "icon": "🟡",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "밝은 노란색 친구를 찾아봐요.",
+    "duration": "2분",
+    "preview": ["🟡", "🍌", "💛"],
+    "skill": "색 구별",
+    "insight": "노란색을 다른 기본색과 구별해요.",
+    "offline": {
+      "title": "노랑 보물 상자",
+      "text": "노란 블록이나 양말을 작은 상자에 모으며 색 이름을 말해 주세요."
+    },
+    "rounds": [
+      {
+        "helper": "세 동그라미의 색을 비교해요.",
+        "prompt": "햇살 같은 노란 동그라미는 무엇일까?",
+        "speech": "노란 동그라미를 찾아 보자.",
+        "success": "햇살처럼 환한 노랑이야!",
+        "scene": ["🔵", "🟡", "🟢"],
+        "options": [
+          {"label": "파란 동그라미", "visual": "🔵"},
+          {"label": "초록 동그라미", "visual": "🟢"},
+          {"label": "노란 동그라미", "visual": "🟡", "correct": true}
+        ]
+      },
+      {
+        "helper": "과일 껍질의 색을 떠올려요.",
+        "prompt": "노란 바나나는 어느 친구일까?",
+        "speech": "노란 바나나를 톡 눌러 보자.",
+        "success": "맛있는 노란 바나나를 찾았어!",
+        "scene": ["🍓", "🍌", "🍇"],
+        "options": [
+          {"label": "딸기", "visual": "🍓"},
+          {"label": "노란 바나나", "visual": "🍌", "correct": true},
+          {"label": "포도", "visual": "🍇"}
+        ]
+      },
+      {
+        "helper": "하트 색을 소리 내어 불러 봐요.",
+        "prompt": "노란 하트는 어디에서 웃고 있을까?",
+        "speech": "노란 하트를 골라 보자.",
+        "success": "반짝반짝 노란 하트야!",
+        "scene": ["💚", "💛", "💜"],
+        "options": [
+          {"label": "초록 하트", "visual": "💚"},
+          {"label": "노란 하트", "visual": "💛", "correct": true},
+          {"label": "보라 하트", "visual": "💜"}
+        ]
+      }
+    ]
+  },
+  "extra003": {
+    "title": "파랑 찰랑 찾기",
+    "icon": "🔵",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "바다 같은 파란색을 알아봐요.",
+    "duration": "2분",
+    "preview": ["🔵", "💙", "🟦"],
+    "skill": "색 구별",
+    "insight": "파란색을 여러 모양 안에서 찾아요.",
+    "offline": {
+      "title": "파란 물건 모으기",
+      "text": "파란 컵, 블록, 수건처럼 안전한 물건을 함께 찾아 한곳에 놓아 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "바다 색을 생각하며 살펴봐요.",
+        "prompt": "바다 같은 파란 동그라미를 골라 볼까?",
+        "speech": "파란 동그라미를 찾아 보자.",
+        "success": "찰랑찰랑 파란색을 찾았어!",
+        "scene": ["🔴", "🔵", "🟠"],
+        "options": [
+          {"label": "빨간 동그라미", "visual": "🔴"},
+          {"label": "파란 동그라미", "visual": "🔵", "correct": true},
+          {"label": "주황 동그라미", "visual": "🟠"}
+        ]
+      },
+      {
+        "helper": "하트 세 개를 차례로 봐요.",
+        "prompt": "파란 하트는 어떤 하트일까?",
+        "speech": "파란 하트를 톡 눌러 보자.",
+        "success": "시원한 파란 하트를 골랐네!",
+        "scene": ["🧡", "💙", "💚"],
+        "options": [
+          {"label": "주황 하트", "visual": "🧡"},
+          {"label": "초록 하트", "visual": "💚"},
+          {"label": "파란 하트", "visual": "💙", "correct": true}
+        ]
+      },
+      {
+        "helper": "네모 안의 색을 비교해요.",
+        "prompt": "파란 네모를 찾아 문을 열어 줄래?",
+        "speech": "파란 네모를 골라 보자.",
+        "success": "파란 네모 문이 활짝 열렸어!",
+        "scene": ["🟩", "🟦", "🟥"],
+        "options": [
+          {"label": "초록 네모", "visual": "🟩"},
+          {"label": "파란 네모", "visual": "🟦", "correct": true},
+          {"label": "빨간 네모", "visual": "🟥"}
+        ]
+      }
+    ]
+  },
+  "extra004": {
+    "title": "같은 색 친구",
+    "icon": "🎨",
+    "category": "look",
+    "cardColor": "mint",
+    "description": "기준 그림과 같은 색을 짝지어요.",
+    "duration": "3분",
+    "preview": ["🟢", "💜", "🟧"],
+    "skill": "색 짝짓기",
+    "insight": "모양이 달라도 같은 색을 연결해요.",
+    "offline": {
+      "title": "색 양말 짝꿍",
+      "text": "깨끗한 양말을 펼치고 같은 색 양말끼리 짝지어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "기준은 초록색 동그라미예요.",
+        "prompt": "초록 동그라미와 같은 색 네모는 무엇일까?",
+        "speech": "같은 초록색 친구를 찾아 보자.",
+        "success": "모양은 달라도 둘 다 초록색이야!",
+        "scene": ["기준", "🟢"],
+        "options": [
+          {"label": "초록 네모", "visual": "🟩", "correct": true},
+          {"label": "파란 네모", "visual": "🟦"},
+          {"label": "빨간 네모", "visual": "🟥"}
+        ]
+      },
+      {
+        "helper": "기준은 보라색 하트예요.",
+        "prompt": "보라 하트와 같은 색 동그라미를 찾아볼까?",
+        "speech": "보라색 동그라미를 골라 보자.",
+        "success": "보라색 짝꿍을 정확히 찾았어!",
+        "scene": ["기준", "💜"],
+        "options": [
+          {"label": "노란 동그라미", "visual": "🟡"},
+          {"label": "보라 동그라미", "visual": "🟣", "correct": true},
+          {"label": "초록 동그라미", "visual": "🟢"}
+        ]
+      },
+      {
+        "helper": "기준은 주황색 네모예요.",
+        "prompt": "주황 네모와 색이 같은 동그라미는 어디에 있을까?",
+        "speech": "주황색 짝꿍을 찾아 보자.",
+        "success": "주황색끼리 멋지게 만났네!",
+        "scene": ["기준", "🟧"],
+        "options": [
+          {"label": "빨간 동그라미", "visual": "🔴"},
+          {"label": "주황 동그라미", "visual": "🟠", "correct": true},
+          {"label": "파란 동그라미", "visual": "🔵"}
+        ]
+      }
+    ]
+  },
+  "extra005": {
+    "title": "동그라미 데굴데굴",
+    "icon": "⚪",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "둥근 동그라미 모양을 찾아봐요.",
+    "duration": "2분",
+    "preview": ["⚪", "🔺", "🟦"],
+    "skill": "모양 인식",
+    "insight": "색과 크기가 달라도 동그라미를 알아봐요.",
+    "offline": {
+      "title": "둥근 것 굴리기",
+      "text": "공과 블록을 놓고 무엇이 굴러가는지 함께 시험해 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "모서리가 없이 둥근 모양을 찾아요.",
+        "prompt": "데굴데굴 굴러갈 동그라미는 어디에 있을까?",
+        "speech": "둥근 동그라미를 골라 보자.",
+        "success": "맞아, 모서리 없이 둥글둥글해!",
+        "options": [
+          {"label": "세모", "visual": "🔺"},
+          {"label": "동그라미", "visual": "⚪", "correct": true},
+          {"label": "네모", "visual": "🟦"}
+        ]
+      },
+      {
+        "helper": "색보다 바깥 모양을 살펴봐요.",
+        "prompt": "빨간 모양 중 동그라미는 어느 것일까?",
+        "speech": "빨간 동그라미를 찾아 보자.",
+        "success": "빨간색이어도 둥근 모양을 알아봤네!",
+        "options": [
+          {"label": "빨간 네모", "visual": "🟥"},
+          {"label": "빨간 세모", "visual": "🔺"},
+          {"label": "빨간 동그라미", "visual": "🔴", "correct": true}
+        ]
+      },
+      {
+        "helper": "익숙한 물건의 모양을 떠올려요.",
+        "prompt": "동그라미 모양인 공은 어떤 그림일까?",
+        "speech": "둥근 공을 톡 눌러 보자.",
+        "success": "공도 동그라미처럼 둥글지!",
+        "options": [
+          {"label": "공", "visual": "⚽", "correct": true},
+          {"label": "선물 상자", "visual": "🎁"},
+          {"label": "삼각자", "visual": "📐"}
+        ]
+      }
+    ]
+  },
+  "extra006": {
+    "title": "세모 뾰족 탐험",
+    "icon": "🔺",
+    "category": "look",
+    "cardColor": "coral",
+    "description": "꼭짓점이 있는 세모를 알아봐요.",
+    "duration": "2분",
+    "preview": ["🔺", "📐", "🍕"],
+    "skill": "모양 인식",
+    "insight": "다양한 그림에서 세모 모양을 찾아요.",
+    "offline": {
+      "title": "세모 손가락",
+      "text": "두 손가락과 엄지로 세모를 만들고 세 변을 천천히 따라가 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "뾰족한 꼭짓점 세 개를 찾아봐요.",
+        "prompt": "꼭짓점이 세 개인 세모는 무엇일까?",
+        "speech": "세모 모양을 골라 보자.",
+        "success": "뾰족뾰족 세모를 찾았어!",
+        "options": [
+          {"label": "동그라미", "visual": "⚪"},
+          {"label": "세모", "visual": "🔺", "correct": true},
+          {"label": "네모", "visual": "🟩"}
+        ]
+      },
+      {
+        "helper": "파란색 모양들의 테두리를 살펴봐요.",
+        "prompt": "파란 모양 가운데 세모를 찾아 줄래?",
+        "speech": "파란 세모를 찾아 보자.",
+        "success": "색에 속지 않고 세모를 골랐네!",
+        "options": [
+          {"label": "파란 동그라미", "visual": "🔵"},
+          {"label": "파란 네모", "visual": "🟦"},
+          {"label": "파란 세모", "visual": "파란 ▲", "subtitle": "세모", "correct": true}
+        ]
+      },
+      {
+        "helper": "음식의 바깥 모양을 살펴봐요.",
+        "prompt": "세모처럼 생긴 피자 조각은 어느 그림일까?",
+        "speech": "세모 피자 조각을 골라 보자.",
+        "success": "피자 조각에서 세모를 발견했어!",
+        "options": [
+          {"label": "도넛", "visual": "🍩"},
+          {"label": "피자 조각", "visual": "🍕", "correct": true},
+          {"label": "크래커", "visual": "🍪"}
+        ]
+      }
+    ]
+  },
+  "extra007": {
+    "title": "네모 반듯 탐험",
+    "icon": "🟦",
+    "category": "look",
+    "cardColor": "purple",
+    "description": "반듯한 네모 모양을 구별해요.",
+    "duration": "2분",
+    "preview": ["🟦", "🟥", "🎁"],
+    "skill": "모양 인식",
+    "insight": "네 변이 있는 네모를 여러 색에서 찾아요.",
+    "offline": {
+      "title": "네모 창문 찾기",
+      "text": "방 안의 창문, 책, 상자처럼 네모난 물건을 손가락으로 가리켜 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "반듯한 네 변을 눈으로 따라가요.",
+        "prompt": "반듯한 네모 모양을 찾아볼까?",
+        "speech": "네모를 톡 눌러 보자.",
+        "success": "네 변이 반듯한 네모야!",
+        "options": [
+          {"label": "동그라미", "visual": "⚪"},
+          {"label": "세모", "visual": "🔺"},
+          {"label": "네모", "visual": "🟦", "correct": true}
+        ]
+      },
+      {
+        "helper": "색은 달라도 네모는 반듯해요.",
+        "prompt": "빨간 네모는 세 그림 중 어디에 있을까?",
+        "speech": "빨간 네모를 찾아 보자.",
+        "success": "반듯한 빨간 네모를 찾았네!",
+        "options": [
+          {"label": "빨간 동그라미", "visual": "🔴"},
+          {"label": "빨간 네모", "visual": "🟥", "correct": true},
+          {"label": "빨간 세모", "visual": "🔺"}
+        ]
+      },
+      {
+        "helper": "물건의 바깥선을 살펴봐요.",
+        "prompt": "네모난 선물 상자는 어떤 그림일까?",
+        "speech": "네모난 선물 상자를 골라 보자.",
+        "success": "상자 속에서 네모를 잘 찾았어!",
+        "options": [
+          {"label": "공", "visual": "⚽"},
+          {"label": "피자 조각", "visual": "🍕"},
+          {"label": "선물 상자", "visual": "🎁", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra008": {
+    "title": "모양 짝꿍",
+    "icon": "🔷",
+    "category": "look",
+    "cardColor": "pink",
+    "description": "기준과 같은 모양을 찾아 연결해요.",
+    "duration": "3분",
+    "preview": ["⚪", "🔺", "🟪"],
+    "skill": "모양 짝짓기",
+    "insight": "색이 달라도 같은 바깥 모양을 알아봐요.",
+    "offline": {
+      "title": "모양 카드 짝짓기",
+      "text": "종이에 동그라미, 세모, 네모를 두 개씩 그려 같은 모양을 만나게 해 주세요."
+    },
+    "rounds": [
+      {
+        "helper": "기준은 하얀 동그라미예요.",
+        "prompt": "하얀 동그라미와 같은 모양은 무엇일까?",
+        "speech": "색이 달라도 같은 동그라미를 찾아 보자.",
+        "success": "둘 다 둥근 동그라미야!",
+        "scene": ["기준", "⚪"],
+        "options": [
+          {"label": "빨간 세모", "visual": "🔺"},
+          {"label": "파란 동그라미", "visual": "🔵", "correct": true},
+          {"label": "초록 네모", "visual": "🟩"}
+        ]
+      },
+      {
+        "helper": "기준은 빨간 세모예요.",
+        "prompt": "빨간 세모와 모양이 같은 친구는 누구일까?",
+        "speech": "같은 세모 모양을 골라 보자.",
+        "success": "색은 달라도 뾰족한 세모네!",
+        "scene": ["기준", "🔺"],
+        "options": [
+          {"label": "노란 동그라미", "visual": "🟡"},
+          {"label": "초록 세모", "visual": "초록 ▲", "subtitle": "세모", "correct": true},
+          {"label": "파란 네모", "visual": "🟦"}
+        ]
+      },
+      {
+        "helper": "기준은 보라 네모예요.",
+        "prompt": "보라 네모와 똑같은 모양을 찾아 줄래?",
+        "speech": "네모 모양 짝꿍을 찾아 보자.",
+        "success": "반듯한 네모끼리 짝이 되었어!",
+        "scene": ["기준", "🟪"],
+        "options": [
+          {"label": "노란 네모", "visual": "🟨", "correct": true},
+          {"label": "보라 동그라미", "visual": "🟣"},
+          {"label": "빨간 세모", "visual": "🔺"}
+        ]
+      }
+    ]
+  },
+  "extra009": {
+    "title": "동물 쌍둥이 찾기",
+    "icon": "🐶",
+    "category": "look",
+    "cardColor": "mint",
+    "description": "기준 동물과 똑같은 그림을 찾아요.",
+    "duration": "2분",
+    "preview": ["🐶", "🐰", "🐸"],
+    "skill": "동일 그림 찾기",
+    "insight": "세부 모습을 관찰해 같은 동물 그림을 짝지어요.",
+    "offline": {
+      "title": "동물 카드 기억 놀이",
+      "text": "동물 카드 두 쌍을 뒤집어 놓고 같은 그림을 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "기준 강아지의 귀와 얼굴을 봐요.",
+        "prompt": "기준 강아지와 똑같은 그림은 누구일까?",
+        "speech": "똑같은 강아지를 찾아 보자.",
+        "success": "멍멍, 강아지 쌍둥이를 찾았어!",
+        "scene": ["기준", "🐶"],
+        "options": [
+          {"label": "고양이", "visual": "🐱"},
+          {"label": "강아지", "visual": "🐶", "correct": true},
+          {"label": "토끼", "visual": "🐰"}
+        ]
+      },
+      {
+        "helper": "기준 토끼의 긴 귀를 잘 봐요.",
+        "prompt": "긴 귀 토끼와 완전히 같은 그림은 무엇일까?",
+        "speech": "똑같은 토끼를 골라 보자.",
+        "success": "깡충, 토끼 쌍둥이가 만났네!",
+        "scene": ["기준", "🐰"],
+        "options": [
+          {"label": "곰", "visual": "🐻"},
+          {"label": "개구리", "visual": "🐸"},
+          {"label": "토끼", "visual": "🐰", "correct": true}
+        ]
+      },
+      {
+        "helper": "기준 개구리의 큰 눈을 살펴봐요.",
+        "prompt": "기준 개구리의 쌍둥이를 찾아 줄래?",
+        "speech": "같은 개구리 그림을 찾아 보자.",
+        "success": "폴짝, 개구리 쌍둥이도 찾았어!",
+        "scene": ["기준", "🐸"],
+        "options": [
+          {"label": "개구리", "visual": "🐸", "correct": true},
+          {"label": "돼지", "visual": "🐷"},
+          {"label": "병아리", "visual": "🐤"}
+        ]
+      }
+    ]
+  },
+  "extra010": {
+    "title": "과일 쌍둥이 찾기",
+    "icon": "🍎",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "기준 과일과 똑같은 그림을 골라요.",
+    "duration": "2분",
+    "preview": ["🍎", "🍌", "🍇"],
+    "skill": "동일 그림 찾기",
+    "insight": "색과 모양을 함께 보며 같은 과일을 찾아요.",
+    "offline": {
+      "title": "과일 짝꿍 장보기",
+      "text": "과일 그림을 두 장씩 준비해 같은 과일끼리 작은 바구니에 담아 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "기준 사과의 색과 꼭지를 봐요.",
+        "prompt": "빨간 사과와 똑같은 과일은 어디에 있을까?",
+        "speech": "같은 사과 그림을 찾아 보자.",
+        "success": "아삭아삭 사과 짝꿍을 찾았어!",
+        "scene": ["기준", "🍎"],
+        "options": [
+          {"label": "사과", "visual": "🍎", "correct": true},
+          {"label": "배", "visual": "🍐"},
+          {"label": "복숭아", "visual": "🍑"}
+        ]
+      },
+      {
+        "helper": "기준 바나나의 길쭉한 모습을 봐요.",
+        "prompt": "노란 바나나와 같은 그림을 골라 볼까?",
+        "speech": "똑같은 바나나를 골라 보자.",
+        "success": "길쭉한 바나나가 한 쌍이네!",
+        "scene": ["기준", "🍌"],
+        "options": [
+          {"label": "레몬", "visual": "🍋"},
+          {"label": "바나나", "visual": "🍌", "correct": true},
+          {"label": "파인애플", "visual": "🍍"}
+        ]
+      },
+      {
+        "helper": "기준 포도의 동글동글한 알을 봐요.",
+        "prompt": "포도송이와 정확히 같은 그림은 무엇일까?",
+        "speech": "같은 포도송이를 찾아 보자.",
+        "success": "동글동글 포도 쌍둥이야!",
+        "scene": ["기준", "🍇"],
+        "options": [
+          {"label": "딸기", "visual": "🍓"},
+          {"label": "체리", "visual": "🍒"},
+          {"label": "포도", "visual": "🍇", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra011": {
+    "title": "탈것 쌍둥이 찾기",
+    "icon": "🚗",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "같은 탈것 그림을 또렷하게 찾아요.",
+    "duration": "2분",
+    "preview": ["🚗", "🚌", "🚲"],
+    "skill": "동일 그림 찾기",
+    "insight": "탈것의 바퀴와 생김새를 비교해 짝을 찾아요.",
+    "offline": {
+      "title": "장난감 차 주차",
+      "text": "비슷한 장난감 탈것을 나란히 놓고 같은 종류끼리 주차해 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "기준 자동차의 모양을 자세히 봐요.",
+        "prompt": "기준 자동차와 똑같은 탈것은 어떤 그림일까?",
+        "speech": "같은 자동차를 찾아 보자.",
+        "success": "부릉부릉 자동차 쌍둥이야!",
+        "scene": ["기준", "🚗"],
+        "options": [
+          {"label": "버스", "visual": "🚌"},
+          {"label": "자동차", "visual": "🚗", "correct": true},
+          {"label": "트럭", "visual": "🚚"}
+        ]
+      },
+      {
+        "helper": "기준 버스의 큰 몸을 살펴봐요.",
+        "prompt": "노란 버스와 완전히 같은 그림을 골라 줄래?",
+        "speech": "똑같은 버스를 골라 보자.",
+        "success": "버스 두 대가 나란히 출발해!",
+        "scene": ["기준", "🚌"],
+        "options": [
+          {"label": "택시", "visual": "🚕"},
+          {"label": "버스", "visual": "🚌", "correct": true},
+          {"label": "기차", "visual": "🚆"}
+        ]
+      },
+      {
+        "helper": "기준 자전거의 두 바퀴를 봐요.",
+        "prompt": "두 바퀴 자전거의 쌍둥이는 어디에 있을까?",
+        "speech": "같은 자전거 그림을 찾아 보자.",
+        "success": "따르릉, 자전거 짝을 찾았네!",
+        "scene": ["기준", "🚲"],
+        "options": [
+          {"label": "오토바이", "visual": "🏍️"},
+          {"label": "킥보드", "visual": "🛴"},
+          {"label": "자전거", "visual": "🚲", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra012": {
+    "title": "큰 동물 척척",
+    "icon": "🐘",
+    "category": "look",
+    "cardColor": "purple",
+    "description": "두 동물의 실제 크기를 비교해요.",
+    "duration": "3분",
+    "preview": ["🐘", "🐭", "🦒"],
+    "skill": "크기 비교",
+    "insight": "차이가 뚜렷한 동물의 크기를 비교해요.",
+    "offline": {
+      "title": "큰 인형 먼저",
+      "text": "크기 차이가 큰 인형 두 개를 놓고 더 큰 인형을 먼저 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "코끼리와 생쥐의 실제 크기를 떠올려요.",
+        "prompt": "코끼리와 생쥐 중 더 큰 동물은 누구일까?",
+        "speech": "더 큰 동물을 골라 보자.",
+        "success": "맞아, 코끼리는 생쥐보다 훨씬 커!",
+        "scene": ["🐘", "🐭"],
+        "options": [
+          {"label": "코끼리", "visual": "🐘", "correct": true},
+          {"label": "생쥐", "visual": "🐭"},
+          {"label": "크기가 같아요", "visual": "〓"}
+        ]
+      },
+      {
+        "helper": "기린과 달팽이의 실제 크기를 생각해요.",
+        "prompt": "기린과 달팽이 가운데 더 큰 친구는 누구일까?",
+        "speech": "더 큰 친구를 찾아 보자.",
+        "success": "키가 큰 기린을 잘 골랐어!",
+        "scene": ["🦒", "🐌"],
+        "options": [
+          {"label": "달팽이", "visual": "🐌"},
+          {"label": "기린", "visual": "🦒", "correct": true},
+          {"label": "크기가 같아요", "visual": "〓"}
+        ]
+      },
+      {
+        "helper": "고래와 물고기의 실제 크기를 비교해요.",
+        "prompt": "고래와 작은 물고기 중 더 큰 쪽은 무엇일까?",
+        "speech": "더 큰 바다 친구를 골라 보자.",
+        "success": "커다란 고래를 정확히 찾았네!",
+        "scene": ["🐋", "🐟"],
+        "options": [
+          {"label": "작은 물고기", "visual": "🐟"},
+          {"label": "크기가 같아요", "visual": "〓"},
+          {"label": "고래", "visual": "🐋", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra013": {
+    "title": "작은 동물 콕콕",
+    "icon": "🐜",
+    "category": "look",
+    "cardColor": "mint",
+    "description": "두 동물 중 더 작은 친구를 찾아요.",
+    "duration": "3분",
+    "preview": ["🐜", "🐄", "🐞"],
+    "skill": "크기 비교",
+    "insight": "실제 크기가 뚜렷이 다른 동물을 비교해요.",
+    "offline": {
+      "title": "작은 블록 먼저",
+      "text": "큰 블록과 작은 블록을 한 개씩 놓고 작은 것을 바구니에 담아 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "개미와 소의 실제 크기를 떠올려요.",
+        "prompt": "개미와 소 중 더 작은 동물은 누구일까?",
+        "speech": "더 작은 동물을 골라 보자.",
+        "success": "작디작은 개미를 찾았어!",
+        "scene": ["🐜", "🐄"],
+        "options": [
+          {"label": "소", "visual": "🐄"},
+          {"label": "개미", "visual": "🐜", "correct": true},
+          {"label": "크기가 같아요", "visual": "〓"}
+        ]
+      },
+      {
+        "helper": "무당벌레와 말의 실제 크기를 비교해요.",
+        "prompt": "무당벌레와 말 가운데 더 작은 친구는 무엇일까?",
+        "speech": "더 작은 친구를 찾아 보자.",
+        "success": "조그만 무당벌레를 잘 골랐네!",
+        "scene": ["🐞", "🐴"],
+        "options": [
+          {"label": "크기가 같아요", "visual": "〓"},
+          {"label": "말", "visual": "🐴"},
+          {"label": "무당벌레", "visual": "🐞", "correct": true}
+        ]
+      },
+      {
+        "helper": "나비와 코끼리의 실제 크기를 생각해요.",
+        "prompt": "나비와 코끼리 중 더 작은 쪽을 골라볼까?",
+        "speech": "더 작은 동물을 톡 눌러 보자.",
+        "success": "가벼운 나비가 더 작아!",
+        "scene": ["🦋", "🐘"],
+        "options": [
+          {"label": "나비", "visual": "🦋", "correct": true},
+          {"label": "코끼리", "visual": "🐘"},
+          {"label": "크기가 같아요", "visual": "〓"}
+        ]
+      }
+    ]
+  },
+  "extra014": {
+    "title": "큰 모양 작은 모양",
+    "icon": "⚫",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "같은 모양의 크기를 눈으로 비교해요.",
+    "duration": "3분",
+    "preview": ["📏", "⚫", "⚪"],
+    "skill": "시각적 크기 비교",
+    "insight": "같은 모양 안에서 크기 차이를 구별해요.",
+    "offline": {
+      "title": "종이 동그라미 비교",
+      "text": "큰 컵과 작은 컵을 대고 동그라미를 그린 뒤 더 큰 동그라미를 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "동그라미 세 개의 넓이를 비교해요.",
+        "prompt": "세 동그라미 중 가장 큰 동그라미는 무엇일까?",
+        "speech": "가장 큰 동그라미를 골라 보자.",
+        "success": "커다란 동그라미를 한눈에 찾았어!",
+        "options": [
+          {"label": "작은 동그라미", "visual": "•"},
+          {"label": "큰 동그라미", "visual": "⬤", "correct": true},
+          {"label": "중간 동그라미", "visual": "●"}
+        ]
+      },
+      {
+        "helper": "세모 세 개의 크기를 천천히 봐요.",
+        "prompt": "세 세모 가운데 가장 작은 세모는 어디에 있을까?",
+        "speech": "가장 작은 세모를 찾아 보자.",
+        "success": "조그만 세모를 정확히 골랐네!",
+        "options": [
+          {"label": "큰 세모", "visual": "▲", "subtitle": "큼"},
+          {"label": "작은 세모", "visual": "▴", "subtitle": "작음", "correct": true},
+          {"label": "중간 세모", "visual": "▲", "subtitle": "중간"}
+        ]
+      },
+      {
+        "helper": "네모의 크기만 비교하면 돼요.",
+        "prompt": "큰 네모라고 적힌 모양을 골라 줄래?",
+        "speech": "큰 네모를 톡 눌러 보자.",
+        "success": "반듯하고 커다란 네모야!",
+        "options": [
+          {"label": "중간 네모", "visual": "■", "subtitle": "중간"},
+          {"label": "큰 네모", "visual": "⬛", "subtitle": "큼", "correct": true},
+          {"label": "작은 네모", "visual": "▪", "subtitle": "작음"}
+        ]
+      }
+    ]
+  },
+  "extra015": {
+    "title": "작게 크게 차례차례",
+    "icon": "📏",
+    "category": "look",
+    "cardColor": "pink",
+    "description": "작은 모양과 큰 모양의 방향을 살펴요.",
+    "duration": "3분",
+    "preview": ["🐭", "➡️", "🐘"],
+    "skill": "크기 순서",
+    "insight": "두 크기의 앞뒤 순서를 시각적으로 구별해요.",
+    "offline": {
+      "title": "컵 크기 줄 세우기",
+      "text": "작은 컵과 큰 컵을 놓고 ‘작은 것 먼저, 큰 것 다음’으로 줄 세워 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "왼쪽에서 오른쪽으로 천천히 봐요.",
+        "prompt": "작은 동그라미 다음에 큰 동그라미가 오는 줄은 무엇일까?",
+        "speech": "작은 것, 큰 것 순서를 골라 보자.",
+        "success": "작게 시작해서 크게 끝났어!",
+        "options": [
+          {"label": "작은 것 다음 큰 것", "visual": "• → ●", "correct": true},
+          {"label": "큰 것 다음 작은 것", "visual": "● → •"},
+          {"label": "큰 것 두 개", "visual": "● → ●"}
+        ]
+      },
+      {
+        "helper": "네모 두 개의 크기와 순서를 함께 봐요.",
+        "prompt": "큰 네모 다음에 작은 네모가 놓인 줄을 찾아볼까?",
+        "speech": "큰 것, 작은 것 순서를 찾아 보자.",
+        "success": "큰 네모 뒤에 작은 네모가 왔네!",
+        "options": [
+          {"label": "작은 것 다음 큰 것", "visual": "▪ → ■"},
+          {"label": "큰 것 다음 작은 것", "visual": "■ → ▪", "correct": true},
+          {"label": "작은 것 두 개", "visual": "▪ → ▪"}
+        ]
+      },
+      {
+        "helper": "세모의 크기가 같은지도 확인해요.",
+        "prompt": "작은 세모 뒤에 큰 세모가 선 그림은 어디일까?",
+        "speech": "작은 세모, 큰 세모 순서를 골라 보자.",
+        "success": "세모의 크기 순서도 척척이야!",
+        "options": [
+          {"label": "큰 세모 다음 작은 세모", "visual": "▲ → ▴"},
+          {"label": "작은 세모 두 개", "visual": "▴ → ▴"},
+          {"label": "작은 세모 다음 큰 세모", "visual": "▴ → ▲", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra016": {
+    "title": "하나만 쏙",
+    "icon": "1️⃣",
+    "category": "number",
+    "cardColor": "coral",
+    "description": "물건 한 개를 알아보고 숫자 1과 만나요.",
+    "duration": "2분",
+    "preview": ["🍎", "1️⃣", "⭐"],
+    "skill": "수량 1",
+    "insight": "한 개의 수량과 숫자 1을 연결해요.",
+    "offline": {
+      "title": "한 개 배달",
+      "text": "아이에게 블록 한 개, 숟가락 한 개처럼 한 번에 하나씩 가져다 달라고 해 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "사과를 손가락으로 하나씩 짚어 봐요.",
+        "prompt": "사과가 한 개 있는 그림은 무엇일까?",
+        "speech": "사과 한 개를 찾아 보자.",
+        "success": "사과 하나, 숫자 1이야!",
+        "options": [
+          {"label": "사과 두 개", "visual": "🍎 🍎"},
+          {"label": "사과 한 개", "visual": "🍎", "correct": true},
+          {"label": "사과 세 개", "visual": "🍎 🍎 🍎"}
+        ]
+      },
+      {
+        "helper": "별이 몇 개인지 천천히 세어 봐요.",
+        "prompt": "별 한 개를 보여 주는 카드를 골라 줄래?",
+        "speech": "별이 하나인 카드를 골라 보자.",
+        "success": "반짝이는 별이 딱 하나야!",
+        "options": [
+          {"label": "별 세 개", "visual": "⭐ ⭐ ⭐"},
+          {"label": "별 두 개", "visual": "⭐ ⭐"},
+          {"label": "별 한 개", "visual": "⭐", "correct": true}
+        ]
+      },
+      {
+        "helper": "숫자 모양을 또렷이 살펴봐요.",
+        "prompt": "한 개를 뜻하는 숫자 1은 어디에 있을까?",
+        "speech": "숫자 1을 찾아 보자.",
+        "success": "하나를 나타내는 숫자 1을 찾았어!",
+        "options": [
+          {"label": "숫자 2", "visual": "2"},
+          {"label": "숫자 1", "visual": "1", "correct": true},
+          {"label": "숫자 3", "visual": "3"}
+        ]
+      }
+    ]
+  },
+  "extra017": {
+    "title": "둘 셋 손가락 세기",
+    "icon": "2️⃣",
+    "category": "number",
+    "cardColor": "blue",
+    "description": "두 개와 세 개를 천천히 세어봐요.",
+    "duration": "3분",
+    "preview": ["🍓", "🍓", "3️⃣"],
+    "skill": "수량 2와 3",
+    "insight": "2와 3의 수량을 세어 구별해요.",
+    "offline": {
+      "title": "두 개 세 개 접시",
+      "text": "접시 두 장에 간식을 두 개와 세 개씩 놓고 함께 세어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "딸기를 손가락으로 톡톡 짚어 봐요.",
+        "prompt": "딸기가 두 개 있는 접시는 어디일까?",
+        "speech": "딸기 둘을 찾아 보자.",
+        "success": "하나, 둘! 딸기가 두 개야!",
+        "options": [
+          {"label": "딸기 한 개", "visual": "🍓"},
+          {"label": "딸기 세 개", "visual": "🍓 🍓 🍓"},
+          {"label": "딸기 두 개", "visual": "🍓 🍓", "correct": true}
+        ]
+      },
+      {
+        "helper": "오리를 왼쪽부터 한 마리씩 세어요.",
+        "prompt": "오리가 세 마리 모인 그림을 찾아볼까?",
+        "speech": "오리 세 마리를 골라 보자.",
+        "success": "하나, 둘, 셋! 오리 세 마리야!",
+        "options": [
+          {"label": "오리 세 마리", "visual": "🦆 🦆 🦆", "correct": true},
+          {"label": "오리 한 마리", "visual": "🦆"},
+          {"label": "오리 두 마리", "visual": "🦆 🦆"}
+        ]
+      },
+      {
+        "helper": "공 세 개를 하나씩 짚어 세어 봐요.",
+        "prompt": "공이 세 개일 때 맞는 숫자는 무엇일까?",
+        "speech": "공 세 개와 숫자를 연결해 보자.",
+        "success": "공 셋은 숫자 3과 짝꿍이야!",
+        "scene": ["⚽", "⚽", "⚽"],
+        "options": [
+          {"label": "숫자 2", "visual": "2"},
+          {"label": "숫자 3", "visual": "3", "correct": true},
+          {"label": "숫자 4", "visual": "4"}
+        ]
+      }
+    ]
+  },
+  "extra018": {
+    "title": "넷까지 차근차근",
+    "icon": "4️⃣",
+    "category": "number",
+    "cardColor": "yellow",
+    "description": "네 개를 빠뜨리지 않고 세어봐요.",
+    "duration": "3분",
+    "preview": ["🐟", "🐟", "4️⃣"],
+    "skill": "수량 4",
+    "insight": "네 개의 수량과 숫자 4를 연결해요.",
+    "offline": {
+      "title": "네 칸 주차장",
+      "text": "종이에 네 칸을 그리고 장난감 자동차 네 대를 한 칸에 한 대씩 놓아 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "물고기를 왼쪽부터 천천히 세어요.",
+        "prompt": "물고기가 네 마리인 바다는 어느 그림일까?",
+        "speech": "물고기 네 마리를 찾아 보자.",
+        "success": "하나, 둘, 셋, 넷! 모두 네 마리야!",
+        "options": [
+          {"label": "물고기 세 마리", "visual": "🐟 🐟 🐟"},
+          {"label": "물고기 네 마리", "visual": "🐟 🐟 🐟 🐟", "correct": true},
+          {"label": "물고기 두 마리", "visual": "🐟 🐟"}
+        ]
+      },
+      {
+        "helper": "꽃을 한 송이씩 손가락으로 짚어요.",
+        "prompt": "꽃 네 송이가 핀 화단을 골라 줄래?",
+        "speech": "꽃 네 송이를 골라 보자.",
+        "success": "예쁜 꽃을 네 송이 모두 셌어!",
+        "options": [
+          {"label": "꽃 두 송이", "visual": "🌼 🌼"},
+          {"label": "꽃 세 송이", "visual": "🌼 🌼 🌼"},
+          {"label": "꽃 네 송이", "visual": "🌼 🌼 🌼 🌼", "correct": true}
+        ]
+      },
+      {
+        "helper": "별 네 개와 어울리는 숫자를 생각해요.",
+        "prompt": "별 네 개를 나타내는 숫자는 무엇일까?",
+        "speech": "네 개를 나타내는 숫자를 찾아 보자.",
+        "success": "숫자 4가 별 네 개와 만났네!",
+        "scene": ["⭐", "⭐", "⭐", "⭐"],
+        "options": [
+          {"label": "숫자 3", "visual": "3"},
+          {"label": "숫자 5", "visual": "5"},
+          {"label": "숫자 4", "visual": "4", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra019": {
+    "title": "다섯 별 반짝",
+    "icon": "5️⃣",
+    "category": "number",
+    "cardColor": "purple",
+    "description": "다섯 개까지 하나씩 세어봐요.",
+    "duration": "3분",
+    "preview": ["⭐", "⭐", "5️⃣"],
+    "skill": "수량 5",
+    "insight": "다섯 개의 수량과 숫자 5를 연결해요.",
+    "offline": {
+      "title": "손가락 다섯",
+      "text": "한 손을 활짝 펴고 손가락을 엄지부터 하나씩 다섯까지 세어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "별을 왼쪽부터 한 개씩 짚어요.",
+        "prompt": "별이 다섯 개 반짝이는 카드는 어디일까?",
+        "speech": "별 다섯 개를 찾아 보자.",
+        "success": "하나, 둘, 셋, 넷, 다섯! 모두 찾았어!",
+        "options": [
+          {"label": "별 네 개", "visual": "⭐ ⭐ ⭐ ⭐"},
+          {"label": "별 다섯 개", "visual": "⭐ ⭐ ⭐ ⭐ ⭐", "correct": true},
+          {"label": "별 세 개", "visual": "⭐ ⭐ ⭐"}
+        ]
+      },
+      {
+        "helper": "블록을 빠뜨리지 않게 차례로 세어요.",
+        "prompt": "블록 다섯 개가 놓인 줄을 골라볼까?",
+        "speech": "블록이 다섯 개인 줄을 찾아 보자.",
+        "success": "블록을 다섯 개까지 차근차근 셌네!",
+        "options": [
+          {"label": "블록 다섯 개", "visual": "🧱 🧱 🧱 🧱 🧱", "correct": true},
+          {"label": "블록 세 개", "visual": "🧱 🧱 🧱"},
+          {"label": "블록 네 개", "visual": "🧱 🧱 🧱 🧱"}
+        ]
+      },
+      {
+        "helper": "사과 다섯 개와 맞는 숫자를 골라요.",
+        "prompt": "사과 다섯 개를 뜻하는 숫자는 어느 것일까?",
+        "speech": "다섯을 나타내는 숫자를 골라 보자.",
+        "success": "숫자 5와 사과 다섯 개가 짝이야!",
+        "scene": ["🍎", "🍎", "🍎", "🍎", "🍎"],
+        "options": [
+          {"label": "숫자 5", "visual": "5", "correct": true},
+          {"label": "숫자 4", "visual": "4"},
+          {"label": "숫자 3", "visual": "3"}
+        ]
+      }
+    ]
+  },
+  "extra020": {
+    "title": "숫자랑 양이랑",
+    "icon": "🔢",
+    "category": "number",
+    "cardColor": "mint",
+    "description": "그림의 수량과 맞는 숫자를 연결해요.",
+    "duration": "3분",
+    "preview": ["2️⃣", "🍊", "🍊"],
+    "skill": "수량-숫자 연결",
+    "insight": "1부터 5까지 수량을 숫자 기호와 짝지어요.",
+    "offline": {
+      "title": "숫자 쪽지 놓기",
+      "text": "블록 한 개부터 다섯 개까지 모아 놓고 맞는 숫자 쪽지를 옆에 놓아 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "귤을 하나씩 짚어 몇 개인지 세어요.",
+        "prompt": "귤 두 개와 짝이 되는 숫자는 무엇일까?",
+        "speech": "귤 둘과 맞는 숫자를 골라 보자.",
+        "success": "귤 둘은 숫자 2와 짝꿍이야!",
+        "scene": ["🍊", "🍊"],
+        "options": [
+          {"label": "숫자 1", "visual": "1"},
+          {"label": "숫자 2", "visual": "2", "correct": true},
+          {"label": "숫자 3", "visual": "3"}
+        ]
+      },
+      {
+        "helper": "자동차를 왼쪽부터 한 대씩 세어요.",
+        "prompt": "자동차 세 대를 나타내는 숫자를 찾아줄래?",
+        "speech": "자동차 셋과 맞는 숫자를 찾아 보자.",
+        "success": "자동차 세 대는 숫자 3이야!",
+        "scene": ["🚗", "🚗", "🚗"],
+        "options": [
+          {"label": "숫자 4", "visual": "4"},
+          {"label": "숫자 2", "visual": "2"},
+          {"label": "숫자 3", "visual": "3", "correct": true}
+        ]
+      },
+      {
+        "helper": "나비를 한 마리씩 천천히 세어요.",
+        "prompt": "나비 네 마리와 맞는 숫자는 어느 것일까?",
+        "speech": "나비 넷과 짝인 숫자를 골라 보자.",
+        "success": "숫자 4를 수량과 잘 연결했어!",
+        "scene": ["🦋", "🦋", "🦋", "🦋"],
+        "options": [
+          {"label": "숫자 3", "visual": "3"},
+          {"label": "숫자 4", "visual": "4", "correct": true},
+          {"label": "숫자 5", "visual": "5"}
+        ]
+      }
+    ]
+  },
+  "extra021": {
+    "title": "더 많은 과일 바구니",
+    "icon": "🧺",
+    "category": "number",
+    "cardColor": "coral",
+    "description": "두 무리 중 더 많은 쪽을 찾아요.",
+    "duration": "3분",
+    "preview": ["🍎", "🍎", "🍎"],
+    "skill": "많고 적음",
+    "insight": "1부터 5까지의 수량을 비교해 더 많은 무리를 골라요.",
+    "offline": {
+      "title": "간식 더 많은 접시",
+      "text": "두 접시에 간식을 한 개와 세 개 놓고 어느 쪽이 더 많은지 물어보세요."
+    },
+    "rounds": [
+      {
+        "helper": "각 바구니의 사과를 따로 세어 봐요.",
+        "prompt": "사과가 더 많은 바구니는 어느 쪽일까?",
+        "speech": "사과가 더 많은 바구니를 골라 보자.",
+        "success": "사과 세 개가 한 개보다 더 많아!",
+        "options": [
+          {"label": "사과 한 개", "visual": "🍎"},
+          {"label": "사과 세 개", "visual": "🍎 🍎 🍎", "correct": true},
+          {"label": "사과 두 개", "visual": "🍎 🍎"}
+        ]
+      },
+      {
+        "helper": "바나나를 줄마다 하나씩 세어요.",
+        "prompt": "바나나가 가장 많이 놓인 줄을 찾아볼까?",
+        "speech": "바나나가 가장 많은 줄을 찾아 보자.",
+        "success": "바나나 네 개가 가장 많네!",
+        "options": [
+          {"label": "바나나 두 개", "visual": "🍌 🍌"},
+          {"label": "바나나 네 개", "visual": "🍌 🍌 🍌 🍌", "correct": true},
+          {"label": "바나나 세 개", "visual": "🍌 🍌 🍌"}
+        ]
+      },
+      {
+        "helper": "딸기 무리를 하나씩 비교해요.",
+        "prompt": "딸기가 가장 많은 접시는 몇 개짜리일까?",
+        "speech": "딸기가 가장 많은 접시를 골라 보자.",
+        "success": "다섯 개 접시에 딸기가 가장 많아!",
+        "options": [
+          {"label": "딸기 다섯 개", "visual": "🍓 🍓 🍓 🍓 🍓", "correct": true},
+          {"label": "딸기 세 개", "visual": "🍓 🍓 🍓"},
+          {"label": "딸기 네 개", "visual": "🍓 🍓 🍓 🍓"}
+        ]
+      }
+    ]
+  },
+  "extra022": {
+    "title": "더 적은 간식 접시",
+    "icon": "🍪",
+    "category": "number",
+    "cardColor": "yellow",
+    "description": "두 무리 중 더 적은 쪽을 찾아요.",
+    "duration": "3분",
+    "preview": ["🍪", "🍪", "🥨"],
+    "skill": "많고 적음",
+    "insight": "작은 수량끼리 비교해 더 적은 무리를 골라요.",
+    "offline": {
+      "title": "더 적은 블록 찾기",
+      "text": "블록 두 개와 네 개를 나눠 놓고 더 적은 쪽을 손으로 가리켜 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "쿠키를 접시마다 따로 세어 봐요.",
+        "prompt": "쿠키가 더 적은 접시는 어디에 있을까?",
+        "speech": "쿠키가 더 적은 접시를 골라 보자.",
+        "success": "쿠키 한 개가 두 개보다 더 적어!",
+        "options": [
+          {"label": "쿠키 두 개", "visual": "🍪 🍪"},
+          {"label": "쿠키 한 개", "visual": "🍪", "correct": true},
+          {"label": "쿠키 세 개", "visual": "🍪 🍪 🍪"}
+        ]
+      },
+      {
+        "helper": "도넛 줄을 하나씩 세어 비교해요.",
+        "prompt": "도넛이 가장 적게 놓인 줄은 무엇일까?",
+        "speech": "도넛이 가장 적은 줄을 찾아 보자.",
+        "success": "도넛 두 개가 가장 적구나!",
+        "options": [
+          {"label": "도넛 네 개", "visual": "🍩 🍩 🍩 🍩"},
+          {"label": "도넛 세 개", "visual": "🍩 🍩 🍩"},
+          {"label": "도넛 두 개", "visual": "🍩 🍩", "correct": true}
+        ]
+      },
+      {
+        "helper": "프레첼 수를 차례로 세어 봐요.",
+        "prompt": "프레첼이 가장 적은 카드를 골라 줄래?",
+        "speech": "프레첼이 가장 적은 카드를 골라 보자.",
+        "success": "세 개가 네 개와 다섯 개보다 적어!",
+        "options": [
+          {"label": "프레첼 다섯 개", "visual": "🥨 🥨 🥨 🥨 🥨"},
+          {"label": "프레첼 세 개", "visual": "🥨 🥨 🥨", "correct": true},
+          {"label": "프레첼 네 개", "visual": "🥨 🥨 🥨 🥨"}
+        ]
+      }
+    ]
+  },
+  "extra023": {
+    "title": "많을까 적을까 같을까",
+    "icon": "⚖️",
+    "category": "number",
+    "cardColor": "blue",
+    "description": "두 무리의 수를 세고 관계를 말해요.",
+    "duration": "3분",
+    "preview": ["⭐", "⚖️", "⭐"],
+    "skill": "수량 관계",
+    "insight": "두 수량을 비교해 더 많음, 더 적음, 같음을 구별해요.",
+    "offline": {
+      "title": "두 줄 비교하기",
+      "text": "단추를 두 줄로 놓고 어느 줄이 더 많은지, 적은지, 같은지 함께 말해 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "왼쪽 별 셋과 오른쪽 별 하나를 세어 봐요.",
+        "prompt": "왼쪽 별 세 개는 오른쪽 별 한 개보다 어떨까?",
+        "speech": "왼쪽이 더 많은지 골라 보자.",
+        "success": "셋은 하나보다 더 많아!",
+        "scene": ["왼쪽 ⭐ ⭐ ⭐", "오른쪽 ⭐"],
+        "options": [
+          {"label": "왼쪽이 더 많아요", "visual": "더 많음", "correct": true},
+          {"label": "왼쪽이 더 적어요", "visual": "더 적음"},
+          {"label": "두 쪽이 같아요", "visual": "같음"}
+        ]
+      },
+      {
+        "helper": "왼쪽 공 둘과 오른쪽 공 넷을 따로 세어요.",
+        "prompt": "왼쪽 공 두 개는 오른쪽 공 네 개보다 어떨까?",
+        "speech": "왼쪽 수량의 관계를 골라 보자.",
+        "success": "둘은 넷보다 더 적어!",
+        "scene": ["왼쪽 ⚽ ⚽", "오른쪽 ⚽ ⚽ ⚽ ⚽"],
+        "options": [
+          {"label": "왼쪽이 더 많아요", "visual": "더 많음"},
+          {"label": "두 쪽이 같아요", "visual": "같음"},
+          {"label": "왼쪽이 더 적어요", "visual": "더 적음", "correct": true}
+        ]
+      },
+      {
+        "helper": "양쪽 하트를 두 개씩 세어 확인해요.",
+        "prompt": "왼쪽 하트 둘과 오른쪽 하트 둘의 수는 어떨까?",
+        "speech": "두 쪽의 수가 같은지 골라 보자.",
+        "success": "둘과 둘, 두 쪽의 수가 같아!",
+        "scene": ["왼쪽 ❤️ ❤️", "오른쪽 💙 💙"],
+        "options": [
+          {"label": "왼쪽이 더 적어요", "visual": "더 적음"},
+          {"label": "두 쪽이 같아요", "visual": "같음", "correct": true},
+          {"label": "왼쪽이 더 많아요", "visual": "더 많음"}
+        ]
+      }
+    ]
+  },
+  "extra024": {
+    "title": "과일 퐁당 패턴",
+    "icon": "🍎",
+    "category": "number",
+    "cardColor": "pink",
+    "description": "두 과일이 번갈아 오는 규칙을 찾아요.",
+    "duration": "3분",
+    "preview": ["🍎", "🍌", "🍎"],
+    "skill": "AB 패턴",
+    "insight": "A-B-A-B로 반복되는 과일 순서를 예측해요.",
+    "offline": {
+      "title": "과일 그림 줄 잇기",
+      "text": "사과와 바나나 그림을 번갈아 놓고 다음에 올 과일을 아이가 골라보게 하세요."
+    },
+    "rounds": [
+      {
+        "helper": "사과, 바나나가 번갈아 와요.",
+        "prompt": "사과, 바나나, 사과, 바나나 다음에는 무엇이 올까?",
+        "speech": "번갈아 오는 다음 과일을 찾아 보자.",
+        "success": "다시 사과가 올 차례야!",
+        "scene": ["🍎", "🍌", "🍎", "🍌", "❓"],
+        "options": [
+          {"label": "포도", "visual": "🍇"},
+          {"label": "사과", "visual": "🍎", "correct": true},
+          {"label": "바나나", "visual": "🍌"}
+        ]
+      },
+      {
+        "helper": "딸기와 포도가 한 번씩 번갈아 와요.",
+        "prompt": "딸기, 포도, 딸기 다음 빈자리에 어떤 과일이 올까?",
+        "speech": "딸기 다음 차례를 골라 보자.",
+        "success": "딸기 다음은 포도, 규칙을 찾았어!",
+        "scene": ["🍓", "🍇", "🍓", "❓"],
+        "options": [
+          {"label": "포도", "visual": "🍇", "correct": true},
+          {"label": "딸기", "visual": "🍓"},
+          {"label": "복숭아", "visual": "🍑"}
+        ]
+      },
+      {
+        "helper": "오렌지와 배가 차례차례 반복돼요.",
+        "prompt": "오렌지, 배, 오렌지, 배 다음 과일을 찾아줄래?",
+        "speech": "다음에 올 과일을 골라 보자.",
+        "success": "오렌지가 다시 올 차례네!",
+        "scene": ["🍊", "🍐", "🍊", "🍐", "❓"],
+        "options": [
+          {"label": "배", "visual": "🍐"},
+          {"label": "레몬", "visual": "🍋"},
+          {"label": "오렌지", "visual": "🍊", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra025": {
+    "title": "모양 번갈아 기차",
+    "icon": "🚂",
+    "category": "number",
+    "cardColor": "purple",
+    "description": "두 모양이 번갈아 놓이는 규칙을 찾아요.",
+    "duration": "3분",
+    "preview": ["⚪", "🔺", "⚪"],
+    "skill": "AB 패턴",
+    "insight": "모양의 반복 순서를 보고 다음 모양을 예측해요.",
+    "offline": {
+      "title": "블록 패턴 기차",
+      "text": "둥근 블록과 네모 블록을 번갈아 놓고 다음 칸을 아이가 이어 보게 하세요."
+    },
+    "rounds": [
+      {
+        "helper": "동그라미와 세모가 번갈아 달려요.",
+        "prompt": "동그라미, 세모, 동그라미 다음 기차 칸은 무슨 모양일까?",
+        "speech": "다음 모양을 찾아 보자.",
+        "success": "동그라미 다음은 세모야!",
+        "scene": ["⚪", "🔺", "⚪", "❓"],
+        "options": [
+          {"label": "네모", "visual": "🟦"},
+          {"label": "세모", "visual": "🔺", "correct": true},
+          {"label": "동그라미", "visual": "⚪"}
+        ]
+      },
+      {
+        "helper": "네모와 동그라미가 한 번씩 반복돼요.",
+        "prompt": "네모, 동그라미, 네모, 동그라미 다음 모양은 무엇일까?",
+        "speech": "반복 규칙의 다음 모양을 골라 보자.",
+        "success": "다시 네모가 올 차례야!",
+        "scene": ["🟩", "⚪", "🟩", "⚪", "❓"],
+        "options": [
+          {"label": "동그라미", "visual": "⚪"},
+          {"label": "세모", "visual": "🔺"},
+          {"label": "네모", "visual": "🟩", "correct": true}
+        ]
+      },
+      {
+        "helper": "세모와 네모가 번갈아 나타나요.",
+        "prompt": "세모, 네모, 세모 뒤 빈칸에는 어떤 모양이 들어갈까?",
+        "speech": "세모 다음 차례를 찾아 보자.",
+        "success": "세모 뒤에는 네모가 와!",
+        "scene": ["🔺", "🟦", "🔺", "❓"],
+        "options": [
+          {"label": "네모", "visual": "🟦", "correct": true},
+          {"label": "동그라미", "visual": "⚪"},
+          {"label": "세모", "visual": "🔺"}
+        ]
+      }
+    ]
+  },
+  "extra026": {
+    "title": "색깔 차례 구슬",
+    "icon": "📿",
+    "category": "number",
+    "cardColor": "mint",
+    "description": "두 색 구슬의 반복 규칙을 이어요.",
+    "duration": "3분",
+    "preview": ["🔴", "🔵", "🔴"],
+    "skill": "AB 패턴",
+    "insight": "색이 번갈아 반복되는 순서를 예측해요.",
+    "offline": {
+      "title": "색 뚜껑 목걸이",
+      "text": "빨간 뚜껑과 파란 뚜껑을 번갈아 놓으며 같은 규칙을 이어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "빨강과 파랑이 한 번씩 번갈아 와요.",
+        "prompt": "빨강, 파랑, 빨강, 파랑 다음 구슬 색은 무엇일까?",
+        "speech": "다음 구슬 색을 골라 보자.",
+        "success": "빨강 구슬이 다시 올 차례야!",
+        "scene": ["🔴", "🔵", "🔴", "🔵", "❓"],
+        "options": [
+          {"label": "파란 구슬", "visual": "🔵"},
+          {"label": "초록 구슬", "visual": "🟢"},
+          {"label": "빨간 구슬", "visual": "🔴", "correct": true}
+        ]
+      },
+      {
+        "helper": "노랑과 초록이 차례차례 반복돼요.",
+        "prompt": "노랑, 초록, 노랑 뒤에는 무슨 색 구슬이 올까?",
+        "speech": "노랑 다음 구슬 색을 찾아 보자.",
+        "success": "노랑 뒤에는 초록이 와!",
+        "scene": ["🟡", "🟢", "🟡", "❓"],
+        "options": [
+          {"label": "빨간 구슬", "visual": "🔴"},
+          {"label": "초록 구슬", "visual": "🟢", "correct": true},
+          {"label": "노란 구슬", "visual": "🟡"}
+        ]
+      },
+      {
+        "helper": "보라와 주황이 번갈아 이어져요.",
+        "prompt": "보라, 주황, 보라, 주황 다음에는 어떤 색이 올까?",
+        "speech": "반복되는 다음 색을 골라 보자.",
+        "success": "보라색 차례를 정확히 찾았어!",
+        "scene": ["🟣", "🟠", "🟣", "🟠", "❓"],
+        "options": [
+          {"label": "보라 구슬", "visual": "🟣", "correct": true},
+          {"label": "주황 구슬", "visual": "🟠"},
+          {"label": "파란 구슬", "visual": "🔵"}
+        ]
+      }
+    ]
+  },
+  "extra027": {
+    "title": "위 아래 공 놀이터",
+    "icon": "↕️",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "물건의 위와 아래 위치를 알아봐요.",
+    "duration": "3분",
+    "preview": ["⚽", "⬆️", "📦"],
+    "skill": "위치 개념",
+    "insight": "기준 물건을 중심으로 위와 아래를 구별해요.",
+    "offline": {
+      "title": "의자 위 아래",
+      "text": "공을 의자 위와 아래에 번갈아 놓고 아이가 위치를 말해 보게 하세요."
+    },
+    "rounds": [
+      {
+        "helper": "상자를 기준으로 공의 자리를 봐요.",
+        "prompt": "상자 위에 공이 있는 그림은 어느 것일까?",
+        "speech": "공이 상자 위에 있는 그림을 골라 보자.",
+        "success": "공이 상자보다 위에 있네!",
+        "options": [
+          {"label": "상자 위의 공", "visual": "⚽\n📦", "correct": true},
+          {"label": "상자 아래의 공", "visual": "📦\n⚽"},
+          {"label": "상자 옆의 공", "visual": "📦 ⚽"}
+        ]
+      },
+      {
+        "helper": "탁자를 기준으로 고양이의 자리를 살펴봐요.",
+        "prompt": "탁자 아래에 고양이가 있는 그림을 찾아줄래?",
+        "speech": "고양이가 탁자 아래에 있는 그림을 찾아 보자.",
+        "success": "고양이가 탁자 아래에 쏙 들어갔어!",
+        "options": [
+          {"label": "탁자 옆의 고양이", "visual": "🪑 🐱"},
+          {"label": "탁자 아래의 고양이", "visual": "🪑\n🐱", "correct": true},
+          {"label": "탁자 위의 고양이", "visual": "🐱\n🪑"}
+        ]
+      },
+      {
+        "helper": "구름을 기준으로 해의 위치를 생각해요.",
+        "prompt": "해가 구름 위에 있는 그림을 골라볼까?",
+        "speech": "해가 구름 위에 있는 그림을 골라 보자.",
+        "success": "해가 구름 위에서 반짝여!",
+        "options": [
+          {"label": "구름 아래의 해", "visual": "☁️\n☀️"},
+          {"label": "구름 옆의 해", "visual": "☁️ ☀️"},
+          {"label": "구름 위의 해", "visual": "☀️\n☁️", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra028": {
+    "title": "안에 쏙 밖에 톡",
+    "icon": "📦",
+    "category": "look",
+    "cardColor": "coral",
+    "description": "상자 안과 밖의 위치를 구별해요.",
+    "duration": "3분",
+    "preview": ["📦", "🧸", "⚽"],
+    "skill": "위치 개념",
+    "insight": "공간의 안과 밖 관계를 말과 그림으로 연결해요.",
+    "offline": {
+      "title": "상자 안팎 놀이",
+      "text": "인형을 상자 안과 밖에 번갈아 두며 ‘안’, ‘밖’을 함께 말해 주세요."
+    },
+    "rounds": [
+      {
+        "helper": "곰 인형이 상자 테두리 안에 있는지 봐요.",
+        "prompt": "곰 인형이 상자 안에 쏙 들어간 그림은 무엇일까?",
+        "speech": "곰 인형이 상자 안에 있는 그림을 골라 보자.",
+        "success": "곰 인형이 상자 안에 쏙!",
+        "options": [
+          {"label": "상자 밖의 곰", "visual": "📦 🧸"},
+          {"label": "상자 안의 곰", "visual": "📦(🧸)", "correct": true},
+          {"label": "상자 위의 곰", "visual": "🧸\n📦"}
+        ]
+      },
+      {
+        "helper": "공이 바구니 안인지 밖인지 확인해요.",
+        "prompt": "공이 바구니 밖에 놓인 그림을 찾아볼까?",
+        "speech": "공이 바구니 밖에 있는 그림을 찾아 보자.",
+        "success": "공이 바구니 바깥에 있네!",
+        "options": [
+          {"label": "바구니 안의 공", "visual": "🧺(⚽)"},
+          {"label": "바구니 위의 공", "visual": "⚽\n🧺"},
+          {"label": "바구니 밖의 공", "visual": "🧺 ⚽", "correct": true}
+        ]
+      },
+      {
+        "helper": "사과가 그릇 테두리 안쪽에 있는지 봐요.",
+        "prompt": "사과가 그릇 안에 담긴 그림은 어느 것일까?",
+        "speech": "사과가 그릇 안에 있는 그림을 골라 보자.",
+        "success": "사과가 그릇 안에 잘 담겼어!",
+        "options": [
+          {"label": "그릇 옆의 사과", "visual": "🥣 🍎"},
+          {"label": "그릇 안의 사과", "visual": "🥣(🍎)", "correct": true},
+          {"label": "그릇 아래의 사과", "visual": "🥣\n🍎"}
+        ]
+      }
+    ]
+  },
+  "extra029": {
+    "title": "같은 무리 바구니",
+    "icon": "🧺",
+    "category": "look",
+    "cardColor": "mint",
+    "description": "같은 특징을 가진 그림끼리 모아요.",
+    "duration": "3분",
+    "preview": ["🍎", "🍌", "🍇"],
+    "skill": "분류",
+    "insight": "종류, 모양, 색이라는 한 가지 기준으로 분류해요.",
+    "offline": {
+      "title": "집게와 블록 나누기",
+      "text": "안전한 빨래집게와 블록을 섞어 놓고 같은 종류끼리 두 그릇에 나눠 담아 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "세 그림이 모두 과일인지 확인해요.",
+        "prompt": "과일끼리만 모인 바구니는 어느 것일까?",
+        "speech": "모두 과일인 바구니를 골라 보자.",
+        "success": "사과, 바나나, 포도는 모두 과일이야!",
+        "options": [
+          {"label": "과일 바구니", "visual": "🍎 🍌 🍇", "correct": true},
+          {"label": "섞인 바구니", "visual": "🍎 🚗 🍇"},
+          {"label": "동물 바구니", "visual": "🐶 🐰 🐸"}
+        ]
+      },
+      {
+        "helper": "세 모양의 바깥선이 모두 둥근지 봐요.",
+        "prompt": "동그라미 모양끼리만 모인 줄을 찾아줄래?",
+        "speech": "모두 동그라미인 줄을 찾아 보자.",
+        "success": "둥근 동그라미만 쏙쏙 모였네!",
+        "options": [
+          {"label": "섞인 모양", "visual": "⚪ 🔺 ⚪"},
+          {"label": "동그라미 모음", "visual": "⚪ 🔵 🟢", "correct": true},
+          {"label": "네모 모음", "visual": "🟥 🟦 🟩"}
+        ]
+      },
+      {
+        "helper": "모양보다 색이 모두 파란지 확인해요.",
+        "prompt": "파란색 그림끼리만 모인 카드는 무엇일까?",
+        "speech": "모두 파란색인 카드를 골라 보자.",
+        "success": "파란색 친구들만 한곳에 모였어!",
+        "options": [
+          {"label": "빨간색 모음", "visual": "🔴 🟥 ❤️"},
+          {"label": "섞인 색 모음", "visual": "🔵 🟥 🟢"},
+          {"label": "파란색 모음", "visual": "🔵 🟦 💙", "correct": true}
+        ]
+      }
+    ]
+  },
+  "extra030": {
+    "title": "세 칸 순서 기차",
+    "icon": "🚃",
+    "category": "number",
+    "cardColor": "purple",
+    "description": "작은 것부터 큰 것까지 세 단계로 줄 세워요.",
+    "duration": "3분",
+    "preview": ["1️⃣", "2️⃣", "3️⃣"],
+    "skill": "3단계 순서",
+    "insight": "크기와 수량이 늘어나는 세 단계의 순서를 이해해요.",
+    "offline": {
+      "title": "세 컵 줄 세우기",
+      "text": "크기가 다른 컵 세 개를 섞어 놓고 작은 것부터 큰 것 순서로 세워 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "왼쪽부터 작은, 중간, 큰 순서인지 봐요.",
+        "prompt": "동그라미가 작은 것부터 큰 것 순서로 놓인 줄은 무엇일까?",
+        "speech": "작은 동그라미부터 커지는 줄을 골라 보자.",
+        "success": "작은 것, 중간 것, 큰 것 순서야!",
+        "options": [
+          {"label": "작은 것부터 큰 것", "visual": "• ● ⬤", "correct": true},
+          {"label": "큰 것부터 작은 것", "visual": "⬤ ● •"},
+          {"label": "순서가 섞임", "visual": "● • ⬤"}
+        ]
+      },
+      {
+        "helper": "별이 하나씩 늘어나는지 세어 봐요.",
+        "prompt": "별 하나, 별 둘, 별 셋 순서로 커지는 줄을 찾아볼까?",
+        "speech": "별의 수가 하나씩 늘어나는 줄을 찾아 보자.",
+        "success": "하나, 둘, 셋으로 차근차근 늘었어!",
+        "options": [
+          {"label": "셋 둘 하나", "visual": "⭐⭐⭐ → ⭐⭐ → ⭐"},
+          {"label": "하나 둘 셋", "visual": "⭐ → ⭐⭐ → ⭐⭐⭐", "correct": true},
+          {"label": "둘 하나 셋", "visual": "⭐⭐ → ⭐ → ⭐⭐⭐"}
+        ]
+      },
+      {
+        "helper": "세모가 조금씩 커지는지 살펴봐요.",
+        "prompt": "세모가 작은 것, 중간 것, 큰 것 순으로 선 기차는 어디일까?",
+        "speech": "세모가 차례로 커지는 기차를 골라 보자.",
+        "success": "세모도 세 단계로 가지런히 섰네!",
+        "options": [
+          {"label": "중간 작은 큰", "visual": "▲ ▴ ▲", "subtitle": "중간-작음-큼"},
+          {"label": "큰 중간 작은", "visual": "▲ ▲ ▴", "subtitle": "큼-중간-작음"},
+          {"label": "작은 중간 큰", "visual": "▴ ▲ ▲", "subtitle": "작음-중간-큼", "correct": true}
+        ]
+      }
+    ]
+  }
+}

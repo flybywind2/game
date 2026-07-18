@@ -1,0 +1,2918 @@
+{
+  "extra031": {
+    "title": "동물 집으로 가요",
+    "icon": "🪺",
+    "category": "look",
+    "cardColor": "mint",
+    "description": "동물과 편안히 쉬는 집을 연결해요.",
+    "duration": "3분",
+    "preview": [
+      "🐦",
+      "🐝",
+      "🐰"
+    ],
+    "skill": "동물마다 사는 집이 다름을 알아봐요",
+    "insight": "동물의 집 이름을 말한 뒤 아이가 동물의 움직임까지 흉내 내게 해 보세요.",
+    "offline": {
+      "title": "인형 집 지어주기",
+      "text": "수건과 상자로 동물 인형이 쉴 작은 집을 함께 만들어보세요."
+    },
+    "rounds": [
+      {
+        "helper": "새가 쉴 집을 찾아요",
+        "prompt": "새가 나뭇가지를 모아 만드는 집은 무엇일까?",
+        "speech": "새가 나뭇가지를 모아 만드는 집은 무엇일까?",
+        "scene": [
+          "🐦"
+        ],
+        "success": "맞아! 새는 포근한 둥지에서 쉬어요.",
+        "options": [
+          {
+            "label": "어항",
+            "visual": "🐠",
+            "subtitle": "물고기 집"
+          },
+          {
+            "label": "둥지",
+            "visual": "🪺",
+            "subtitle": "새의 집",
+            "correct": true
+          },
+          {
+            "label": "개집",
+            "visual": "🏠",
+            "subtitle": "강아지 집"
+          }
+        ]
+      },
+      {
+        "helper": "윙윙 벌의 집을 찾아요",
+        "prompt": "벌들이 함께 사는 집은 무엇일까?",
+        "speech": "윙윙 벌들이 함께 사는 집은 무엇일까?",
+        "scene": [
+          "🐝"
+        ],
+        "success": "윙윙! 벌들이 벌집으로 모였어.",
+        "options": [
+          {
+            "label": "벌집",
+            "visual": "🍯",
+            "subtitle": "벌이 모여 살아요",
+            "correct": true
+          },
+          {
+            "label": "둥지",
+            "visual": "🪺",
+            "subtitle": "새가 쉬어요"
+          },
+          {
+            "label": "연못",
+            "visual": "🪷",
+            "subtitle": "물가예요"
+          }
+        ]
+      },
+      {
+        "helper": "토끼가 숨을 곳을 찾아요",
+        "prompt": "토끼가 땅속에 파서 사는 집은 무엇일까?",
+        "speech": "토끼가 땅속에 파서 사는 집은 무엇일까?",
+        "scene": [
+          "🐰"
+        ],
+        "success": "깡충깡충! 토끼가 땅굴 집에 쏙 들어갔어.",
+        "options": [
+          {
+            "label": "땅굴",
+            "visual": "🕳️",
+            "subtitle": "땅속 집",
+            "correct": true
+          },
+          {
+            "label": "벌집",
+            "visual": "🍯",
+            "subtitle": "벌의 집"
+          },
+          {
+            "label": "어항",
+            "visual": "🐠",
+            "subtitle": "물고기 집"
+          }
+        ]
+      }
+    ]
+  },
+  "extra032": {
+    "title": "동물은 이렇게 움직여요",
+    "icon": "🐟",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "동물마다 다른 움직임을 몸으로 익혀요.",
+    "duration": "2분",
+    "preview": [
+      "🐟",
+      "🐸",
+      "🦅"
+    ],
+    "skill": "헤엄치기·뛰기·날기 동작을 구별해요",
+    "insight": "정답을 고른 뒤 헤엄치기나 날기를 온몸으로 따라 하면 동작말이 오래 남아요.",
+    "offline": {
+      "title": "동물 움직임 체조",
+      "text": "물고기처럼 헤엄치고, 개구리처럼 뛰고, 새처럼 팔을 펼쳐보세요."
+    },
+    "rounds": [
+      {
+        "helper": "물속 움직임을 떠올려요",
+        "prompt": "지느러미로 물속을 헤엄치는 동물은 누구일까?",
+        "speech": "지느러미로 물속을 헤엄치는 동물은 누구일까?",
+        "success": "첨벙첨벙! 물고기가 물속을 헤엄쳐요.",
+        "options": [
+          {
+            "label": "물고기",
+            "visual": "🐟",
+            "subtitle": "헤엄쳐요",
+            "correct": true
+          },
+          {
+            "label": "토끼",
+            "visual": "🐰",
+            "subtitle": "깡충 뛰어요"
+          },
+          {
+            "label": "닭",
+            "visual": "🐔",
+            "subtitle": "두 발로 걸어요"
+          }
+        ]
+      },
+      {
+        "helper": "깡충 움직이는 친구예요",
+        "prompt": "뒷다리로 깡충깡충 뛰는 동물은 누구일까?",
+        "speech": "뒷다리로 깡충깡충 뛰는 동물은 누구일까?",
+        "success": "개굴개굴! 개구리가 힘껏 뛰었어.",
+        "options": [
+          {
+            "label": "거북이",
+            "visual": "🐢",
+            "subtitle": "엉금 걸어요"
+          },
+          {
+            "label": "개구리",
+            "visual": "🐸",
+            "subtitle": "깡충 뛰어요",
+            "correct": true
+          },
+          {
+            "label": "물고기",
+            "visual": "🐠",
+            "subtitle": "헤엄쳐요"
+          }
+        ]
+      },
+      {
+        "helper": "하늘을 나는 친구예요",
+        "prompt": "날개를 활짝 펴고 하늘을 나는 동물은 누구일까?",
+        "speech": "날개를 활짝 펴고 하늘을 나는 동물은 누구일까?",
+        "success": "훨훨! 독수리가 높은 하늘을 날아요.",
+        "options": [
+          {
+            "label": "독수리",
+            "visual": "🦅",
+            "subtitle": "훨훨 날아요",
+            "correct": true
+          },
+          {
+            "label": "고슴도치",
+            "visual": "🦔",
+            "subtitle": "종종 걸어요"
+          },
+          {
+            "label": "문어",
+            "visual": "🐙",
+            "subtitle": "물속에 살아요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra033": {
+    "title": "동물의 특별한 몸",
+    "icon": "🦒",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "몸의 특징을 보고 동물 이름을 맞혀요.",
+    "duration": "3분",
+    "preview": [
+      "🦒",
+      "🐢",
+      "🐘"
+    ],
+    "skill": "눈에 띄는 특징으로 동물을 알아봐요",
+    "insight": "“목이 길다”, “등딱지가 단단하다”처럼 특징을 짧은 문장으로 반복해 주세요.",
+    "offline": {
+      "title": "동물 특징 흉내",
+      "text": "팔을 코처럼 길게 뻗거나 목을 쭉 세우며 동물 흉내를 내보세요."
+    },
+    "rounds": [
+      {
+        "helper": "긴 목을 찾아봐요",
+        "prompt": "목이 아주 길어서 높은 잎을 먹는 동물은 누구일까?",
+        "speech": "목이 아주 길어서 높은 잎을 먹는 동물은 누구일까?",
+        "success": "그래! 기린은 긴 목으로 높은 잎도 먹어요.",
+        "options": [
+          {
+            "label": "기린",
+            "visual": "🦒",
+            "subtitle": "목이 길어요",
+            "correct": true
+          },
+          {
+            "label": "양",
+            "visual": "🐑",
+            "subtitle": "털이 복슬복슬"
+          },
+          {
+            "label": "돼지",
+            "visual": "🐷",
+            "subtitle": "코가 동그래요"
+          }
+        ]
+      },
+      {
+        "helper": "단단한 등을 살펴봐요",
+        "prompt": "등에 단단한 등딱지를 지고 다니는 동물은 누구일까?",
+        "speech": "등에 단단한 등딱지를 지고 다니는 동물은 누구일까?",
+        "success": "정답! 거북이는 등딱지로 몸을 지켜요.",
+        "options": [
+          {
+            "label": "토끼",
+            "visual": "🐇",
+            "subtitle": "귀가 길어요"
+          },
+          {
+            "label": "거북이",
+            "visual": "🐢",
+            "subtitle": "등딱지가 있어요",
+            "correct": true
+          },
+          {
+            "label": "오리",
+            "visual": "🦆",
+            "subtitle": "부리가 있어요"
+          }
+        ]
+      },
+      {
+        "helper": "길쭉한 코를 찾아봐요",
+        "prompt": "길고 힘센 코로 물을 뿜는 동물은 누구일까?",
+        "speech": "길고 힘센 코로 물을 뿜는 동물은 누구일까?",
+        "success": "뿌우! 코끼리가 긴 코로 물을 뿜어요.",
+        "options": [
+          {
+            "label": "코뿔소",
+            "visual": "🦏",
+            "subtitle": "코에 뿔이 있어요"
+          },
+          {
+            "label": "하마",
+            "visual": "🦛",
+            "subtitle": "입이 커요"
+          },
+          {
+            "label": "코끼리",
+            "visual": "🐘",
+            "subtitle": "코가 길어요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra034": {
+    "title": "아기 동물이 자라면",
+    "icon": "🐣",
+    "category": "word",
+    "cardColor": "pink",
+    "description": "아기 동물과 자란 동물의 이름을 연결해요.",
+    "duration": "3분",
+    "preview": [
+      "🐣",
+      "🐶",
+      "🐱"
+    ],
+    "skill": "병아리·강아지·고양이 이름 관계를 알아요",
+    "insight": "사진이나 인형을 나란히 놓고 “작은 아기, 자란 어른”이라고 비교해 보세요.",
+    "offline": {
+      "title": "아기와 어른 짝짓기",
+      "text": "동물 그림책에서 아기 동물과 다 자란 동물을 함께 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "삐약삐약 아기를 떠올려요",
+        "prompt": "병아리가 쑥쑥 자라면 어떤 동물이 될까?",
+        "speech": "삐약삐약 병아리가 쑥쑥 자라면 어떤 동물이 될까?",
+        "scene": [
+          "🐣"
+        ],
+        "success": "맞아! 병아리가 자라면 닭이 돼요.",
+        "options": [
+          {
+            "label": "오리",
+            "visual": "🦆",
+            "subtitle": "꽥꽥"
+          },
+          {
+            "label": "닭",
+            "visual": "🐔",
+            "subtitle": "꼬꼬댁",
+            "correct": true
+          },
+          {
+            "label": "칠면조",
+            "visual": "🦃",
+            "subtitle": "큰 새예요"
+          }
+        ]
+      },
+      {
+        "helper": "멍멍 아기를 떠올려요",
+        "prompt": "어린 강아지가 자라면 어떤 동물일까?",
+        "speech": "어린 강아지가 자라면 어떤 동물일까?",
+        "scene": [
+          "🐶"
+        ],
+        "success": "멍멍! 강아지는 자라서 큰 개가 돼요.",
+        "options": [
+          {
+            "label": "개",
+            "visual": "🐕",
+            "subtitle": "멍멍",
+            "correct": true
+          },
+          {
+            "label": "고양이",
+            "visual": "🐈",
+            "subtitle": "야옹"
+          },
+          {
+            "label": "여우",
+            "visual": "🦊",
+            "subtitle": "꼬리가 풍성해요"
+          }
+        ]
+      },
+      {
+        "helper": "야옹 아기를 떠올려요",
+        "prompt": "아기 고양이가 자라면 어떤 동물일까?",
+        "speech": "아기 고양이가 자라면 어떤 동물일까?",
+        "scene": [
+          "🐱"
+        ],
+        "success": "야옹! 아기 고양이가 멋지게 자랐어.",
+        "options": [
+          {
+            "label": "호랑이",
+            "visual": "🐅",
+            "subtitle": "줄무늬가 있어요"
+          },
+          {
+            "label": "사자",
+            "visual": "🦁",
+            "subtitle": "갈기가 있어요"
+          },
+          {
+            "label": "고양이",
+            "visual": "🐈",
+            "subtitle": "야옹",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra035": {
+    "title": "사는 곳이 달라요",
+    "icon": "🌊",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "바다·연못·숲에 사는 동물을 찾아요.",
+    "duration": "3분",
+    "preview": [
+      "🐙",
+      "🐸",
+      "🐿️"
+    ],
+    "skill": "동물과 익숙한 서식 환경을 연결해요",
+    "insight": "“어디에서 살까?”를 묻고 물, 나무, 풀 같은 환경말도 함께 들려주세요.",
+    "offline": {
+      "title": "동물 그림 자리 찾기",
+      "text": "파란 천은 물, 초록 천은 숲으로 정하고 동물 인형을 알맞게 놓아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "깊은 바닷속을 떠올려요",
+        "prompt": "깊은 바닷속에서 사는 동물은 누구일까?",
+        "speech": "깊은 바닷속에서 사는 동물은 누구일까?",
+        "success": "꿈틀꿈틀! 문어는 바닷속에 살아요.",
+        "options": [
+          {
+            "label": "문어",
+            "visual": "🐙",
+            "subtitle": "바닷속",
+            "correct": true
+          },
+          {
+            "label": "다람쥐",
+            "visual": "🐿️",
+            "subtitle": "숲속"
+          },
+          {
+            "label": "닭",
+            "visual": "🐔",
+            "subtitle": "땅 위"
+          }
+        ]
+      },
+      {
+        "helper": "연못가 친구를 찾아요",
+        "prompt": "연못가에서 폴짝 뛰는 동물은 누구일까?",
+        "speech": "연못가에서 폴짝 뛰는 동물은 누구일까?",
+        "success": "개굴개굴! 개구리는 연못가를 좋아해요.",
+        "options": [
+          {
+            "label": "낙타",
+            "visual": "🐫",
+            "subtitle": "메마른 곳"
+          },
+          {
+            "label": "개구리",
+            "visual": "🐸",
+            "subtitle": "연못가",
+            "correct": true
+          },
+          {
+            "label": "북극곰",
+            "visual": "🐻‍❄️",
+            "subtitle": "추운 곳"
+          }
+        ]
+      },
+      {
+        "helper": "나무가 많은 숲을 떠올려요",
+        "prompt": "숲의 나무 사이를 오르내리는 동물은 누구일까?",
+        "speech": "숲의 나무 사이를 오르내리는 동물은 누구일까?",
+        "success": "쪼르르! 다람쥐가 숲 나무를 올라가요.",
+        "options": [
+          {
+            "label": "고래",
+            "visual": "🐋",
+            "subtitle": "바다"
+          },
+          {
+            "label": "펭귄",
+            "visual": "🐧",
+            "subtitle": "차가운 바닷가"
+          },
+          {
+            "label": "다람쥐",
+            "visual": "🐿️",
+            "subtitle": "숲",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra036": {
+    "title": "빵집 진열대",
+    "icon": "🥖",
+    "category": "look",
+    "cardColor": "coral",
+    "description": "모양과 설명을 보고 빵집 음식을 알아봐요.",
+    "duration": "2분",
+    "preview": [
+      "🥖",
+      "🎂",
+      "🍪"
+    ],
+    "skill": "빵·케이크·과자 이름과 특징을 익혀요",
+    "insight": "실제 간식을 볼 때 길다, 둥글다, 바삭하다 같은 낱말을 덧붙여 주세요.",
+    "offline": {
+      "title": "우리 집 빵집",
+      "text": "찰흙으로 긴 빵, 둥근 과자를 만들며 빵집 놀이를 해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "길쭉한 모양을 잘 봐요",
+        "prompt": "길쭉하고 겉이 바삭한 빵을 찾아볼까?",
+        "speech": "길쭉하고 겉이 바삭한 빵을 찾아볼까?",
+        "success": "찾았다! 길쭉한 바게트 빵이야.",
+        "options": [
+          {
+            "label": "바게트",
+            "visual": "🥖",
+            "subtitle": "길쭉한 빵",
+            "correct": true
+          },
+          {
+            "label": "치즈",
+            "visual": "🧀",
+            "subtitle": "노란 음식"
+          },
+          {
+            "label": "달걀",
+            "visual": "🥚",
+            "subtitle": "동그란 음식"
+          }
+        ]
+      },
+      {
+        "helper": "축하할 때 먹는 음식을 떠올려요",
+        "prompt": "생일에 초를 꽂는 달콤한 음식은 무엇일까?",
+        "speech": "생일에 초를 꽂는 달콤한 음식은 무엇일까?",
+        "success": "축하해! 생일 케이크에 초를 꽂아요.",
+        "options": [
+          {
+            "label": "샌드위치",
+            "visual": "🥪",
+            "subtitle": "빵 사이에 쏙"
+          },
+          {
+            "label": "케이크",
+            "visual": "🎂",
+            "subtitle": "초를 꽂아요",
+            "correct": true
+          },
+          {
+            "label": "주먹밥",
+            "visual": "🍙",
+            "subtitle": "밥으로 만들어요"
+          }
+        ]
+      },
+      {
+        "helper": "작고 바삭한 간식이에요",
+        "prompt": "작고 바삭바삭한 과자는 무엇일까?",
+        "speech": "작고 바삭바삭한 과자는 무엇일까?",
+        "success": "냠냠! 동그란 쿠키가 바삭바삭해.",
+        "options": [
+          {
+            "label": "수프",
+            "visual": "🥣",
+            "subtitle": "숟가락으로 먹어요"
+          },
+          {
+            "label": "국수",
+            "visual": "🍜",
+            "subtitle": "후루룩"
+          },
+          {
+            "label": "쿠키",
+            "visual": "🍪",
+            "subtitle": "바삭바삭",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra037": {
+    "title": "채소밭 친구들",
+    "icon": "🥕",
+    "category": "word",
+    "cardColor": "mint",
+    "description": "익숙한 채소의 이름과 생김새를 익혀요.",
+    "duration": "3분",
+    "preview": [
+      "🥕",
+      "🥦",
+      "🥒"
+    ],
+    "skill": "당근·브로콜리·오이를 알아보고 말해요",
+    "insight": "식사할 때 채소 이름을 맞히기보다 색과 모양부터 즐겁게 관찰해 보세요.",
+    "offline": {
+      "title": "냉장고 채소 관찰",
+      "text": "집에 있는 채소를 씻어 색, 길이, 냄새를 함께 살펴보세요."
+    },
+    "rounds": [
+      {
+        "helper": "주황색 뿌리채소예요",
+        "prompt": "주황색이고 토끼가 좋아하는 채소는 무엇일까?",
+        "speech": "주황색이고 토끼가 좋아하는 채소는 무엇일까?",
+        "success": "아삭아삭! 주황색 당근이야.",
+        "options": [
+          {
+            "label": "당근",
+            "visual": "🥕",
+            "subtitle": "주황색",
+            "correct": true
+          },
+          {
+            "label": "가지",
+            "visual": "🍆",
+            "subtitle": "보라색"
+          },
+          {
+            "label": "옥수수",
+            "visual": "🌽",
+            "subtitle": "노란 알갱이"
+          }
+        ]
+      },
+      {
+        "helper": "작은 나무처럼 생겼어요",
+        "prompt": "초록색 작은 나무처럼 생긴 채소는 무엇일까?",
+        "speech": "초록색 작은 나무처럼 생긴 채소는 무엇일까?",
+        "success": "맞아! 초록초록 브로콜리야.",
+        "options": [
+          {
+            "label": "토마토",
+            "visual": "🍅",
+            "subtitle": "빨갛고 동그래요"
+          },
+          {
+            "label": "브로콜리",
+            "visual": "🥦",
+            "subtitle": "작은 나무 모양",
+            "correct": true
+          },
+          {
+            "label": "감자",
+            "visual": "🥔",
+            "subtitle": "흙 속에서 자라요"
+          }
+        ]
+      },
+      {
+        "helper": "길쭉한 초록 채소예요",
+        "prompt": "길쭉하고 초록색인 아삭한 채소는 무엇일까?",
+        "speech": "길쭉하고 초록색인 아삭한 채소는 무엇일까?",
+        "success": "아삭! 시원한 오이를 잘 찾았어.",
+        "options": [
+          {
+            "label": "고추",
+            "visual": "🌶️",
+            "subtitle": "매울 수 있어요"
+          },
+          {
+            "label": "양파",
+            "visual": "🧅",
+            "subtitle": "겹겹이 있어요"
+          },
+          {
+            "label": "오이",
+            "visual": "🥒",
+            "subtitle": "길쭉하고 초록색",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra038": {
+    "title": "식탁 도구 척척",
+    "icon": "🥄",
+    "category": "word",
+    "cardColor": "purple",
+    "description": "먹고 마실 때 쓰는 도구를 골라요.",
+    "duration": "2분",
+    "preview": [
+      "🥄",
+      "🥤",
+      "🍽️"
+    ],
+    "skill": "식탁 도구와 쓰임을 연결해요",
+    "insight": "실제 식사 준비에 아이를 초대해 숟가락, 컵, 접시를 하나씩 놓아보게 해 주세요.",
+    "offline": {
+      "title": "식탁 차리기 도우미",
+      "text": "빈 식탁에 숟가락과 컵, 접시를 안전하게 한 자리씩 놓아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "국을 먹을 때 써요",
+        "prompt": "따뜻한 국을 떠먹을 때 쓰는 것은 무엇일까?",
+        "speech": "따뜻한 국을 떠먹을 때 쓰는 것은 무엇일까?",
+        "success": "맞아! 숟가락으로 국을 떠먹어요.",
+        "options": [
+          {
+            "label": "숟가락",
+            "visual": "🥄",
+            "subtitle": "떠먹어요",
+            "correct": true
+          },
+          {
+            "label": "빗",
+            "visual": "🪮",
+            "subtitle": "머리를 빗어요"
+          },
+          {
+            "label": "열쇠",
+            "visual": "🔑",
+            "subtitle": "문을 열어요"
+          }
+        ]
+      },
+      {
+        "helper": "물을 마실 때 써요",
+        "prompt": "물을 담아 마시는 것은 무엇일까?",
+        "speech": "물을 담아 마시는 것은 무엇일까?",
+        "success": "꿀꺽꿀꺽! 컵에 물을 담아 마셔요.",
+        "options": [
+          {
+            "label": "화분",
+            "visual": "🪴",
+            "subtitle": "식물을 심어요"
+          },
+          {
+            "label": "컵",
+            "visual": "🥤",
+            "subtitle": "마셔요",
+            "correct": true
+          },
+          {
+            "label": "가방",
+            "visual": "🎒",
+            "subtitle": "물건을 넣어요"
+          }
+        ]
+      },
+      {
+        "helper": "음식을 담을 때 써요",
+        "prompt": "밥과 반찬을 올려놓는 것은 무엇일까?",
+        "speech": "밥과 반찬을 올려놓는 것은 무엇일까?",
+        "success": "그래! 접시에 음식을 가지런히 담아요.",
+        "options": [
+          {
+            "label": "접시",
+            "visual": "🍽️",
+            "subtitle": "음식을 담아요",
+            "correct": true
+          },
+          {
+            "label": "시계",
+            "visual": "⏰",
+            "subtitle": "시간을 알려줘요"
+          },
+          {
+            "label": "우산",
+            "visual": "☂️",
+            "subtitle": "비를 막아요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra039": {
+    "title": "냠냠 소리말",
+    "icon": "😋",
+    "category": "word",
+    "cardColor": "coral",
+    "description": "먹고 마시는 모습을 재미있는 소리말로 표현해요.",
+    "duration": "3분",
+    "preview": [
+      "🍎",
+      "🍜",
+      "💧"
+    ],
+    "skill": "아삭아삭·후루룩·꿀꺽꿀꺽을 이해해요",
+    "insight": "식사 중 자연스럽게 소리말을 들려주되 일부러 큰 소리를 내게 하지는 않아도 괜찮아요.",
+    "offline": {
+      "title": "식사 소리말 찾기",
+      "text": "간식을 먹으며 어울리는 소리말을 작게 말해보고 한 문장으로 이어보세요."
+    },
+    "rounds": [
+      {
+        "helper": "단단한 과일을 베어 물어요",
+        "prompt": "사과를 베어 물 때 어울리는 말은 무엇일까?",
+        "speech": "사과를 베어 물 때 어울리는 말은 무엇일까?",
+        "scene": [
+          "🍎"
+        ],
+        "success": "아삭아삭! 사과를 맛있게 먹어요.",
+        "options": [
+          {
+            "label": "아삭아삭",
+            "visual": "🍎",
+            "subtitle": "사과 먹는 말",
+            "correct": true
+          },
+          {
+            "label": "반짝반짝",
+            "visual": "✨",
+            "subtitle": "빛나는 말"
+          },
+          {
+            "label": "폴짝폴짝",
+            "visual": "🐸",
+            "subtitle": "뛰는 말"
+          }
+        ]
+      },
+      {
+        "helper": "긴 국수를 먹어요",
+        "prompt": "국수를 먹을 때 어울리는 말은 무엇일까?",
+        "speech": "국수를 먹을 때 어울리는 말은 무엇일까?",
+        "scene": [
+          "🍜"
+        ],
+        "success": "후루룩! 긴 국수를 먹는 소리말이야.",
+        "options": [
+          {
+            "label": "엉금엉금",
+            "visual": "🐢",
+            "subtitle": "천천히 가는 말"
+          },
+          {
+            "label": "후루룩",
+            "visual": "🍜",
+            "subtitle": "국수 먹는 말",
+            "correct": true
+          },
+          {
+            "label": "펄럭펄럭",
+            "visual": "🚩",
+            "subtitle": "바람에 흔들리는 말"
+          }
+        ]
+      },
+      {
+        "helper": "물을 천천히 마셔요",
+        "prompt": "물을 마실 때 어울리는 말은 무엇일까?",
+        "speech": "물을 마실 때 어울리는 말은 무엇일까?",
+        "scene": [
+          "💧"
+        ],
+        "success": "꿀꺽꿀꺽! 물을 천천히 마셔요.",
+        "options": [
+          {
+            "label": "사각사각",
+            "visual": "✏️",
+            "subtitle": "글씨 쓰는 말"
+          },
+          {
+            "label": "둥실둥실",
+            "visual": "☁️",
+            "subtitle": "떠가는 말"
+          },
+          {
+            "label": "꿀꺽꿀꺽",
+            "visual": "🥤",
+            "subtitle": "물 마시는 말",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra040": {
+    "title": "먹을 것은 어디서 올까",
+    "icon": "🌱",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "익숙한 먹을거리와 자연 속 시작을 연결해요.",
+    "duration": "3분",
+    "preview": [
+      "🍎",
+      "🥔",
+      "🥚"
+    ],
+    "skill": "사과·감자·달걀이 오는 곳을 알아봐요",
+    "insight": "마트에서 끝나지 않고 나무, 흙, 닭처럼 먹을거리의 시작을 짧게 이야기해 주세요.",
+    "offline": {
+      "title": "먹을거리 시작 찾기",
+      "text": "냉장고 속 음식 하나를 골라 어디에서 왔는지 그림책이나 사진으로 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "빨간 열매가 달리는 곳이에요",
+        "prompt": "사과는 어디에서 자랄까?",
+        "speech": "빨간 사과는 어디에서 자랄까?",
+        "scene": [
+          "🍎"
+        ],
+        "success": "맞아! 사과는 사과나무 가지에서 자라요.",
+        "options": [
+          {
+            "label": "나무",
+            "visual": "🌳",
+            "subtitle": "가지에 열려요",
+            "correct": true
+          },
+          {
+            "label": "연못",
+            "visual": "🪷",
+            "subtitle": "물이 있어요"
+          },
+          {
+            "label": "돌밭",
+            "visual": "🪨",
+            "subtitle": "돌이 있어요"
+          }
+        ]
+      },
+      {
+        "helper": "흙 아래를 떠올려요",
+        "prompt": "감자는 어디에서 자랄까?",
+        "speech": "동글동글 감자는 어디에서 자랄까?",
+        "scene": [
+          "🥔"
+        ],
+        "success": "쏙! 감자는 흙 속에서 자라요.",
+        "options": [
+          {
+            "label": "구름 위",
+            "visual": "☁️",
+            "subtitle": "높은 하늘"
+          },
+          {
+            "label": "흙 속",
+            "visual": "🌱",
+            "subtitle": "땅 아래",
+            "correct": true
+          },
+          {
+            "label": "바닷속",
+            "visual": "🌊",
+            "subtitle": "깊은 물"
+          }
+        ]
+      },
+      {
+        "helper": "꼬꼬댁 동물을 떠올려요",
+        "prompt": "우리가 먹는 달걀은 어떤 동물이 낳을까?",
+        "speech": "우리가 먹는 달걀은 어떤 동물이 낳을까?",
+        "scene": [
+          "🥚"
+        ],
+        "success": "꼬꼬댁! 닭이 달걀을 낳아요.",
+        "options": [
+          {
+            "label": "닭",
+            "visual": "🐔",
+            "subtitle": "달걀을 낳아요",
+            "correct": true
+          },
+          {
+            "label": "양",
+            "visual": "🐑",
+            "subtitle": "털이 복슬복슬"
+          },
+          {
+            "label": "말",
+            "visual": "🐴",
+            "subtitle": "달려요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra041": {
+    "title": "탈것의 길을 찾아요",
+    "icon": "🚂",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "기차·배·비행기가 다니는 곳을 알아봐요.",
+    "duration": "3분",
+    "preview": [
+      "🚂",
+      "⛵",
+      "✈️"
+    ],
+    "skill": "탈것과 철길·물·하늘을 연결해요",
+    "insight": "밖에서 탈것을 볼 때 바퀴 아래와 움직이는 방향을 함께 관찰해 보세요.",
+    "offline": {
+      "title": "탈것 길 만들기",
+      "text": "테이프로 철길을 만들고 파란 천을 물로 삼아 장난감 탈것을 움직여보세요."
+    },
+    "rounds": [
+      {
+        "helper": "칙칙폭폭 길을 찾아요",
+        "prompt": "기차가 달리는 길은 어디일까?",
+        "speech": "칙칙폭폭 기차가 달리는 길은 어디일까?",
+        "scene": [
+          "🚂"
+        ],
+        "success": "칙칙폭폭! 기차는 철길을 따라 달려요.",
+        "options": [
+          {
+            "label": "철길",
+            "visual": "🛤️",
+            "subtitle": "기차가 달려요",
+            "correct": true
+          },
+          {
+            "label": "구름",
+            "visual": "☁️",
+            "subtitle": "하늘에 있어요"
+          },
+          {
+            "label": "바다",
+            "visual": "🌊",
+            "subtitle": "물이 가득해요"
+          }
+        ]
+      },
+      {
+        "helper": "둥둥 떠가는 곳이에요",
+        "prompt": "배가 움직이는 곳은 어디일까?",
+        "speech": "둥둥 배가 움직이는 곳은 어디일까?",
+        "scene": [
+          "⛵"
+        ],
+        "success": "둥둥! 배는 물 위를 움직여요.",
+        "options": [
+          {
+            "label": "운동장",
+            "visual": "🏟️",
+            "subtitle": "땅 위"
+          },
+          {
+            "label": "물 위",
+            "visual": "🌊",
+            "subtitle": "배가 떠요",
+            "correct": true
+          },
+          {
+            "label": "철길",
+            "visual": "🛤️",
+            "subtitle": "기차 길"
+          }
+        ]
+      },
+      {
+        "helper": "높이 날아가는 곳이에요",
+        "prompt": "비행기가 날아가는 곳은 어디일까?",
+        "speech": "비행기가 높이 날아가는 곳은 어디일까?",
+        "scene": [
+          "✈️"
+        ],
+        "success": "슝! 비행기는 하늘을 날아가요.",
+        "options": [
+          {
+            "label": "땅속",
+            "visual": "🕳️",
+            "subtitle": "땅 아래"
+          },
+          {
+            "label": "연못",
+            "visual": "🪷",
+            "subtitle": "작은 물터"
+          },
+          {
+            "label": "하늘",
+            "visual": "☁️",
+            "subtitle": "높은 곳",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra042": {
+    "title": "도와주는 자동차",
+    "icon": "🚒",
+    "category": "look",
+    "cardColor": "coral",
+    "description": "우리 동네에서 일하는 자동차를 알아봐요.",
+    "duration": "3분",
+    "preview": [
+      "🚒",
+      "🚑",
+      "🚛"
+    ],
+    "skill": "소방차·구급차·쓰레기차의 일을 구별해요",
+    "insight": "사이렌을 무서워한다면 “도움이 필요한 곳으로 가는 소리”라고 차분히 설명해 주세요.",
+    "offline": {
+      "title": "자동차 역할놀이",
+      "text": "장난감 차로 불을 끄고, 아픈 인형을 돕고, 종이 쓰레기를 모아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "불을 끄러 가는 차예요",
+        "prompt": "불이 난 곳에 물을 싣고 달려가는 차는 무엇일까?",
+        "speech": "불이 난 곳에 물을 싣고 달려가는 차는 무엇일까?",
+        "success": "맞아! 소방차가 달려와 불을 꺼요.",
+        "options": [
+          {
+            "label": "택시",
+            "visual": "🚕",
+            "subtitle": "사람을 태워요"
+          },
+          {
+            "label": "소방차",
+            "visual": "🚒",
+            "subtitle": "불을 꺼요",
+            "correct": true
+          },
+          {
+            "label": "트랙터",
+            "visual": "🚜",
+            "subtitle": "밭에서 일해요"
+          }
+        ]
+      },
+      {
+        "helper": "아픈 사람을 돕는 차예요",
+        "prompt": "아픈 사람을 병원으로 안전하게 데려가는 차는 무엇일까?",
+        "speech": "아픈 사람을 병원으로 안전하게 데려가는 차는 무엇일까?",
+        "success": "삐뽀삐뽀! 구급차가 안전하게 도와줘요.",
+        "options": [
+          {
+            "label": "버스",
+            "visual": "🚌",
+            "subtitle": "여러 사람이 타요"
+          },
+          {
+            "label": "경주차",
+            "visual": "🏎️",
+            "subtitle": "경주해요"
+          },
+          {
+            "label": "구급차",
+            "visual": "🚑",
+            "subtitle": "아픈 사람을 도와요",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "helper": "동네를 깨끗하게 하는 차예요",
+        "prompt": "모아 둔 쓰레기를 실어 가는 차는 무엇일까?",
+        "speech": "모아 둔 쓰레기를 실어 가는 차는 무엇일까?",
+        "success": "부릉부릉! 쓰레기차가 동네를 깨끗하게 도와줘요.",
+        "options": [
+          {
+            "label": "쓰레기차",
+            "visual": "🚛",
+            "subtitle": "쓰레기를 모아요",
+            "correct": true
+          },
+          {
+            "label": "기차",
+            "visual": "🚆",
+            "subtitle": "철길을 달려요"
+          },
+          {
+            "label": "비행기",
+            "visual": "✈️",
+            "subtitle": "하늘을 날아요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra043": {
+    "title": "탈것 몸의 비밀",
+    "icon": "🛞",
+    "category": "word",
+    "cardColor": "purple",
+    "description": "바퀴·페달·날개의 이름과 쓰임을 익혀요.",
+    "duration": "3분",
+    "preview": [
+      "🛞",
+      "🚲",
+      "🪽"
+    ],
+    "skill": "탈것의 주요 부분을 기능과 연결해요",
+    "insight": "안전한 곳에서 실제 자전거나 자동차의 바퀴를 가리키며 이름을 반복해 주세요.",
+    "offline": {
+      "title": "탈것 부분 찾기",
+      "text": "그림책 속 탈것에서 바퀴, 페달, 날개를 손가락으로 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "둥글게 빙글빙글 돌아요",
+        "prompt": "자동차가 길 위를 굴러가게 돕는 둥근 것은 무엇일까?",
+        "speech": "자동차가 길 위를 굴러가게 돕는 둥근 것은 무엇일까?",
+        "success": "빙글빙글! 바퀴가 굴러 자동차가 움직여요.",
+        "options": [
+          {
+            "label": "바퀴",
+            "visual": "🛞",
+            "subtitle": "빙글빙글 굴러요",
+            "correct": true
+          },
+          {
+            "label": "창문",
+            "visual": "🪟",
+            "subtitle": "밖을 봐요"
+          },
+          {
+            "label": "의자",
+            "visual": "💺",
+            "subtitle": "앉아요"
+          }
+        ]
+      },
+      {
+        "helper": "발로 밟는 부분이에요",
+        "prompt": "자전거를 움직이려고 발로 밟는 곳은 무엇일까?",
+        "speech": "자전거를 움직이려고 발로 밟는 곳은 무엇일까?",
+        "success": "맞아! 발로 페달을 밟으면 자전거가 나아가요.",
+        "options": [
+          {
+            "label": "종",
+            "visual": "🔔",
+            "subtitle": "따르릉 소리"
+          },
+          {
+            "label": "페달",
+            "visual": "🚲",
+            "subtitle": "발로 밟아요",
+            "correct": true
+          },
+          {
+            "label": "바구니",
+            "visual": "🧺",
+            "subtitle": "물건을 담아요"
+          }
+        ]
+      },
+      {
+        "helper": "하늘을 나는 부분이에요",
+        "prompt": "비행기 양옆에 펼쳐진 큰 부분은 무엇일까?",
+        "speech": "비행기 양옆에 펼쳐진 큰 부분은 무엇일까?",
+        "success": "훨훨! 비행기에는 큰 날개가 있어요.",
+        "options": [
+          {
+            "label": "노",
+            "visual": "🛶",
+            "subtitle": "배를 저어요"
+          },
+          {
+            "label": "바퀴",
+            "visual": "🛞",
+            "subtitle": "길에서 굴러요"
+          },
+          {
+            "label": "날개",
+            "visual": "🪽",
+            "subtitle": "양옆에 펼쳐져요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra044": {
+    "title": "함께 쓰는 물건 짝꿍",
+    "icon": "🔑",
+    "category": "word",
+    "cardColor": "mint",
+    "description": "서로 함께 쓰는 생활 물건을 연결해요.",
+    "duration": "3분",
+    "preview": [
+      "🔑",
+      "🪥",
+      "🖍️"
+    ],
+    "skill": "관련 있는 두 물건의 쓰임을 이해해요",
+    "insight": "실제 물건 두 개를 나란히 놓고 “무엇과 함께 쓸까?”라고 천천히 물어보세요.",
+    "offline": {
+      "title": "우리 집 짝꿍 찾기",
+      "text": "열쇠와 문, 칫솔과 치약처럼 함께 쓰는 안전한 물건 짝을 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "잠긴 것을 열 때 필요해요",
+        "prompt": "자물쇠를 열 때 함께 쓰는 물건은 무엇일까?",
+        "speech": "자물쇠를 열 때 함께 쓰는 물건은 무엇일까?",
+        "scene": [
+          "🔒"
+        ],
+        "success": "찰칵! 자물쇠와 열쇠는 함께 쓰는 짝꿍이야.",
+        "options": [
+          {
+            "label": "열쇠",
+            "visual": "🔑",
+            "subtitle": "자물쇠를 열어요",
+            "correct": true
+          },
+          {
+            "label": "숟가락",
+            "visual": "🥄",
+            "subtitle": "음식을 떠요"
+          },
+          {
+            "label": "양말",
+            "visual": "🧦",
+            "subtitle": "발에 신어요"
+          }
+        ]
+      },
+      {
+        "helper": "이를 닦을 때 함께 써요",
+        "prompt": "칫솔에 조금 묻혀 이를 닦는 것은 무엇일까?",
+        "speech": "칫솔에 조금 묻혀 이를 닦는 것은 무엇일까?",
+        "scene": [
+          "🪥"
+        ],
+        "success": "치카치카! 칫솔과 치약은 함께 쓰는 짝꿍이야.",
+        "options": [
+          {
+            "label": "풀",
+            "visual": "🧴",
+            "subtitle": "종이를 붙여요"
+          },
+          {
+            "label": "치약",
+            "visual": "🦷",
+            "subtitle": "칫솔에 묻혀요",
+            "correct": true
+          },
+          {
+            "label": "비누",
+            "visual": "🧼",
+            "subtitle": "손을 씻어요"
+          }
+        ]
+      },
+      {
+        "helper": "그림을 그릴 때 함께 써요",
+        "prompt": "크레용으로 그림을 그릴 때 필요한 것은 무엇일까?",
+        "speech": "크레용으로 그림을 그릴 때 필요한 것은 무엇일까?",
+        "scene": [
+          "🖍️"
+        ],
+        "success": "슥슥! 크레용과 종이는 그림 그리기 짝꿍이야.",
+        "options": [
+          {
+            "label": "프라이팬",
+            "visual": "🍳",
+            "subtitle": "음식을 만들어요"
+          },
+          {
+            "label": "우산",
+            "visual": "☂️",
+            "subtitle": "비를 막아요"
+          },
+          {
+            "label": "종이",
+            "visual": "📄",
+            "subtitle": "그림을 그려요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra045": {
+    "title": "하늘 날씨 그림책",
+    "icon": "🌤️",
+    "category": "look",
+    "cardColor": "blue",
+    "description": "하늘 모습을 보고 맑음·비·눈을 알아봐요.",
+    "duration": "2분",
+    "preview": [
+      "☀️",
+      "🌧️",
+      "🌨️"
+    ],
+    "skill": "기본 날씨 모습을 보고 이름을 말해요",
+    "insight": "정답 뒤에 “오늘 하늘은 어때?”라고 물어 실제 날씨 관찰로 이어가 보세요.",
+    "offline": {
+      "title": "창문 날씨 기록",
+      "text": "매일 창밖을 보고 해, 빗방울, 눈송이 중 하나를 종이에 그려보세요."
+    },
+    "rounds": [
+      {
+        "helper": "밝은 해를 살펴봐요",
+        "prompt": "해가 환하게 비치는 날씨는 무엇일까?",
+        "speech": "해가 환하게 비치는 날씨는 무엇일까?",
+        "scene": [
+          "☀️"
+        ],
+        "success": "반짝! 해가 비치는 맑은 날이야.",
+        "options": [
+          {
+            "label": "맑음",
+            "visual": "☀️",
+            "subtitle": "해가 보여요",
+            "correct": true
+          },
+          {
+            "label": "비",
+            "visual": "🌧️",
+            "subtitle": "빗방울이 내려요"
+          },
+          {
+            "label": "눈",
+            "visual": "🌨️",
+            "subtitle": "눈송이가 내려요"
+          }
+        ]
+      },
+      {
+        "helper": "구름 아래 빗방울을 봐요",
+        "prompt": "구름에서 빗방울이 떨어지는 날씨는 무엇일까?",
+        "speech": "구름에서 빗방울이 떨어지는 날씨는 무엇일까?",
+        "scene": [
+          "🌧️"
+        ],
+        "success": "주룩주룩! 비가 오는 날이야.",
+        "options": [
+          {
+            "label": "눈",
+            "visual": "🌨️",
+            "subtitle": "하얀 눈송이"
+          },
+          {
+            "label": "비",
+            "visual": "🌧️",
+            "subtitle": "빗방울",
+            "correct": true
+          },
+          {
+            "label": "맑음",
+            "visual": "☀️",
+            "subtitle": "밝은 해"
+          }
+        ]
+      },
+      {
+        "helper": "하얀 눈송이를 봐요",
+        "prompt": "하얀 눈송이가 내려오는 날씨는 무엇일까?",
+        "speech": "하얀 눈송이가 내려오는 날씨는 무엇일까?",
+        "scene": [
+          "❄️",
+          "❄️"
+        ],
+        "success": "소복소복! 눈이 오는 날이야.",
+        "options": [
+          {
+            "label": "바람",
+            "visual": "💨",
+            "subtitle": "쌩쌩 불어요"
+          },
+          {
+            "label": "맑음",
+            "visual": "☀️",
+            "subtitle": "해가 보여요"
+          },
+          {
+            "label": "눈",
+            "visual": "🌨️",
+            "subtitle": "눈송이가 내려요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra046": {
+    "title": "낮과 밤 친구",
+    "icon": "🌞",
+    "category": "word",
+    "cardColor": "purple",
+    "description": "해가 뜨는 낮과 달이 뜨는 밤을 구별해요.",
+    "duration": "3분",
+    "preview": [
+      "🌞",
+      "🌙",
+      "🛌"
+    ],
+    "skill": "낮과 밤의 대표 모습을 이해해요",
+    "insight": "아침과 저녁 일과를 이야기하며 밝다, 어둡다, 낮, 밤을 자연스럽게 들려주세요.",
+    "offline": {
+      "title": "낮밤 그림 나누기",
+      "text": "해와 달을 그린 종이에 낮에 하는 일과 밤에 하는 일을 나누어 놓아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "환한 하늘을 떠올려요",
+        "prompt": "해가 떠서 밖이 환한 때는 낮일까, 밤일까?",
+        "speech": "해가 떠서 밖이 환한 때는 낮일까, 밤일까?",
+        "scene": [
+          "🌞"
+        ],
+        "success": "환한 해가 떠 있는 때는 낮이야.",
+        "options": [
+          {
+            "label": "낮",
+            "visual": "☀️",
+            "subtitle": "환해요",
+            "correct": true
+          },
+          {
+            "label": "밤",
+            "visual": "🌙",
+            "subtitle": "어두워요"
+          },
+          {
+            "label": "새벽별",
+            "visual": "⭐",
+            "subtitle": "반짝여요"
+          }
+        ]
+      },
+      {
+        "helper": "달과 별을 떠올려요",
+        "prompt": "달과 별이 반짝이는 때는 낮일까, 밤일까?",
+        "speech": "달과 별이 반짝이는 때는 낮일까, 밤일까?",
+        "scene": [
+          "🌙",
+          "⭐"
+        ],
+        "success": "반짝반짝! 달과 별이 보이는 때는 밤이야.",
+        "options": [
+          {
+            "label": "낮",
+            "visual": "🌞",
+            "subtitle": "해가 떠요"
+          },
+          {
+            "label": "밤",
+            "visual": "🌙",
+            "subtitle": "달이 보여요",
+            "correct": true
+          },
+          {
+            "label": "무지개",
+            "visual": "🌈",
+            "subtitle": "여러 색이에요"
+          }
+        ]
+      },
+      {
+        "helper": "잠잘 시간을 생각해요",
+        "prompt": "이불을 덮고 오래 자는 때는 보통 언제일까?",
+        "speech": "이불을 덮고 오래 자는 때는 보통 언제일까?",
+        "scene": [
+          "🛌"
+        ],
+        "success": "그래! 밤이 되면 이불을 덮고 푹 자요.",
+        "options": [
+          {
+            "label": "밤",
+            "visual": "🌛",
+            "subtitle": "푹 자요",
+            "correct": true
+          },
+          {
+            "label": "한낮",
+            "visual": "🌞",
+            "subtitle": "해가 높아요"
+          },
+          {
+            "label": "놀이 시간",
+            "visual": "🧸",
+            "subtitle": "즐겁게 놀아요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra047": {
+    "title": "씨앗이 쑥쑥",
+    "icon": "🌱",
+    "category": "look",
+    "cardColor": "mint",
+    "description": "씨앗이 싹과 꽃으로 자라는 모습을 알아봐요.",
+    "duration": "3분",
+    "preview": [
+      "🫘",
+      "🌱",
+      "🌻"
+    ],
+    "skill": "식물의 간단한 성장 흐름을 이해해요",
+    "insight": "정확한 단계 이름보다 “먼저 씨앗, 다음에 싹”처럼 순서말을 반복해 주세요.",
+    "offline": {
+      "title": "콩 싹 관찰",
+      "text": "젖은 솜 위에 콩을 놓고 며칠 동안 싹이 나오는 모습을 함께 관찰해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "식물의 처음을 찾아요",
+        "prompt": "식물이 자라기 시작할 때 흙에 심는 것은 무엇일까?",
+        "speech": "식물이 자라기 시작할 때 흙에 심는 것은 무엇일까?",
+        "success": "맞아! 작은 씨앗을 흙에 심어요.",
+        "options": [
+          {
+            "label": "씨앗",
+            "visual": "🫘",
+            "subtitle": "흙에 심어요",
+            "correct": true
+          },
+          {
+            "label": "꽃",
+            "visual": "🌼",
+            "subtitle": "활짝 피어요"
+          },
+          {
+            "label": "낙엽",
+            "visual": "🍂",
+            "subtitle": "나무에서 떨어져요"
+          }
+        ]
+      },
+      {
+        "helper": "씨앗 다음 모습을 찾아요",
+        "prompt": "씨앗에서 처음 뾰족하게 올라오는 것은 무엇일까?",
+        "speech": "씨앗에서 처음 뾰족하게 올라오는 것은 무엇일까?",
+        "success": "쏙! 씨앗에서 작은 싹이 올라왔어.",
+        "options": [
+          {
+            "label": "열매",
+            "visual": "🍎",
+            "subtitle": "나중에 맺혀요"
+          },
+          {
+            "label": "싹",
+            "visual": "🌱",
+            "subtitle": "처음 올라와요",
+            "correct": true
+          },
+          {
+            "label": "마른 잎",
+            "visual": "🍂",
+            "subtitle": "바스락거려요"
+          }
+        ]
+      },
+      {
+        "helper": "쑥쑥 자란 뒤를 떠올려요",
+        "prompt": "싹이 햇빛과 물을 먹고 자라면 무엇이 활짝 필까?",
+        "speech": "싹이 햇빛과 물을 먹고 자라면 무엇이 활짝 필까?",
+        "success": "활짝! 예쁜 꽃이 피었어.",
+        "options": [
+          {
+            "label": "돌",
+            "visual": "🪨",
+            "subtitle": "단단해요"
+          },
+          {
+            "label": "구름",
+            "visual": "☁️",
+            "subtitle": "하늘에 떠요"
+          },
+          {
+            "label": "꽃",
+            "visual": "🌻",
+            "subtitle": "활짝 피어요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra048": {
+    "title": "자연에서 만나요",
+    "icon": "🍃",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "잎·조개껍데기·무지개를 만나는 곳을 찾아요.",
+    "duration": "3분",
+    "preview": [
+      "🍃",
+      "🐚",
+      "🌈"
+    ],
+    "skill": "자연물과 나타나는 장소·상황을 연결해요",
+    "insight": "산책하며 아이가 발견한 자연물을 바로 이름 붙여주고 만지기 전 안전도 살펴주세요.",
+    "offline": {
+      "title": "산책 보물 세 가지",
+      "text": "산책에서 잎, 작은 돌, 나뭇가지처럼 안전한 자연물 세 가지를 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "초록 잎이 붙어 있는 곳이에요",
+        "prompt": "초록 잎은 주로 어디에 달려 있을까?",
+        "speech": "초록 잎은 주로 어디에 달려 있을까?",
+        "scene": [
+          "🍃"
+        ],
+        "success": "살랑살랑! 잎은 나무 가지에 달려 있어요.",
+        "options": [
+          {
+            "label": "나무",
+            "visual": "🌳",
+            "subtitle": "가지에 달려요",
+            "correct": true
+          },
+          {
+            "label": "자동차",
+            "visual": "🚗",
+            "subtitle": "길을 달려요"
+          },
+          {
+            "label": "냉장고",
+            "visual": "🧊",
+            "subtitle": "음식을 차갑게 해요"
+          }
+        ]
+      },
+      {
+        "helper": "파도 가까운 곳을 떠올려요",
+        "prompt": "조개껍데기는 어디에서 만날 수 있을까?",
+        "speech": "조개껍데기는 어디에서 만날 수 있을까?",
+        "scene": [
+          "🐚"
+        ],
+        "success": "맞아! 바닷가 모래에서 조개껍데기를 만날 수 있어요.",
+        "options": [
+          {
+            "label": "놀이터",
+            "visual": "🛝",
+            "subtitle": "미끄럼틀이 있어요"
+          },
+          {
+            "label": "바닷가",
+            "visual": "🏖️",
+            "subtitle": "파도와 모래",
+            "correct": true
+          },
+          {
+            "label": "주방",
+            "visual": "🍳",
+            "subtitle": "음식을 만들어요"
+          }
+        ]
+      },
+      {
+        "helper": "비가 그친 하늘을 봐요",
+        "prompt": "비가 그친 뒤 하늘에서 볼 수 있는 여러 색 띠는 무엇일까?",
+        "speech": "비가 그친 뒤 하늘에서 볼 수 있는 여러 색 띠는 무엇일까?",
+        "success": "빨주노초파남보! 하늘에 무지개가 떴어.",
+        "options": [
+          {
+            "label": "번개",
+            "visual": "⚡",
+            "subtitle": "번쩍"
+          },
+          {
+            "label": "눈송이",
+            "visual": "❄️",
+            "subtitle": "하얗게 내려요"
+          },
+          {
+            "label": "무지개",
+            "visual": "🌈",
+            "subtitle": "여러 색 띠",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra049": {
+    "title": "열고 닫고 반대말",
+    "icon": "🔓",
+    "category": "word",
+    "cardColor": "pink",
+    "description": "열림·닫힘, 가득·비움, 켬·끔을 구별해요.",
+    "duration": "3분",
+    "preview": [
+      "🔓",
+      "🥛",
+      "💡"
+    ],
+    "skill": "사물 상태를 나타내는 반대말을 이해해요",
+    "insight": "문이나 상자를 직접 열고 닫으며 두 말을 행동과 함께 들려주면 이해가 쉬워요.",
+    "offline": {
+      "title": "반대로 해보기",
+      "text": "상자를 열었다 닫고, 컵에 블록을 채웠다 비우며 반대말을 말해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "문의 모습을 떠올려요",
+        "prompt": "‘문이 열렸어요’의 반대는 무엇일까?",
+        "speech": "문이 열렸어요의 반대는 무엇일까?",
+        "success": "맞아! 열린 문의 반대는 닫힌 문이야.",
+        "options": [
+          {
+            "label": "문이 닫혔어요",
+            "visual": "🔒",
+            "subtitle": "닫힘",
+            "correct": true
+          },
+          {
+            "label": "문이 커졌어요",
+            "visual": "🚪",
+            "subtitle": "크기"
+          },
+          {
+            "label": "문이 빨개졌어요",
+            "visual": "🟥",
+            "subtitle": "색깔"
+          }
+        ]
+      },
+      {
+        "helper": "컵 속을 살펴봐요",
+        "prompt": "‘컵에 물이 가득해요’의 반대는 무엇일까?",
+        "speech": "컵에 물이 가득해요의 반대는 무엇일까?",
+        "success": "그래! 가득한 컵의 반대는 빈 컵이야.",
+        "options": [
+          {
+            "label": "컵이 높아요",
+            "visual": "⬆️",
+            "subtitle": "높이"
+          },
+          {
+            "label": "컵이 비었어요",
+            "visual": "🥤",
+            "subtitle": "비어 있음",
+            "correct": true
+          },
+          {
+            "label": "컵이 파래요",
+            "visual": "🟦",
+            "subtitle": "색깔"
+          }
+        ]
+      },
+      {
+        "helper": "불빛을 켰다 꺼요",
+        "prompt": "‘불을 켰어요’의 반대는 무엇일까?",
+        "speech": "불을 켰어요의 반대는 무엇일까?",
+        "success": "딸깍! 불을 켜다의 반대는 불을 끄다야.",
+        "options": [
+          {
+            "label": "불을 들었어요",
+            "visual": "🙌",
+            "subtitle": "들기"
+          },
+          {
+            "label": "불을 그렸어요",
+            "visual": "🖍️",
+            "subtitle": "그리기"
+          },
+          {
+            "label": "불을 껐어요",
+            "visual": "🌑",
+            "subtitle": "끔",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra050": {
+    "title": "말대로 몸을 움직여요",
+    "icon": "👏",
+    "category": "word",
+    "cardColor": "purple",
+    "description": "짧은 동작말을 듣고 알맞은 움직임을 골라요.",
+    "duration": "2분",
+    "preview": [
+      "👏",
+      "👋",
+      "🦶"
+    ],
+    "skill": "손뼉 치기·손 흔들기·발 구르기 동작말을 이해해요",
+    "insight": "정답을 고른 뒤 보호자와 함께 실제 동작을 한 번만 따라 해보세요.",
+    "offline": {
+      "title": "세 가지 동작 놀이",
+      "text": "“짝짝 손뼉”, “살랑 손 흔들기”, “쿵쿵 발 구르기”를 차례로 따라 해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "두 손을 마주쳐요",
+        "prompt": "‘손뼉을 짝짝 쳐요’는 어떤 움직임일까?",
+        "speech": "손뼉을 짝짝 쳐요. 어떤 움직임일까?",
+        "success": "짝짝짝! 두 손을 마주치면 손뼉 치기야.",
+        "options": [
+          {
+            "label": "손뼉 치기",
+            "visual": "👏",
+            "subtitle": "두 손을 짝짝",
+            "correct": true
+          },
+          {
+            "label": "귀 막기",
+            "visual": "🙉",
+            "subtitle": "두 귀를 가려요"
+          },
+          {
+            "label": "팔짱 끼기",
+            "visual": "🙅",
+            "subtitle": "팔을 모아요"
+          }
+        ]
+      },
+      {
+        "helper": "멀리 있는 친구에게 인사해요",
+        "prompt": "‘손을 살랑살랑 흔들어요’는 어떤 움직임일까?",
+        "speech": "손을 살랑살랑 흔들어요. 어떤 움직임일까?",
+        "success": "안녕! 손을 흔들며 반갑게 인사해요.",
+        "options": [
+          {
+            "label": "무릎 굽히기",
+            "visual": "🧎",
+            "subtitle": "몸을 낮춰요"
+          },
+          {
+            "label": "손 흔들기",
+            "visual": "👋",
+            "subtitle": "살랑살랑",
+            "correct": true
+          },
+          {
+            "label": "눈 감기",
+            "visual": "😌",
+            "subtitle": "눈을 감아요"
+          }
+        ]
+      },
+      {
+        "helper": "두 발로 힘찬 소리를 내요",
+        "prompt": "‘발을 바닥에 쿵쿵 굴러요’는 어떤 움직임일까?",
+        "speech": "발을 바닥에 쿵쿵 굴러요. 어떤 움직임일까?",
+        "success": "쿵쿵! 두 발로 바닥을 힘차게 굴렀어.",
+        "options": [
+          {
+            "label": "고개 끄덕이기",
+            "visual": "🙂",
+            "subtitle": "고개를 움직여요"
+          },
+          {
+            "label": "손가락 펴기",
+            "visual": "🖐️",
+            "subtitle": "손을 펼쳐요"
+          },
+          {
+            "label": "발 구르기",
+            "visual": "🦶",
+            "subtitle": "바닥을 쿵쿵",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra051": {
+    "title": "도구는 척척",
+    "icon": "✂️",
+    "category": "word",
+    "cardColor": "coral",
+    "description": "가위·연필·빗자루가 하는 일을 알아봐요.",
+    "duration": "3분",
+    "preview": [
+      "✂️",
+      "✏️",
+      "🧹"
+    ],
+    "skill": "생활 도구와 대표 기능을 연결해요",
+    "insight": "가위는 반드시 어른과 함께 쓰고, 도구 이름 뒤에 “무엇을 할까?”를 덧붙여 주세요.",
+    "offline": {
+      "title": "우리 집 도구 찾기",
+      "text": "안전한 연필과 빗자루를 찾아 이름과 쓰임을 한 문장으로 말해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "종이를 자를 때 쓰는 도구예요",
+        "prompt": "종이를 싹둑 자를 때 어른과 함께 쓰는 것은 무엇일까?",
+        "speech": "종이를 싹둑 자를 때 어른과 함께 쓰는 것은 무엇일까?",
+        "success": "싹둑! 가위는 어른과 함께 안전하게 써요.",
+        "options": [
+          {
+            "label": "가위",
+            "visual": "✂️",
+            "subtitle": "종이를 잘라요",
+            "correct": true
+          },
+          {
+            "label": "숟가락",
+            "visual": "🥄",
+            "subtitle": "음식을 떠요"
+          },
+          {
+            "label": "양말",
+            "visual": "🧦",
+            "subtitle": "발에 신어요"
+          }
+        ]
+      },
+      {
+        "helper": "종이에 선을 그어요",
+        "prompt": "종이에 글씨를 쓰고 선을 그을 때 쓰는 것은 무엇일까?",
+        "speech": "종이에 글씨를 쓰고 선을 그을 때 쓰는 것은 무엇일까?",
+        "success": "사각사각! 연필로 선을 그어요.",
+        "options": [
+          {
+            "label": "칫솔",
+            "visual": "🪥",
+            "subtitle": "이를 닦아요"
+          },
+          {
+            "label": "연필",
+            "visual": "✏️",
+            "subtitle": "쓰고 그려요",
+            "correct": true
+          },
+          {
+            "label": "우산",
+            "visual": "☂️",
+            "subtitle": "비를 막아요"
+          }
+        ]
+      },
+      {
+        "helper": "바닥을 깨끗하게 해요",
+        "prompt": "바닥의 먼지를 쓸어 모을 때 쓰는 것은 무엇일까?",
+        "speech": "바닥의 먼지를 쓸어 모을 때 쓰는 것은 무엇일까?",
+        "success": "쓱쓱! 빗자루로 바닥을 깨끗하게 쓸어요.",
+        "options": [
+          {
+            "label": "빗자루",
+            "visual": "🧹",
+            "subtitle": "바닥을 쓸어요",
+            "correct": true
+          },
+          {
+            "label": "베개",
+            "visual": "🛏️",
+            "subtitle": "머리를 대요"
+          },
+          {
+            "label": "컵",
+            "visual": "🥤",
+            "subtitle": "물을 마셔요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra052": {
+    "title": "어느 방에 있을까",
+    "icon": "🏠",
+    "category": "look",
+    "cardColor": "yellow",
+    "description": "침대·욕조·냉장고가 있는 방을 찾아요.",
+    "duration": "3분",
+    "preview": [
+      "🛏️",
+      "🛁",
+      "🧊"
+    ],
+    "skill": "집 안 공간과 대표 물건을 연결해요",
+    "insight": "집 안을 이동하며 “침대가 있는 침실”처럼 물건과 공간 이름을 함께 말해 주세요.",
+    "offline": {
+      "title": "우리 집 방 탐험",
+      "text": "한 방씩 둘러보며 그곳에서 쓰는 물건을 두 가지씩 찾아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "푹 자는 곳을 떠올려요",
+        "prompt": "침대가 있는 방은 어디일까?",
+        "speech": "푹 자는 침대가 있는 방은 어디일까?",
+        "scene": [
+          "🛏️"
+        ],
+        "success": "포근포근! 침대는 침실에 있어요.",
+        "options": [
+          {
+            "label": "주방",
+            "visual": "🍳",
+            "subtitle": "음식을 만들어요"
+          },
+          {
+            "label": "침실",
+            "visual": "🛏️",
+            "subtitle": "잠을 자요",
+            "correct": true
+          },
+          {
+            "label": "욕실",
+            "visual": "🛁",
+            "subtitle": "몸을 씻어요"
+          }
+        ]
+      },
+      {
+        "helper": "몸을 씻는 곳을 떠올려요",
+        "prompt": "욕조와 샤워기가 있는 방은 어디일까?",
+        "speech": "욕조와 샤워기가 있는 방은 어디일까?",
+        "scene": [
+          "🛁"
+        ],
+        "success": "보글보글! 욕조는 욕실에 있어요.",
+        "options": [
+          {
+            "label": "거실",
+            "visual": "🛋️",
+            "subtitle": "함께 쉬어요"
+          },
+          {
+            "label": "침실",
+            "visual": "🛏️",
+            "subtitle": "잠을 자요"
+          },
+          {
+            "label": "욕실",
+            "visual": "🛁",
+            "subtitle": "몸을 씻어요",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "helper": "음식을 보관하는 곳을 떠올려요",
+        "prompt": "냉장고와 가스레인지가 있는 곳은 어디일까?",
+        "speech": "냉장고와 가스레인지가 있는 곳은 어디일까?",
+        "scene": [
+          "🧊",
+          "🍳"
+        ],
+        "success": "맞아! 주방에서 음식을 보관하고 만들어요.",
+        "options": [
+          {
+            "label": "주방",
+            "visual": "🍳",
+            "subtitle": "음식을 만들어요",
+            "correct": true
+          },
+          {
+            "label": "현관",
+            "visual": "🚪",
+            "subtitle": "드나드는 곳"
+          },
+          {
+            "label": "침실",
+            "visual": "🛏️",
+            "subtitle": "잠을 자요"
+          }
+        ]
+      }
+    ]
+  },
+  "extra053": {
+    "title": "옷은 어디에 입을까",
+    "icon": "👟",
+    "category": "word",
+    "cardColor": "pink",
+    "description": "신발·장갑·목도리를 몸의 알맞은 곳과 연결해요.",
+    "duration": "2분",
+    "preview": [
+      "👟",
+      "🧤",
+      "🧣"
+    ],
+    "skill": "옷과 몸의 위치를 연결해 말해요",
+    "insight": "옷을 입을 때 “발에 신발”, “손에 장갑”처럼 짧고 같은 문장으로 반복해 주세요.",
+    "offline": {
+      "title": "인형 옷 입히기",
+      "text": "인형에게 신발, 장갑, 목도리를 알맞은 곳에 입혀보세요."
+    },
+    "rounds": [
+      {
+        "helper": "걸을 때 발을 지켜줘요",
+        "prompt": "신발은 몸의 어디에 신을까?",
+        "speech": "신발은 몸의 어디에 신을까?",
+        "scene": [
+          "👟"
+        ],
+        "success": "맞아! 신발은 두 발에 신어요.",
+        "options": [
+          {
+            "label": "발",
+            "visual": "🦶",
+            "subtitle": "신발을 신어요",
+            "correct": true
+          },
+          {
+            "label": "손",
+            "visual": "✋",
+            "subtitle": "물건을 잡아요"
+          },
+          {
+            "label": "귀",
+            "visual": "👂",
+            "subtitle": "소리를 들어요"
+          }
+        ]
+      },
+      {
+        "helper": "추운 날 두 손을 감싸요",
+        "prompt": "장갑은 몸의 어디에 낄까?",
+        "speech": "장갑은 몸의 어디에 낄까?",
+        "scene": [
+          "🧤"
+        ],
+        "success": "포근포근! 장갑은 두 손에 껴요.",
+        "options": [
+          {
+            "label": "머리",
+            "visual": "🙂",
+            "subtitle": "모자를 써요"
+          },
+          {
+            "label": "손",
+            "visual": "✋",
+            "subtitle": "장갑을 껴요",
+            "correct": true
+          },
+          {
+            "label": "무릎",
+            "visual": "🦵",
+            "subtitle": "다리를 구부려요"
+          }
+        ]
+      },
+      {
+        "helper": "목을 따뜻하게 감싸요",
+        "prompt": "목도리는 몸의 어디에 두를까?",
+        "speech": "목도리는 몸의 어디에 두를까?",
+        "scene": [
+          "🧣"
+        ],
+        "success": "따뜻해! 목도리는 목에 둘러요.",
+        "options": [
+          {
+            "label": "발목",
+            "visual": "🦶",
+            "subtitle": "양말을 신어요"
+          },
+          {
+            "label": "허리",
+            "visual": "👖",
+            "subtitle": "바지를 입어요"
+          },
+          {
+            "label": "목",
+            "visual": "🧣",
+            "subtitle": "목도리를 둘러요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra054": {
+    "title": "손끝 느낌 말",
+    "icon": "🖐️",
+    "category": "word",
+    "cardColor": "blue",
+    "description": "차갑다·부드럽다·단단하다를 사물과 연결해요.",
+    "duration": "3분",
+    "preview": [
+      "🧊",
+      "🪶",
+      "🪨"
+    ],
+    "skill": "촉감과 온도를 나타내는 쉬운 말을 이해해요",
+    "insight": "안전한 물건을 직접 만지게 하고 아이의 표현이 달라도 느낌을 존중해 주세요.",
+    "offline": {
+      "title": "촉감 바구니",
+      "text": "수건, 쿠션, 나무 블록을 만지며 부드럽다와 단단하다를 말해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "차가운 것을 떠올려요",
+        "prompt": "얼음을 만졌을 때 가장 잘 어울리는 말은 무엇일까?",
+        "speech": "얼음을 만졌을 때 가장 잘 어울리는 말은 무엇일까?",
+        "scene": [
+          "🧊"
+        ],
+        "success": "앗 차가워! 얼음은 차가워요.",
+        "options": [
+          {
+            "label": "차가워요",
+            "visual": "🥶",
+            "subtitle": "얼음 같은 느낌",
+            "correct": true
+          },
+          {
+            "label": "푹신해요",
+            "visual": "🛋️",
+            "subtitle": "쿠션 같은 느낌"
+          },
+          {
+            "label": "끈적해요",
+            "visual": "🍯",
+            "subtitle": "꿀 같은 느낌"
+          }
+        ]
+      },
+      {
+        "helper": "살랑한 깃털을 떠올려요",
+        "prompt": "깃털을 살살 만졌을 때 어울리는 말은 무엇일까?",
+        "speech": "깃털을 살살 만졌을 때 어울리는 말은 무엇일까?",
+        "scene": [
+          "🪶"
+        ],
+        "success": "살랑살랑! 깃털은 부드러워요.",
+        "options": [
+          {
+            "label": "거칠어요",
+            "visual": "🧱",
+            "subtitle": "까슬한 느낌"
+          },
+          {
+            "label": "부드러워요",
+            "visual": "🪶",
+            "subtitle": "살살한 느낌",
+            "correct": true
+          },
+          {
+            "label": "뜨거워요",
+            "visual": "🔥",
+            "subtitle": "만지면 위험해요"
+          }
+        ]
+      },
+      {
+        "helper": "단단한 돌을 떠올려요",
+        "prompt": "돌을 손으로 눌렀을 때 어울리는 말은 무엇일까?",
+        "speech": "돌을 손으로 눌렀을 때 어울리는 말은 무엇일까?",
+        "scene": [
+          "🪨"
+        ],
+        "success": "맞아! 돌은 눌러도 단단해요.",
+        "options": [
+          {
+            "label": "흔들려요",
+            "visual": "🌊",
+            "subtitle": "출렁이는 모습"
+          },
+          {
+            "label": "달콤해요",
+            "visual": "🍬",
+            "subtitle": "맛을 나타내요"
+          },
+          {
+            "label": "단단해요",
+            "visual": "🪨",
+            "subtitle": "꾹 눌러도 단단해요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra055": {
+    "title": "달콤 새콤 짭짤",
+    "icon": "👅",
+    "category": "word",
+    "cardColor": "yellow",
+    "description": "익숙한 음식과 단맛·신맛·짠맛을 연결해요.",
+    "duration": "3분",
+    "preview": [
+      "🍯",
+      "🍋",
+      "🧂"
+    ],
+    "skill": "기본 맛을 나타내는 낱말을 이해해요",
+    "insight": "정답을 외우기보다 안전한 식사 중 아이가 느낀 맛을 자기 말로 표현하게 해 주세요.",
+    "offline": {
+      "title": "오늘 음식 맛 말하기",
+      "text": "식사 중 음식 하나를 골라 달다, 시다, 짭짤하다 중 어울리는 말을 해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "꿀의 맛을 떠올려요",
+        "prompt": "꿀을 조금 맛보면 어떤 맛이 날까?",
+        "speech": "꿀을 조금 맛보면 어떤 맛이 날까?",
+        "scene": [
+          "🍯"
+        ],
+        "success": "달콤해! 꿀은 단맛이 나요.",
+        "options": [
+          {
+            "label": "달콤해요",
+            "visual": "🍯",
+            "subtitle": "단맛",
+            "correct": true
+          },
+          {
+            "label": "새콤해요",
+            "visual": "🍋",
+            "subtitle": "신맛"
+          },
+          {
+            "label": "짭짤해요",
+            "visual": "🧂",
+            "subtitle": "짠맛"
+          }
+        ]
+      },
+      {
+        "helper": "레몬의 맛을 떠올려요",
+        "prompt": "레몬을 맛보면 어떤 맛이 날까?",
+        "speech": "노란 레몬을 맛보면 어떤 맛이 날까?",
+        "scene": [
+          "🍋"
+        ],
+        "success": "아이 새콤해! 레몬은 신맛이 나요.",
+        "options": [
+          {
+            "label": "고소해요",
+            "visual": "🥜",
+            "subtitle": "견과류 같은 맛"
+          },
+          {
+            "label": "새콤해요",
+            "visual": "🍋",
+            "subtitle": "신맛",
+            "correct": true
+          },
+          {
+            "label": "달콤해요",
+            "visual": "🍯",
+            "subtitle": "단맛"
+          }
+        ]
+      },
+      {
+        "helper": "소금의 맛을 떠올려요",
+        "prompt": "소금은 어떤 맛을 내줄까?",
+        "speech": "소금은 어떤 맛을 내줄까?",
+        "scene": [
+          "🧂"
+        ],
+        "success": "맞아! 소금은 짠맛을 내줘요.",
+        "options": [
+          {
+            "label": "새콤해요",
+            "visual": "🍋",
+            "subtitle": "신맛"
+          },
+          {
+            "label": "달콤해요",
+            "visual": "🍬",
+            "subtitle": "단맛"
+          },
+          {
+            "label": "짭짤해요",
+            "visual": "🧂",
+            "subtitle": "짠맛",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra056": {
+    "title": "우리 집 소리말",
+    "icon": "🔔",
+    "category": "word",
+    "cardColor": "purple",
+    "description": "종·시계·북의 소리를 말로 표현해요.",
+    "duration": "2분",
+    "preview": [
+      "🔔",
+      "⏰",
+      "🥁"
+    ],
+    "skill": "딩동·째깍째깍·둥둥 소리말을 구별해요",
+    "insight": "실제 생활 소리를 들었을 때 아이가 만든 재미있는 소리말도 좋은 답으로 받아주세요.",
+    "offline": {
+      "title": "집 안 소리 산책",
+      "text": "시계, 문, 물건을 두드리는 소리를 차례로 듣고 소리말을 만들어보세요."
+    },
+    "rounds": [
+      {
+        "helper": "문 앞 종소리를 떠올려요",
+        "prompt": "초인종이 울릴 때 어울리는 소리말은 무엇일까?",
+        "speech": "초인종이 울릴 때 어울리는 소리말은 무엇일까?",
+        "scene": [
+          "🔔"
+        ],
+        "success": "딩동! 누가 문 앞에 왔나 봐.",
+        "options": [
+          {
+            "label": "딩동",
+            "visual": "🔔",
+            "subtitle": "초인종 소리",
+            "correct": true
+          },
+          {
+            "label": "졸졸",
+            "visual": "🚰",
+            "subtitle": "물 흐르는 소리"
+          },
+          {
+            "label": "부릉",
+            "visual": "🚗",
+            "subtitle": "자동차 소리"
+          }
+        ]
+      },
+      {
+        "helper": "시계가 가는 소리를 떠올려요",
+        "prompt": "시계가 움직일 때 어울리는 소리말은 무엇일까?",
+        "speech": "시계가 움직일 때 어울리는 소리말은 무엇일까?",
+        "scene": [
+          "⏰"
+        ],
+        "success": "째깍째깍! 시계가 계속 움직여요.",
+        "options": [
+          {
+            "label": "철썩철썩",
+            "visual": "🌊",
+            "subtitle": "파도 소리"
+          },
+          {
+            "label": "째깍째깍",
+            "visual": "⏰",
+            "subtitle": "시계 소리",
+            "correct": true
+          },
+          {
+            "label": "바스락바스락",
+            "visual": "🍂",
+            "subtitle": "마른 잎 소리"
+          }
+        ]
+      },
+      {
+        "helper": "북을 두드리는 소리를 떠올려요",
+        "prompt": "북을 힘차게 두드릴 때 어울리는 소리말은 무엇일까?",
+        "speech": "북을 힘차게 두드릴 때 어울리는 소리말은 무엇일까?",
+        "scene": [
+          "🥁"
+        ],
+        "success": "둥둥! 신나는 북소리야.",
+        "options": [
+          {
+            "label": "사각사각",
+            "visual": "✏️",
+            "subtitle": "연필 소리"
+          },
+          {
+            "label": "보글보글",
+            "visual": "🍲",
+            "subtitle": "끓는 소리"
+          },
+          {
+            "label": "둥둥",
+            "visual": "🥁",
+            "subtitle": "북소리",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra057": {
+    "title": "동물 이름 바구니",
+    "icon": "🐾",
+    "category": "word",
+    "cardColor": "mint",
+    "description": "서로 다른 그림에서 동물을 찾아 한 바구니에 모아요.",
+    "duration": "2분",
+    "preview": [
+      "🦁",
+      "🐧",
+      "🐌"
+    ],
+    "skill": "동물 범주에 속하는 낱말을 골라요",
+    "insight": "“왜 동물일까?”를 어렵게 설명하게 하기보다 움직이고 먹고 자란다는 점을 간단히 이야기해 주세요.",
+    "offline": {
+      "title": "동물 그림 모으기",
+      "text": "잡지나 그림책에서 동물 그림을 세 개 찾아 손가락으로 가리켜보세요."
+    },
+    "rounds": [
+      {
+        "helper": "동물 한 마리를 찾아요",
+        "prompt": "사자, 의자, 사과 중 동물은 무엇일까?",
+        "speech": "사자, 의자, 사과 중 동물은 무엇일까?",
+        "success": "어흥! 사자는 동물이야.",
+        "options": [
+          {
+            "label": "의자",
+            "visual": "🪑",
+            "subtitle": "앉는 물건"
+          },
+          {
+            "label": "사자",
+            "visual": "🦁",
+            "subtitle": "동물",
+            "correct": true
+          },
+          {
+            "label": "사과",
+            "visual": "🍎",
+            "subtitle": "과일"
+          }
+        ]
+      },
+      {
+        "helper": "동물 한 마리를 더 찾아요",
+        "prompt": "펭귄, 연필, 우산 중 동물은 무엇일까?",
+        "speech": "펭귄, 연필, 우산 중 동물은 무엇일까?",
+        "success": "뒤뚱뒤뚱! 펭귄은 동물이야.",
+        "options": [
+          {
+            "label": "펭귄",
+            "visual": "🐧",
+            "subtitle": "동물",
+            "correct": true
+          },
+          {
+            "label": "연필",
+            "visual": "✏️",
+            "subtitle": "쓰는 도구"
+          },
+          {
+            "label": "우산",
+            "visual": "☂️",
+            "subtitle": "비를 막는 물건"
+          }
+        ]
+      },
+      {
+        "helper": "마지막 동물을 찾아요",
+        "prompt": "달팽이, 모자, 빵 중 동물은 무엇일까?",
+        "speech": "달팽이, 모자, 빵 중 동물은 무엇일까?",
+        "success": "느릿느릿! 달팽이도 동물이야.",
+        "options": [
+          {
+            "label": "모자",
+            "visual": "🧢",
+            "subtitle": "쓰는 옷"
+          },
+          {
+            "label": "빵",
+            "visual": "🍞",
+            "subtitle": "먹는 음식"
+          },
+          {
+            "label": "달팽이",
+            "visual": "🐌",
+            "subtitle": "동물",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra058": {
+    "title": "악기 이름 콩콩",
+    "icon": "🎹",
+    "category": "word",
+    "cardColor": "coral",
+    "description": "피아노·북·트럼펫의 생김새와 이름을 익혀요.",
+    "duration": "3분",
+    "preview": [
+      "🎹",
+      "🥁",
+      "🎺"
+    ],
+    "skill": "익숙한 악기 세 가지를 보고 이름을 말해요",
+    "insight": "악기 이름 뒤에 “두드려요”, “눌러요”, “불어요” 같은 동작말을 덧붙여 주세요.",
+    "offline": {
+      "title": "주방 악기 연주",
+      "text": "빈 통을 북처럼 두드리고 탁자 위를 피아노처럼 살살 눌러 연주해보세요."
+    },
+    "rounds": [
+      {
+        "helper": "검고 흰 건반을 살펴봐요",
+        "prompt": "손가락으로 건반을 눌러 연주하는 악기는 무엇일까?",
+        "speech": "손가락으로 검고 흰 건반을 눌러 연주하는 악기는 무엇일까?",
+        "success": "딩동댕! 건반을 누르는 피아노야.",
+        "options": [
+          {
+            "label": "피아노",
+            "visual": "🎹",
+            "subtitle": "건반을 눌러요",
+            "correct": true
+          },
+          {
+            "label": "북",
+            "visual": "🥁",
+            "subtitle": "두드려요"
+          },
+          {
+            "label": "트럼펫",
+            "visual": "🎺",
+            "subtitle": "입으로 불어요"
+          }
+        ]
+      },
+      {
+        "helper": "채로 둥둥 두드려요",
+        "prompt": "채로 둥둥 두드려 연주하는 악기는 무엇일까?",
+        "speech": "채로 둥둥 두드려 연주하는 악기는 무엇일까?",
+        "success": "둥둥둥! 신나게 두드리는 북이야.",
+        "options": [
+          {
+            "label": "바이올린",
+            "visual": "🎻",
+            "subtitle": "활로 켜요"
+          },
+          {
+            "label": "북",
+            "visual": "🥁",
+            "subtitle": "채로 두드려요",
+            "correct": true
+          },
+          {
+            "label": "피아노",
+            "visual": "🎹",
+            "subtitle": "건반을 눌러요"
+          }
+        ]
+      },
+      {
+        "helper": "입으로 후 불어요",
+        "prompt": "입으로 후 불어서 소리 내는 금빛 악기는 무엇일까?",
+        "speech": "입으로 후 불어서 소리 내는 금빛 악기는 무엇일까?",
+        "success": "빠라빠라! 입으로 부는 트럼펫이야.",
+        "options": [
+          {
+            "label": "북",
+            "visual": "🥁",
+            "subtitle": "두드려요"
+          },
+          {
+            "label": "기타",
+            "visual": "🎸",
+            "subtitle": "줄을 튕겨요"
+          },
+          {
+            "label": "트럼펫",
+            "visual": "🎺",
+            "subtitle": "입으로 불어요",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra059": {
+    "title": "옷 이름 바구니",
+    "icon": "👕",
+    "category": "word",
+    "cardColor": "pink",
+    "description": "여러 그림 가운데 몸에 입는 옷을 찾아요.",
+    "duration": "2분",
+    "preview": [
+      "👕",
+      "👖",
+      "🧦"
+    ],
+    "skill": "티셔츠·바지·양말을 옷 범주로 묶어요",
+    "insight": "옷을 갈아입을 때 아이가 한 가지를 직접 고르고 옷 이름을 말해보게 해 주세요.",
+    "offline": {
+      "title": "빨래 개기 놀이",
+      "text": "깨끗한 티셔츠, 바지, 양말을 종류별로 나누어 놓아보세요."
+    },
+    "rounds": [
+      {
+        "helper": "몸에 입는 것을 찾아요",
+        "prompt": "티셔츠, 바나나, 버스 중 옷은 무엇일까?",
+        "speech": "티셔츠, 바나나, 버스 중 옷은 무엇일까?",
+        "success": "맞아! 티셔츠는 몸에 입는 옷이야.",
+        "options": [
+          {
+            "label": "바나나",
+            "visual": "🍌",
+            "subtitle": "과일"
+          },
+          {
+            "label": "티셔츠",
+            "visual": "👕",
+            "subtitle": "옷",
+            "correct": true
+          },
+          {
+            "label": "버스",
+            "visual": "🚌",
+            "subtitle": "탈것"
+          }
+        ]
+      },
+      {
+        "helper": "다리에 입는 옷을 찾아요",
+        "prompt": "바지, 컵, 꽃 중 옷은 무엇일까?",
+        "speech": "바지, 컵, 꽃 중 옷은 무엇일까?",
+        "success": "쏙! 바지는 다리에 입는 옷이야.",
+        "options": [
+          {
+            "label": "바지",
+            "visual": "👖",
+            "subtitle": "옷",
+            "correct": true
+          },
+          {
+            "label": "컵",
+            "visual": "🥤",
+            "subtitle": "마시는 도구"
+          },
+          {
+            "label": "꽃",
+            "visual": "🌼",
+            "subtitle": "식물"
+          }
+        ]
+      },
+      {
+        "helper": "발에 신는 옷을 찾아요",
+        "prompt": "양말, 사자, 연필 중 옷은 무엇일까?",
+        "speech": "양말, 사자, 연필 중 옷은 무엇일까?",
+        "success": "포근포근! 양말은 발에 신는 옷이야.",
+        "options": [
+          {
+            "label": "사자",
+            "visual": "🦁",
+            "subtitle": "동물"
+          },
+          {
+            "label": "연필",
+            "visual": "✏️",
+            "subtitle": "쓰는 도구"
+          },
+          {
+            "label": "양말",
+            "visual": "🧦",
+            "subtitle": "옷",
+            "correct": true
+          }
+        ]
+      }
+    ]
+  },
+  "extra060": {
+    "title": "놀이감 이름 바구니",
+    "icon": "🧸",
+    "category": "word",
+    "cardColor": "blue",
+    "description": "공·블록·곰 인형을 놀이감으로 묶어요.",
+    "duration": "2분",
+    "preview": [
+      "⚽",
+      "🧱",
+      "🧸"
+    ],
+    "skill": "익숙한 놀이감을 다른 범주의 물건과 구별해요",
+    "insight": "정리 시간에 놀이감 이름을 말하며 같은 바구니에 넣는 습관으로 이어가 보세요.",
+    "offline": {
+      "title": "놀이감 정리 대장",
+      "text": "공, 블록, 인형을 찾아 놀이감 바구니에 하나씩 넣어보세요."
+    },
+    "rounds": [
+      {
+        "helper": "굴리고 차며 노는 것을 찾아요",
+        "prompt": "공, 사과, 숟가락 중 놀이감은 무엇일까?",
+        "speech": "공, 사과, 숟가락 중 놀이감은 무엇일까?",
+        "success": "통통! 공은 굴리고 차며 노는 놀이감이야.",
+        "options": [
+          {
+            "label": "공",
+            "visual": "⚽",
+            "subtitle": "놀이감",
+            "correct": true
+          },
+          {
+            "label": "사과",
+            "visual": "🍎",
+            "subtitle": "과일"
+          },
+          {
+            "label": "숟가락",
+            "visual": "🥄",
+            "subtitle": "식탁 도구"
+          }
+        ]
+      },
+      {
+        "helper": "차곡차곡 쌓는 것을 찾아요",
+        "prompt": "블록, 신발, 당근 중 놀이감은 무엇일까?",
+        "speech": "블록, 신발, 당근 중 놀이감은 무엇일까?",
+        "success": "차곡차곡! 블록은 쌓으며 노는 놀이감이야.",
+        "options": [
+          {
+            "label": "신발",
+            "visual": "👟",
+            "subtitle": "발에 신어요"
+          },
+          {
+            "label": "당근",
+            "visual": "🥕",
+            "subtitle": "채소"
+          },
+          {
+            "label": "블록",
+            "visual": "🧱",
+            "subtitle": "놀이감",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "helper": "포근히 안고 노는 것을 찾아요",
+        "prompt": "곰 인형, 우산, 접시 중 놀이감은 무엇일까?",
+        "speech": "곰 인형, 우산, 접시 중 놀이감은 무엇일까?",
+        "success": "꼬옥! 곰 인형은 함께 노는 놀이감이야.",
+        "options": [
+          {
+            "label": "우산",
+            "visual": "☂️",
+            "subtitle": "비를 막아요"
+          },
+          {
+            "label": "곰 인형",
+            "visual": "🧸",
+            "subtitle": "놀이감",
+            "correct": true
+          },
+          {
+            "label": "접시",
+            "visual": "🍽️",
+            "subtitle": "음식을 담아요"
+          }
+        ]
+      }
+    ]
+  }
+}
