@@ -590,19 +590,185 @@ button.pattern-cell {
 }
 
 .trace-board {
+  width: min(100%, 440px);
+}
+
+.trace-board[hidden] {
+  display: none;
+}
+
+.trace-board.is-drawing-board {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 3px solid #d9cdeb;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 0 rgba(184, 165, 214, 0.38);
+}
+
+.trace-draw-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--ink);
+}
+
+.trace-draw-heading strong {
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.trace-draw-visual {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 15px;
+  background: var(--purple-soft);
+  font-size: 32px;
+}
+
+.trace-draw-visual .play-shape {
+  transform: scale(0.48);
+}
+
+.trace-canvas-shell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 3px solid #a98bc7;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.98), rgba(255, 248, 234, 0.9)),
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(117, 189, 241, 0.1) 23px 25px);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.trace-canvas-shell.is-complete {
+  border-color: #2f956f;
+  box-shadow: 0 0 0 6px rgba(47, 149, 111, 0.16);
+}
+
+.trace-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.trace-canvas:focus-visible {
+  outline: 4px solid #3175a8;
+  outline-offset: -7px;
+  border-radius: 24px;
+}
+
+.trace-canvas.is-drawing {
+  cursor: grabbing;
+}
+
+.trace-status {
+  min-height: 24px;
+  margin: 0;
+  color: var(--purple-dark);
+  font-size: 15px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.trace-progress {
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border: 2px solid #d3c5e7;
+  border-radius: 999px;
+  background: #f3ecfb;
+}
+
+.trace-progress > span {
+  width: 0;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--coral), var(--yellow), var(--mint));
+  transition: width 180ms ease;
+}
+
+.trace-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.trace-clear,
+.trace-finish {
+  width: 100%;
+  min-width: 0;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 3px solid transparent;
+  border-radius: 20px;
+  font-size: 16px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.trace-clear {
+  border-color: #c9b9df;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  box-shadow: 0 5px 0 #c9b9df;
+}
+
+.trace-finish {
+  box-shadow: 0 5px 0 #86cbb4;
+}
+
+.trace-alternate {
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: transparent;
+  color: #285f8b;
+  font-size: 14px;
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.trace-dot-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.trace-dot-layer[hidden],
+.trace-actions[hidden] {
+  display: none;
+}
+
+.trace-access-point {
+  z-index: 3;
+}
+
+.trace-board.is-point-trace {
   position: relative;
   width: min(100%, 520px);
   aspect-ratio: 1.65 / 1;
+  overflow: hidden;
   border: 3px solid #ded2c4;
   border-radius: 32px;
   background:
     radial-gradient(circle at center, rgba(255, 255, 255, 0.92), rgba(255, 248, 234, 0.82)),
     repeating-linear-gradient(0deg, transparent 0 24px, rgba(117, 189, 241, 0.08) 24px 26px);
-  overflow: hidden;
-}
-
-.trace-board[hidden] {
-  display: none;
 }
 
 .trace-faint-visual {
@@ -950,7 +1116,25 @@ button.pattern-cell {
 
   .trace-board {
     width: min(100%, 430px);
+  }
+
+  .trace-board.is-drawing-board {
+    padding: 10px;
     border-radius: 24px;
+  }
+
+  .trace-canvas-shell {
+    border-radius: 20px;
+  }
+
+  .trace-draw-heading strong {
+    font-size: 16px;
+  }
+
+  .trace-clear,
+  .trace-finish {
+    min-height: 54px;
+    font-size: 14px;
   }
 
   .trace-point {
@@ -1007,7 +1191,9 @@ button.pattern-cell {
 
 @media (prefers-reduced-motion: reduce) {
   .activity-drag-ghost,
-  .memory-card {
+  .memory-card,
+  .trace-canvas-shell,
+  .trace-progress > span {
     transition: none;
   }
 
@@ -1027,6 +1213,10 @@ button.pattern-cell {
   .sequence-slot,
   .single-drop-target,
   .trace-start-target,
+  .trace-canvas-shell,
+  .trace-clear,
+  .trace-finish,
+  .trace-alternate,
   .trace-point {
     border: 2px solid ButtonText;
   }

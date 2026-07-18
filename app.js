@@ -1026,7 +1026,7 @@
 
     const engine = window.MONGLE_INTERACTIONS;
     const mode = engine?.resolveMode(activeGameKey, game, round) || "choice";
-    const modeMeta = engine?.metaFor(mode) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
+    const modeMeta = engine?.metaFor(mode, activeGameKey) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
     interactionHintElement.textContent = modeMeta.label + " · " + modeMeta.instruction;
     interactionHintElement.dataset.icon = interactionIcon(mode);
     const ownsScene = ["count", "compare", "memory", "pattern", "spot", "trace", "order", "sequence"].includes(mode);

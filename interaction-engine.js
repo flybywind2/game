@@ -40,8 +40,8 @@
       instruction: "같은 그림을 세 개 모두 톡톡 눌러요.",
     },
     trace: {
-      label: "선 따라가기",
-      instruction: "맞는 그림을 찾고 반짝이는 점을 차례로 눌러요.",
+      label: "손가락 그리기",
+      instruction: "맞는 도형을 찾고 굵은 안내선을 손가락으로 따라 그려요.",
     },
     order: {
       label: "크기 차례",
@@ -156,7 +156,13 @@
 
   let activeController = null;
 
-  function metaFor(mode) {
+  function metaFor(mode, gameKey) {
+    if (mode === "trace" && gameKey === "extra050") {
+      return {
+        label: "동작 따라가기",
+        instruction: "맞는 동작 그림을 찾고 반짝이는 점을 차례로 눌러요.",
+      };
+    }
     return MODE_META[mode] || MODE_META.choice;
   }
 
@@ -1127,33 +1133,6 @@
   }
 
   const TRACE_POINTS = Object.freeze({
-    circle: [
-      [50, 14],
-      [78, 25],
-      [84, 53],
-      [70, 82],
-      [37, 84],
-      [16, 60],
-      [22, 29],
-    ],
-    square: [
-      [18, 18],
-      [50, 18],
-      [82, 18],
-      [82, 50],
-      [82, 82],
-      [50, 82],
-      [18, 82],
-      [18, 50],
-    ],
-    triangle: [
-      [50, 14],
-      [65, 38],
-      [80, 76],
-      [50, 78],
-      [20, 76],
-      [35, 38],
-    ],
     wave: [
       [15, 50],
       [28, 26],
@@ -1165,12 +1144,553 @@
   });
 
   function traceKind(option, gameKey) {
-    if (option.type === "shape" && TRACE_POINTS[option.visual]) return option.visual;
+    if (option.type === "shape" && ["circle", "triangle", "square"].includes(option.visual)) {
+      return option.visual;
+    }
     return {
       extra005: "circle",
       extra006: "triangle",
       extra007: "square",
     }[gameKey] || "wave";
+  }
+
+  function sampleTraceEdges(vertices, samplesPerEdge, closed = true) {
+    const points = [];
+    const edgeCount = closed ? vertices.length : vertices.length - 1;
+    for (let edge = 0; edge < edgeCount; edge += 1) {
+      const start = vertices[edge];
+      const end = vertices[(edge + 1) % vertices.length];
+      for (let step = 0; step < samplesPerEdge; step += 1) {
+        const progress = step / samplesPerEdge;
+        points.push({
+          x: start.x + (end.x - start.x) * progress,
+          y: start.y + (end.y - start.y) * progress,
+        });
+      }
+    }
+    points.push({ ...(closed ? vertices[0] : vertices.at(-1)) });
+    return points;
+  }
+
+  function buildTraceGuide(kind, width, height) {
+    const size = Math.min(width, height);
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = size * 0.32;
+
+    if (kind === "circle") {
+      return Array.from({ length: 121 }, (_, index) => {
+        const angle = -Math.PI / 2 + (Math.PI * 2 * index) / 120;
+        return {
+          x: centerX + Math.cos(angle) * radius,
+          y: centerY + Math.sin(angle) * radius,
+        };
+      });
+    }
+
+    if (kind === "square") {
+      return sampleTraceEdges(
+        [
+          { x: centerX - radius, y: centerY - radius },
+          { x: centerX + radius, y: centerY - radius },
+          { x: centerX + radius, y: centerY + radius },
+          { x: centerX - radius, y: centerY + radius },
+        ],
+        28,
+      );
+    }
+
+    if (kind === "triangle") {
+      return sampleTraceEdges(
+        [
+          { x: centerX, y: centerY - radius },
+          { x: centerX + radius * 0.94, y: centerY + radius * 0.78 },
+          { x: centerX - radius * 0.94, y: centerY + radius * 0.78 },
+        ],
+        36,
+      );
+    }
+
+    return Array.from({ length: 101 }, (_, index) => {
+      const progress = index / 100;
+      return {
+        x: width * (0.12 + progress * 0.76),
+        y: centerY + Math.sin(progress * Math.PI * 4) * size * 0.17,
+      };
+    });
+  }
+
+  function tracePathLength(points) {
+    let length = 0;
+    for (let index = 1; index < points.length; index += 1) {
+      length += Math.hypot(points[index].x - points[index - 1].x, points[index].y - points[index - 1].y);
+    }
+    return length;
+  }
+
+  function drawTraceLine(context, points, color, width) {
+    if (!points.length) return;
+    context.beginPath();
+    context.moveTo(points[0].x, points[0].y);
+    points.slice(1).forEach((point) => context.lineTo(point.x, point.y));
+    context.strokeStyle = color;
+    context.lineWidth = width;
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    context.stroke();
+  }
+
+  function setupShapeDrawing(config) {
+    const { controller, traceBoard, option, kind, onComplete, onMistake, onProgress, announce } = config;
+    traceBoard.classList.add("is-drawing-board");
+
+    const heading = document.createElement("div");
+    heading.className = "trace-draw-heading";
+    const badge = createVisual(option, "trace-draw-visual");
+    const headingText = document.createElement("strong");
+    headingText.textContent = optionName(option) + "를 그려 봐요";
+    heading.append(badge, headingText);
+
+    const canvasShell = document.createElement("div");
+    canvasShell.className = "trace-canvas-shell";
+    const canvas = document.createElement("canvas");
+    canvas.className = "trace-canvas";
+    canvas.tabIndex = 0;
+    canvas.dataset.traceKind = kind;
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute(
+      "aria-label",
+      optionName(option) + " 굵은 안내선. 손가락이나 마우스로 선을 따라 그려요. 키보드 사용자는 아래의 키보드로 점 이어 보기 버튼을 누르세요.",
+    );
+    const dotLayer = document.createElement("div");
+    dotLayer.className = "trace-dot-layer";
+    dotLayer.hidden = true;
+    canvasShell.append(canvas, dotLayer);
+
+    const status = document.createElement("p");
+    status.className = "trace-status";
+    status.id = "trace-status-" + Math.random().toString(36).slice(2);
+    status.setAttribute("aria-live", "polite");
+    status.textContent = "노란 시작점부터 천천히 이어 그려요.";
+    canvas.setAttribute("aria-describedby", status.id);
+
+    const progress = document.createElement("div");
+    progress.className = "trace-progress";
+    progress.setAttribute("role", "progressbar");
+    progress.setAttribute("aria-label", "도형 그리기 진행");
+    progress.setAttribute("aria-valuemin", "0");
+    progress.setAttribute("aria-valuemax", "100");
+    progress.setAttribute("aria-valuenow", "0");
+    const progressFill = document.createElement("span");
+    progress.appendChild(progressFill);
+
+    const actions = document.createElement("div");
+    actions.className = "trace-actions";
+    const clearButton = document.createElement("button");
+    clearButton.type = "button";
+    clearButton.className = "trace-clear";
+    clearButton.textContent = "다시 그리기";
+    const finishButton = document.createElement("button");
+    finishButton.type = "button";
+    finishButton.className = "activity-confirm trace-finish";
+    finishButton.textContent = "다 그렸어요!";
+    actions.append(clearButton, finishButton);
+    const alternateButton = document.createElement("button");
+    alternateButton.type = "button";
+    alternateButton.className = "trace-alternate";
+    alternateButton.textContent = "키보드로 점 이어 보기";
+    alternateButton.setAttribute("aria-pressed", "false");
+    traceBoard.append(heading, canvasShell, status, progress, alternateButton, actions);
+
+    const context = canvas.getContext("2d");
+    let cssWidth = 0;
+    let cssHeight = 0;
+    let guidePoints = [];
+    let strokes = [];
+    let activeStroke = null;
+    let activePointer = null;
+    let finished = false;
+    let completionQueued = false;
+    let alternateActive = false;
+    let alternateNext = 0;
+    const alternatePoints = [];
+
+    const pixelStrokes = () =>
+      strokes.map((stroke) => stroke.map((point) => ({ x: point.x * cssWidth, y: point.y * cssHeight })));
+
+    const renderCanvas = () => {
+      if (!cssWidth || !cssHeight) return;
+      context.clearRect(0, 0, cssWidth, cssHeight);
+
+      drawTraceLine(context, guidePoints, "#e7dbf6", 30);
+      context.setLineDash([7, 11]);
+      drawTraceLine(context, guidePoints, "#765b9b", 4);
+      context.setLineDash([]);
+
+      const start = guidePoints[0];
+      context.beginPath();
+      context.arc(start.x, start.y, 26, 0, Math.PI * 2);
+      context.fillStyle = "#ffd45d";
+      context.fill();
+      context.lineWidth = 4;
+      context.strokeStyle = "#76591f";
+      context.stroke();
+      context.fillStyle = "#513d16";
+      context.font = "900 12px sans-serif";
+      context.textAlign = "center";
+      context.textBaseline = "middle";
+      context.fillText("시작", start.x, start.y);
+
+      pixelStrokes().forEach((stroke) => drawTraceLine(context, stroke, "#f26c62", 15));
+
+      if (finished) {
+        context.beginPath();
+        context.arc(cssWidth - 38, 38, 25, 0, Math.PI * 2);
+        context.fillStyle = "#2f956f";
+        context.fill();
+        context.fillStyle = "white";
+        context.font = "900 30px sans-serif";
+        context.fillText("✓", cssWidth - 38, 39);
+      }
+    };
+
+    const updateAlternatePositions = () => {
+      if (!guidePoints.length) return;
+      const pointCount = kind === "triangle" ? 6 : 8;
+      while (alternatePoints.length < pointCount) {
+        const index = alternatePoints.length;
+        const point = document.createElement("button");
+        point.type = "button";
+        point.className = "trace-point trace-access-point";
+        point.textContent = String(index + 1);
+        point.setAttribute("aria-label", "키보드 대체, " + (index + 1) + "번째 점");
+        point.disabled = index !== 0;
+        controller.on(point, "click", () => {
+          if (!alternateActive || finished || index !== alternateNext) return;
+          point.disabled = true;
+          point.classList.add("is-done");
+          point.dataset.next = "false";
+          alternateNext += 1;
+          const percentage = Math.round((alternateNext / pointCount) * 100);
+          progressFill.style.width = percentage + "%";
+          progress.setAttribute("aria-valuenow", String(percentage));
+          onProgress("prompt");
+          if (alternateNext === pointCount) {
+            finalizeDrawing(point);
+            return;
+          }
+          const following = alternatePoints[alternateNext];
+          following.disabled = false;
+          following.dataset.next = "true";
+          following.focus({ preventScroll: true });
+          announce(alternateNext + "개 점을 이었어요.");
+        });
+        if (index === 0) point.dataset.next = "true";
+        alternatePoints.push(point);
+        dotLayer.appendChild(point);
+      }
+      alternatePoints.forEach((point, index) => {
+        const guideIndex = Math.round((index / pointCount) * (guidePoints.length - 1));
+        const guide = guidePoints[guideIndex];
+        point.style.left = (guide.x / cssWidth) * 100 + "%";
+        point.style.top = (guide.y / cssHeight) * 100 + "%";
+      });
+    };
+
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      cssWidth = rect.width;
+      cssHeight = rect.height;
+      const scale = Math.min(window.devicePixelRatio || 1, 2.5);
+      canvas.width = Math.max(1, Math.round(cssWidth * scale));
+      canvas.height = Math.max(1, Math.round(cssHeight * scale));
+      context.setTransform(scale, 0, 0, scale, 0, 0);
+      guidePoints = buildTraceGuide(kind, cssWidth, cssHeight);
+      updateAlternatePositions();
+      renderCanvas();
+    };
+
+    const nearestDistance = (point) => {
+      let nearest = Infinity;
+      guidePoints.forEach((guide) => {
+        nearest = Math.min(nearest, Math.hypot(point.x - guide.x, point.y - guide.y));
+      });
+      return nearest;
+    };
+
+    const measure = () => {
+      const drawnStrokes = pixelStrokes().filter((stroke) => stroke.length > 1);
+      const drawn = drawnStrokes.flat();
+      if (!drawn.length || !guidePoints.length) {
+        return { coverage: 0, guidedLength: 0, beganAtStart: false, finishedAtStart: false, pass: false };
+      }
+      const tolerance = Math.max(25, Math.min(cssWidth, cssHeight) * 0.09);
+      const coverageFor = (points) =>
+        guidePoints.filter((guide) =>
+          points.some((point) => Math.hypot(point.x - guide.x, point.y - guide.y) <= tolerance),
+        ).length / guidePoints.length;
+      const guidedLengthFor = (points) => {
+        let length = 0;
+        for (let index = 1; index < points.length; index += 1) {
+          const previous = points[index - 1];
+          const current = points[index];
+          const midpoint = { x: (previous.x + current.x) / 2, y: (previous.y + current.y) / 2 };
+          if (
+            nearestDistance(previous) <= tolerance * 1.35 &&
+            nearestDistance(midpoint) <= tolerance * 1.35 &&
+            nearestDistance(current) <= tolerance * 1.35
+          ) {
+            length += Math.hypot(current.x - previous.x, current.y - previous.y);
+          }
+        }
+        return length;
+      };
+      const guidedRatioFor = (points) => {
+        const total = tracePathLength(points);
+        return total > 0 ? guidedLengthFor(points) / total : 0;
+      };
+      const coverage = coverageFor(drawn);
+      const guidedLength = drawnStrokes.reduce((total, stroke) => total + guidedLengthFor(stroke), 0);
+      const guideLength = tracePathLength(guidePoints);
+      const start = guidePoints[0];
+      const nearStart = (point) =>
+        Boolean(point && Math.hypot(point.x - start.x, point.y - start.y) <= tolerance * 1.55);
+      const beganAtStart = drawnStrokes.some((stroke) => nearStart(stroke[0]));
+      let finishedAtStart = false;
+      let pass = false;
+
+      drawnStrokes.forEach((stroke, startIndex) => {
+        if (!nearStart(stroke[0])) return;
+        const connectedStrokes = [stroke];
+        let end = stroke.at(-1);
+        for (let index = startIndex + 1; index < drawnStrokes.length; index += 1) {
+          const nextStroke = drawnStrokes[index];
+          const gap = Math.hypot(nextStroke[0].x - end.x, nextStroke[0].y - end.y);
+          if (
+            gap > tolerance * 1.8 ||
+            guidedLengthFor(nextStroke) < 8 ||
+            guidedRatioFor(nextStroke) < 0.62
+          ) {
+            continue;
+          }
+          connectedStrokes.push(nextStroke);
+          end = nextStroke.at(-1);
+        }
+        if (!nearStart(end)) return;
+        finishedAtStart = true;
+        const connected = connectedStrokes.flat();
+        const connectedGuided = connectedStrokes.reduce(
+          (total, item) => total + guidedLengthFor(item),
+          0,
+        );
+        const connectedTotal = connectedStrokes.reduce(
+          (total, item) => total + tracePathLength(item),
+          0,
+        );
+        if (
+          coverageFor(connected) >= 0.86 &&
+          connectedGuided >= guideLength * 0.62 &&
+          connectedTotal > 0 &&
+          connectedGuided / connectedTotal >= 0.72
+        ) {
+          pass = true;
+        }
+      });
+
+      return { coverage, guidedLength, beganAtStart, finishedAtStart, pass };
+    };
+
+    const updateProgress = () => {
+      const result = measure();
+      const percentage = Math.min(100, Math.round(result.coverage * 100));
+      progressFill.style.width = percentage + "%";
+      progress.setAttribute("aria-valuenow", String(percentage));
+      if (percentage < 15) status.textContent = "노란 시작점부터 천천히 이어 그려요.";
+      else if (percentage < 45) status.textContent = "좋아요! 굵은 선을 따라 계속 이어요.";
+      else if (percentage < 68) status.textContent = "거의 다 왔어요. 빈 곳을 조금 더 그려요!";
+      else if (!result.beganAtStart) status.textContent = "노란 시작점에서 한 번 시작해 볼까요?";
+      else if (!result.finishedAtStart) status.textContent = "노란 시작점까지 돌아오면 완성이에요!";
+      else if (!result.pass) status.textContent = "안내선 가까이에서 조금만 더 이어 볼까요?";
+      return result;
+    };
+
+    const finalizeDrawing = (source) => {
+      if (finished || completionQueued) return;
+      completionQueued = true;
+      finished = true;
+      canvasShell.classList.add("is-complete");
+      status.textContent = "멋진 " + optionName(option) + " 완성!";
+      progressFill.style.width = "100%";
+      progress.setAttribute("aria-valuenow", "100");
+      onProgress("prompt");
+      announce(optionName(option) + "를 직접 완성했어요.");
+      renderCanvas();
+      controller.later(() => onComplete(source), 380);
+    };
+
+    const completeDrawing = (source) => {
+      if (finished || completionQueued) return;
+      const result = updateProgress();
+      if (!result.pass) {
+        if (result.coverage < 0.08) {
+          pulse(canvasShell);
+          announce("먼저 노란 시작점에서 손가락으로 선을 그려요.");
+          return;
+        }
+        status.textContent = !result.beganAtStart
+          ? "노란 시작점에서 시작해 볼까요?"
+          : !result.finishedAtStart
+            ? "좋아요! 노란 시작점까지 돌아오면 완성이에요."
+            : "잘하고 있어요! 빈 안내선을 조금 더 이어 그려요.";
+        announce(status.textContent);
+        onMistake(source, canvasShell);
+        return;
+      }
+      finalizeDrawing(canvas);
+    };
+
+    const eventPoint = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: Math.max(0, Math.min(rect.width, event.clientX - rect.left)),
+        y: Math.max(0, Math.min(rect.height, event.clientY - rect.top)),
+      };
+    };
+
+    const appendPoint = (point) => {
+      if (!activeStroke || !cssWidth || !cssHeight) return;
+      const normalized = { x: point.x / cssWidth, y: point.y / cssHeight };
+      const previous = activeStroke.at(-1);
+      if (!previous) {
+        activeStroke.push(normalized);
+        return;
+      }
+      const distance = Math.hypot((normalized.x - previous.x) * cssWidth, (normalized.y - previous.y) * cssHeight);
+      const steps = Math.max(1, Math.ceil(distance / 5));
+      for (let step = 1; step <= steps; step += 1) {
+        activeStroke.push({
+          x: previous.x + (normalized.x - previous.x) * (step / steps),
+          y: previous.y + (normalized.y - previous.y) * (step / steps),
+        });
+      }
+    };
+
+    const stopDrawing = (event) => {
+      if (event.pointerId !== activePointer) return;
+      appendPoint(eventPoint(event));
+      activePointer = null;
+      activeStroke = null;
+      canvas.classList.remove("is-drawing");
+      renderCanvas();
+      const result = updateProgress();
+      if (result.pass) completeDrawing(canvas);
+    };
+
+    controller.on(canvas, "pointerdown", (event) => {
+      if (finished || activePointer !== null || (event.pointerType === "mouse" && event.button !== 0)) return;
+      event.preventDefault();
+      activePointer = event.pointerId;
+      activeStroke = [];
+      strokes.push(activeStroke);
+      canvas.setPointerCapture?.(activePointer);
+      appendPoint(eventPoint(event));
+      canvas.classList.add("is-drawing");
+      renderCanvas();
+    });
+    controller.on(canvas, "pointermove", (event) => {
+      if (event.pointerId !== activePointer) return;
+      event.preventDefault();
+      appendPoint(eventPoint(event));
+      renderCanvas();
+    });
+    controller.on(canvas, "pointerup", stopDrawing);
+    controller.on(canvas, "pointercancel", stopDrawing);
+
+    controller.on(clearButton, "click", () => {
+      if (finished) return;
+      strokes = [];
+      activeStroke = null;
+      activePointer = null;
+      progressFill.style.width = "0%";
+      progress.setAttribute("aria-valuenow", "0");
+      status.textContent = "깨끗해졌어요. 노란 시작점부터 다시 그려요.";
+      announce("깨끗하게 지웠어요. 다시 그려 봐요.");
+      renderCanvas();
+      canvas.focus({ preventScroll: true });
+    });
+    controller.on(finishButton, "click", () => completeDrawing(finishButton));
+    controller.on(alternateButton, "click", () => {
+      if (finished) return;
+      alternateActive = !alternateActive;
+      alternateButton.setAttribute("aria-pressed", String(alternateActive));
+      alternateButton.textContent = alternateActive ? "손가락으로 직접 그리기" : "키보드로 점 이어 보기";
+      dotLayer.hidden = !alternateActive;
+      actions.hidden = alternateActive;
+      canvas.style.pointerEvents = alternateActive ? "none" : "";
+      canvas.tabIndex = alternateActive ? -1 : 0;
+      if (alternateActive) {
+        status.textContent = "키보드로 1번 점부터 차례로 이어요.";
+        alternatePoints[alternateNext]?.focus({ preventScroll: true });
+      } else {
+        updateProgress();
+        canvas.focus({ preventScroll: true });
+      }
+    });
+
+    const resizeObserver = new ResizeObserver(resizeCanvas);
+    resizeObserver.observe(canvasShell);
+    controller.addCleanup(() => resizeObserver.disconnect());
+    controller.later(() => {
+      resizeCanvas();
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      traceBoard.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      controller.later(() => canvas.focus({ preventScroll: true }), reducedMotion ? 0 : 320);
+    }, 0);
+    announce("좋아요. 이제 노란 시작점부터 굵은 선을 따라 직접 그려요.");
+    return canvasShell;
+  }
+
+  function setupPointTrace(config) {
+    const { controller, traceBoard, option, onComplete, onMistake, onProgress, announce } = config;
+    traceBoard.classList.add("is-point-trace");
+    const faint = createVisual(option, "trace-faint-visual");
+    traceBoard.appendChild(faint);
+    const points = TRACE_POINTS.wave;
+    let next = 0;
+    points.forEach(([left, top], index) => {
+      const point = document.createElement("button");
+      point.type = "button";
+      point.className = "trace-point";
+      point.style.left = left + "%";
+      point.style.top = top + "%";
+      point.textContent = String(index + 1);
+      point.setAttribute("aria-label", index + 1 + "번째 점");
+      controller.on(point, "click", () => {
+        if (index !== next) {
+          onMistake(point, traceBoard.querySelector('.trace-point[data-next="true"]'));
+          return;
+        }
+        point.disabled = true;
+        point.classList.add("is-done");
+        point.dataset.next = "false";
+        next += 1;
+        onProgress("prompt");
+        announce(index + 1 + "번째 점을 이었어요.");
+        const following = traceBoard.querySelectorAll(".trace-point")[next];
+        if (following) {
+          following.dataset.next = "true";
+          following.focus({ preventScroll: true });
+        }
+        if (next === points.length) onComplete(point);
+      });
+      if (index === 0) point.dataset.next = "true";
+      traceBoard.appendChild(point);
+    });
+    controller.later(() => {
+      traceBoard.querySelector('.trace-point[data-next="true"]')?.focus({ preventScroll: true });
+    }, 0);
+    announce("좋아요. 이제 1번 점부터 차례로 눌러요.");
   }
 
   function renderTrace(context) {
@@ -1191,7 +1711,7 @@
     target.type = "button";
     target.className = "trace-start-target";
     target.dataset.activityDrop = "trace";
-    target.innerHTML = "<span aria-hidden=\"true\">✦</span><strong>먼저 맞는 그림을 놓아요</strong>";
+    target.innerHTML = '<span aria-hidden="true">✦</span><strong>먼저 맞는 그림을 놓아요</strong>';
     target.setAttribute("aria-label", "맞는 그림을 놓는 자리");
 
     setupPickAndDrop(
@@ -1210,43 +1730,12 @@
         });
         target.hidden = true;
         traceBoard.hidden = false;
-        const faint = createVisual(option, "trace-faint-visual");
-        traceBoard.appendChild(faint);
-        const points = TRACE_POINTS[traceKind(option, gameKey)];
-        let next = 0;
-        points.forEach(([left, top], index) => {
-          const point = document.createElement("button");
-          point.type = "button";
-          point.className = "trace-point";
-          point.style.left = left + "%";
-          point.style.top = top + "%";
-          point.textContent = String(index + 1);
-          point.setAttribute("aria-label", index + 1 + "번째 점");
-          controller.on(point, "click", () => {
-            if (index !== next) {
-              onMistake(point, traceBoard.querySelector(".trace-point[data-next=\"true\"]"));
-              return;
-            }
-            point.disabled = true;
-            point.classList.add("is-done");
-            point.dataset.next = "false";
-            next += 1;
-            onProgress("prompt");
-            announce(index + 1 + "번째 점을 이었어요.");
-            const following = traceBoard.querySelectorAll(".trace-point")[next];
-            if (following) {
-              following.dataset.next = "true";
-              following.focus({ preventScroll: true });
-            }
-            if (next === points.length) onComplete(point);
-          });
-          if (index === 0) point.dataset.next = "true";
-          traceBoard.appendChild(point);
-        });
-        controller.later(() => {
-          traceBoard.querySelector('.trace-point[data-next="true"]')?.focus({ preventScroll: true });
-        }, 0);
-        announce("좋아요. 이제 1번 점부터 차례로 눌러요.");
+        const kind = traceKind(option, gameKey);
+        if (kind === "wave") {
+          setupPointTrace({ controller, traceBoard, option, onComplete, onMistake, onProgress, announce });
+        } else {
+          setupShapeDrawing({ controller, traceBoard, option, kind, onComplete, onMistake, onProgress, announce });
+        }
         return true;
       },
       announce,
@@ -1257,7 +1746,7 @@
         pulse(
           traceBoard.hidden
             ? sources.find((source) => round.options[Number(source.dataset.optionIndex)]?.correct)
-            : traceBoard.querySelector(".trace-point[data-next=\"true\"]"),
+            : traceBoard.querySelector('.trace-point[data-next="true"], .trace-canvas-shell'),
         ),
       replay: () => pulse(traceBoard.hidden ? target : traceBoard, "is-replay"),
     };
@@ -1368,7 +1857,7 @@
     stage.className = "activity-stage mode-" + mode;
     stage.dataset.mode = mode;
     stage.setAttribute("role", "group");
-    stage.setAttribute("aria-label", metaFor(mode).label);
+    stage.setAttribute("aria-label", metaFor(mode, config.gameKey).label);
 
     const context = {
       ...config,
@@ -1381,8 +1870,8 @@
 
     return {
       mode,
-      label: metaFor(mode).label,
-      instruction: metaFor(mode).instruction,
+      label: metaFor(mode, config.gameKey).label,
+      instruction: metaFor(mode, config.gameKey).instruction,
       hint: activity?.hint || (() => {}),
       replay: activity?.replay || (() => {}),
       destroy() {
