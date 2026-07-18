@@ -29,7 +29,7 @@
     },
     memory: {
       label: "짝 기억하기",
-      instruction: "카드를 뒤집어 같은 그림 짝꿍을 찾아요.",
+      instruction: "그림을 먼저 보고 기억했어요를 누른 뒤 같은 짝을 찾아요.",
     },
     pattern: {
       label: "규칙 완성",
@@ -610,7 +610,10 @@
   function renderMemory(context) {
     const { controller, stage, round, roundIndex, seed, onAttempt, onComplete, onProgress, announce } = context;
     const pairCount = roundIndex === 0 ? 2 : 3;
-    const options = round.options.slice(0, pairCount);
+    const requested = correctOption(round);
+    const options = roundIndex === 0
+      ? [requested, ...round.options.filter((option) => option !== requested)].slice(0, pairCount)
+      : round.options.slice(0, pairCount);
     const cards = [];
     options.forEach((option, pair) => {
       cards.push({ option, pair, copy: 0 }, { option, pair, copy: 1 });
@@ -618,18 +621,20 @@
     const counter = createCounter("짝꿍", 0, pairCount);
     const board = document.createElement("div");
     board.className = "memory-board";
+    const cardButtons = [];
     let open = [];
     let matches = 0;
-    let locked = false;
+    let locked = true;
     let misses = 0;
 
     shuffled(cards, seed).forEach((card, index) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "memory-card";
+      button.className = "memory-card is-preview";
       button.dataset.pair = String(card.pair);
       button.dataset.index = String(index);
-      button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
+      button.disabled = true;
+      button.setAttribute("aria-label", optionName(card.option) + " 그림 미리 보기");
       const front = document.createElement("span");
       front.className = "memory-front";
       front.textContent = "?";
@@ -684,9 +689,55 @@
           }
         }, 720);
       });
+      cardButtons.push(button);
       board.appendChild(button);
     });
-    stage.append(counter, board);
+
+    const startButton = document.createElement("button");
+    startButton.type = "button";
+    startButton.className = "activity-confirm memory-start";
+    startButton.textContent = "그림을 봤어요!";
+
+    const coverCards = () => {
+      cardButtons.forEach((button, index) => {
+        button.classList.remove("is-preview");
+        button.disabled = false;
+        button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
+      });
+      locked = false;
+      startButton.hidden = true;
+      announce("이제 카드를 뒤집어 같은 그림 두 장을 찾아요.");
+      cardButtons[0]?.focus({ preventScroll: true });
+    };
+    controller.on(startButton, "click", coverCards);
+
+    const previewUnmatched = () => {
+      if (startButton.hidden === false || locked) {
+        pulse(cardButtons.filter((button) => !button.classList.contains("is-matched")), "is-replay");
+        return;
+      }
+      const unmatched = cardButtons.filter((button) => !button.classList.contains("is-matched"));
+      locked = true;
+      open = [];
+      unmatched.forEach((button) => {
+        button.classList.remove("is-open", "is-miss");
+        button.classList.add("is-preview");
+        button.disabled = true;
+      });
+      announce("남은 그림을 다시 보여줄게요. 잘 기억해요.");
+      controller.later(() => {
+        unmatched.forEach((button, index) => {
+          button.classList.remove("is-preview");
+          button.disabled = false;
+          button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
+        });
+        locked = false;
+        unmatched[0]?.focus({ preventScroll: true });
+      }, 1300);
+    };
+
+    stage.append(counter, board, startButton);
+    announce("그림을 먼저 보고 짝의 자리를 기억해요.");
     return {
       hint: () => {
         const unmatched = [...board.querySelectorAll(".memory-card:not(.is-matched)")];
@@ -694,7 +745,7 @@
         const pair = unmatched[0].dataset.pair;
         pulse(unmatched.filter((item) => item.dataset.pair === pair));
       },
-      replay: () => pulse(board.querySelectorAll(".memory-card:not(.is-matched)"), "is-replay"),
+      replay: previewUnmatched,
     };
   }
 
