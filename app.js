@@ -592,6 +592,12 @@
   let answersElement;
   let feedbackElement;
   let guideCharacter;
+  let interactionHintElement;
+  let activityAnnouncer;
+  let activeActivity = null;
+  let roundSettled = false;
+  let returnFocusElement = null;
+  let roundInstructionToken = 0;
   let activeGameKey = null;
   let roundIndex = 0;
   let wrongAttempts = 0;
@@ -707,9 +713,14 @@
     answersElement = document.querySelector("#answer-grid");
     feedbackElement = document.querySelector("#feedback");
     guideCharacter = playMain.querySelector(".guide-character");
+    interactionHintElement = document.querySelector("#interaction-hint");
+    activityAnnouncer = document.querySelector("#activity-announcer");
   }
 
   function restorePlayTemplate() {
+    activeActivity?.destroy();
+    window.MONGLE_INTERACTIONS?.cleanup();
+    activeActivity = null;
     playMain.innerHTML = playTemplate;
     cachePlayElements();
   }
@@ -904,12 +915,16 @@
 
   function startGame(key) {
     if (!GAMES[key]) return;
+    if (!shell.classList.contains("is-open")) {
+      returnFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    }
     startBgm();
     playChime("start");
     clearTimeout(advanceTimer);
     activeGameKey = key;
     roundIndex = 0;
     wrongAttempts = 0;
+    roundSettled = false;
     restorePlayTemplate();
     replayButton.disabled = false;
     shell.classList.remove("is-closing");
@@ -922,15 +937,25 @@
 
   function closeGame() {
     clearTimeout(advanceTimer);
+    roundInstructionToken += 1;
+    activeActivity?.destroy();
+    window.MONGLE_INTERACTIONS?.cleanup();
+    activeActivity = null;
     stopVoice();
     stopBgm(true);
     shell.classList.add("is-closing");
+    const focusTarget = returnFocusElement;
     window.setTimeout(() => {
       shell.classList.remove("is-open", "is-closing");
       shell.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       activeGameKey = null;
-      document.querySelector(`[data-game]`)?.focus({ preventScroll: true });
+      if (focusTarget?.isConnected && !focusTarget.hidden) {
+        focusTarget.focus({ preventScroll: true });
+      } else {
+        document.querySelector(".game-start:not(.is-hidden), #start-recommended")?.focus({ preventScroll: true });
+      }
+      returnFocusElement = null;
     }, 190);
   }
 
@@ -943,7 +968,41 @@
       if (index === activeIndex) dot.classList.add("current");
       progressBar.appendChild(dot);
     }
-    progressBar.setAttribute("aria-label", `${total}문제 중 ${Math.min(activeIndex + 1, total)}번째`);
+    const current = Math.min(activeIndex + 1, total);
+    progressBar.setAttribute("role", "progressbar");
+    progressBar.setAttribute("aria-valuemin", "1");
+    progressBar.setAttribute("aria-valuemax", String(total));
+    progressBar.setAttribute("aria-valuenow", String(Math.min(current, total)));
+    progressBar.setAttribute("aria-label", total + "문제 중 " + current + "번째");
+  }
+
+  function announceActivity(message) {
+    if (!activityAnnouncer) return;
+    activityAnnouncer.textContent = "";
+    window.setTimeout(() => {
+      if (activityAnnouncer) activityAnnouncer.textContent = message;
+    }, 20);
+  }
+
+  function interactionIcon(mode) {
+    return {
+      count: "●●●",
+      compare: "⚖",
+      drag: "↘",
+      sort: "🧺",
+      sequence: "1·2·3",
+      memory: "▦",
+      pattern: "◆?",
+      spot: "⌕",
+      trace: "•—•",
+      order: "◔",
+      choice: "☝",
+    }[mode] || "☝";
+  }
+
+  function speakRoundInstruction(round) {
+    roundInstructionToken += 1;
+    speak(round.speech || round.prompt);
   }
 
   function renderRound() {
@@ -951,8 +1010,12 @@
     const round = currentRound();
     if (!game || !round) return;
 
+    activeActivity?.destroy();
+    activeActivity = null;
+    roundSettled = false;
     wrongAttempts = 0;
     replayButton.disabled = false;
+    guideCharacter.classList.remove("celebrate");
     gameName.textContent = game.title;
     promptHelper.textContent = round.helper;
     promptElement.textContent = round.prompt;
@@ -960,10 +1023,37 @@
     feedbackElement.textContent = "";
     feedbackElement.className = "feedback";
     renderProgress(game.rounds.length, roundIndex);
-    renderScene(round.scene);
-    renderAnswers(round.options);
 
-    speak(round.speech || round.prompt);
+    const engine = window.MONGLE_INTERACTIONS;
+    const mode = engine?.resolveMode(activeGameKey, game, round) || "choice";
+    const modeMeta = engine?.metaFor(mode) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
+    interactionHintElement.textContent = modeMeta.label + " · " + modeMeta.instruction;
+    interactionHintElement.dataset.icon = interactionIcon(mode);
+    const ownsScene = ["count", "compare", "memory", "pattern", "spot", "trace", "order", "sequence"].includes(mode);
+    renderScene(ownsScene ? [] : round.scene);
+
+    if (!engine || mode === "choice") {
+      answersElement.className = "answer-grid";
+      renderAnswers(round.options);
+    } else {
+      activeActivity = engine.render({
+        stage: answersElement,
+        game,
+        round,
+        gameKey: activeGameKey,
+        roundIndex,
+        onAttempt: recordAttempt,
+        onComplete: completeCurrentRound,
+        onMistake: reportRoundMistake,
+        onProgress: playChime,
+        announce: announceActivity,
+      });
+    }
+
+    speakRoundInstruction(round);
+    window.setTimeout(() => {
+      answersElement.querySelector("button:not([disabled])")?.focus({ preventScroll: true });
+    }, 80);
   }
 
   function renderScene(items) {
@@ -982,10 +1072,11 @@
       span.style.animationDelay = `${index * 70}ms`;
       sceneElement.appendChild(span);
     });
-    sceneElement.setAttribute("aria-label", `${items.length}개의 그림`);
+    sceneElement.setAttribute("aria-label", items.join(" "));
   }
 
   function renderAnswers(options) {
+    answersElement.className = "answer-grid";
     answersElement.innerHTML = "";
     options.forEach((option, index) => {
       const button = document.createElement("button");
@@ -1024,62 +1115,90 @@
     });
   }
 
-  function handleAnswer(option, button) {
-    const round = currentRound();
-    if (!round || button.disabled) return;
-
+  function recordAttempt() {
     dailyProgress.attempts += 1;
     dailyProgress.lastPlayed = activeGameKey;
     saveProgress();
+  }
 
-    if (option.correct) {
-      answersElement.querySelectorAll("button").forEach((answer) => {
-        answer.disabled = true;
-        answer.classList.remove("hint");
-      });
-      button.classList.add("is-correct");
-      replayButton.disabled = true;
-      feedbackElement.textContent = `★ ${round.success}`;
-      feedbackElement.className = "feedback success";
-      guideCharacter.classList.add("celebrate");
-      playChime("success");
-      let advanced = false;
-      const gameKey = activeGameKey;
-      const advance = () => {
-        if (advanced || activeGameKey !== gameKey) return;
-        advanced = true;
+  function completeCurrentRound(source, { record = true } = {}) {
+    const round = currentRound();
+    if (!round || roundSettled) return;
+    if (record) recordAttempt();
+    roundSettled = true;
+    roundInstructionToken += 1;
+    answersElement.classList.add("is-resolved");
+    answersElement.querySelectorAll("button").forEach((control) => {
+      control.disabled = true;
+      control.classList.remove("hint", "is-hint");
+    });
+    source?.classList.add("is-correct");
+    replayButton.disabled = true;
+    feedbackElement.textContent = "★ " + round.success;
+    feedbackElement.className = "feedback success";
+    guideCharacter.classList.add("celebrate");
+    playChime("success");
+    let advanced = false;
+    const gameKey = activeGameKey;
+    const advance = () => {
+      if (advanced || activeGameKey !== gameKey) return;
+      advanced = true;
+      clearTimeout(advanceTimer);
+      roundIndex += 1;
+      if (roundIndex >= GAMES[gameKey].rounds.length) completeGame();
+      else renderRound();
+    };
+    const spoken = speak(round.success, {
+      onended: () => {
         clearTimeout(advanceTimer);
-        roundIndex += 1;
-        if (roundIndex >= GAMES[gameKey].rounds.length) completeGame();
-        else renderRound();
-      };
-      const spoken = speak(round.success, {
-        onended: () => {
-          clearTimeout(advanceTimer);
-          advanceTimer = window.setTimeout(advance, 280);
-        },
-      });
-      advanceTimer = window.setTimeout(advance, spoken ? 7000 : 1200);
-      return;
-    }
+        advanceTimer = window.setTimeout(advance, 280);
+      },
+    });
+    advanceTimer = window.setTimeout(advance, spoken ? 7000 : 1200);
+  }
 
+  function reportRoundMistake(source, hintTargets) {
+    if (roundSettled) return;
+    recordAttempt();
     wrongAttempts += 1;
-    button.classList.remove("try-again");
-    void button.offsetWidth;
-    button.classList.add("try-again");
-    feedbackElement.textContent = wrongAttempts === 1 ? "괜찮아! 다시 한번 찾아볼까?" : "잘 보고 천천히 톡 해봐요.";
+    source?.classList.remove("try-again");
+    if (source) void source.offsetWidth;
+    source?.classList.add("try-again");
+    feedbackElement.textContent =
+      wrongAttempts === 1 ? "괜찮아! 놓인 그림은 그대로 두고 다시 해봐요." : "한 단계만 반짝여 줄게요.";
     feedbackElement.className = "feedback retry";
     playChime("retry");
     speak(wrongAttempts === 1 ? "괜찮아. 다시 한번 찾아볼까?" : "정답 친구가 살짝 움직일 거야.");
 
     if (wrongAttempts >= 2) {
-      const correctIndex = round.options.findIndex((answer) => answer.correct);
-      answersElement.querySelector(`[data-index="${correctIndex}"]`)?.classList.add("hint");
+      if (hintTargets) {
+        const targets =
+          hintTargets instanceof Element
+            ? [hintTargets]
+            : Array.from(hintTargets).filter(Boolean);
+        targets.forEach((target) => target.classList.add("hint"));
+        window.setTimeout(() => targets.forEach((target) => target.classList.remove("hint")), 1200);
+      } else {
+        activeActivity?.hint();
+      }
     }
-    window.setTimeout(() => button.classList.remove("try-again"), 500);
+    window.setTimeout(() => source?.classList.remove("try-again"), 500);
+  }
+
+  function handleAnswer(option, button) {
+    if (!currentRound() || button.disabled || roundSettled) return;
+    if (option.correct) {
+      completeCurrentRound(button);
+      return;
+    }
+    const correctIndex = currentRound().options.findIndex((answer) => answer.correct);
+    reportRoundMistake(button, answersElement.querySelector('[data-index="' + correctIndex + '"]'));
   }
 
   function completeGame() {
+    roundInstructionToken += 1;
+    activeActivity?.destroy();
+    activeActivity = null;
     const game = GAMES[activeGameKey];
     dailyProgress.completed[activeGameKey] = (dailyProgress.completed[activeGameKey] || 0) + 1;
     dailyProgress.lastPlayed = activeGameKey;
@@ -1276,7 +1395,8 @@
     const round = currentRound();
     if (round) {
       playChime("prompt");
-      speak(round.speech || round.prompt);
+      speakRoundInstruction(round);
+      activeActivity?.replay();
     }
   });
 
