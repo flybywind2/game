@@ -168,6 +168,12 @@
         instruction: "양쪽 그림을 모두 세고 더 많은 묶음의 개수를 골라요.",
       };
     }
+    if (mode === "drag" && gameKey === "body") {
+      return {
+        label: "몸의 쓰임 연결",
+        instruction: "질문 그림을 보고 알맞은 몸 부분을 빈자리에 놓아요.",
+      };
+    }
     return MODE_META[mode] || MODE_META.choice;
   }
 
@@ -897,7 +903,71 @@
     };
   }
 
+  function renderBodyFunction(context) {
+    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const tray = document.createElement("div");
+    tray.className = "activity-tray body-function-tray";
+    const sources = shuffled(
+      round.options.map((option, index) => ({ option, index })),
+      seed,
+    ).map((item) => {
+      const token = createToken(item.option);
+      token.dataset.optionIndex = String(item.index);
+      token.dataset.label = optionName(item.option);
+      tray.appendChild(token);
+      return token;
+    });
+    const correctSource = sources.find(
+      (source) => round.options[Number(source.dataset.optionIndex)] === correct,
+    );
+    const target = document.createElement("button");
+    target.type = "button";
+    target.className = "single-drop-target body-function-target";
+    target.dataset.activityDrop = "body-part";
+    target.setAttribute("aria-label", "알맞은 몸 부분을 놓는 자리");
+    target.innerHTML =
+      "<span aria-hidden=\"true\">🧩</span>" +
+      "<strong>몸 부분 놓기</strong>" +
+      "<small>그림을 끌거나, 그림과 이곳을 차례로 눌러요</small>";
+
+    setupPickAndDrop(
+      controller,
+      sources,
+      [target],
+      (source) => {
+        const option = round.options[Number(source.dataset.optionIndex)];
+        if (!option?.correct) {
+          onMistake(source, correctSource);
+          return false;
+        }
+        source.disabled = true;
+        source.classList.add("is-placed");
+        target.replaceChildren(
+          createVisual(option),
+          Object.assign(document.createElement("strong"), {
+            textContent: optionName(option),
+          }),
+        );
+        target.classList.add("is-filled");
+        target.setAttribute("aria-label", optionName(option) + " 놓음");
+        target.disabled = true;
+        onProgress("prompt");
+        announce(optionName(option) + " 그림을 놓았어요.");
+        onComplete(target);
+        return true;
+      },
+      announce,
+    );
+    stage.append(tray, target);
+    return {
+      hint: () => pulse([correctSource, target].filter(Boolean)),
+      replay: () => pulse([...sources.filter((source) => !source.disabled), target], "is-replay"),
+    };
+  }
+
   function renderDrag(context) {
+    if (context.gameKey === "body") return renderBodyFunction(context);
     const { controller, stage, round, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
     const pairCount = roundIndex === 0 ? 2 : Math.min(3, round.options.length);
     const requested = correctOption(round);

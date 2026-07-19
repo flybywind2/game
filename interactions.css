@@ -1183,7 +1183,8 @@ button.pattern-cell {
     display: none;
   }
 
-  .size-tray .activity-token-label {
+  .size-tray .activity-token-label,
+  .body-function-tray .activity-token-label {
     display: block;
     font-size: 12px;
     white-space: normal;
