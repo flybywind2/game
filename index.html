@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
     <link rel="stylesheet" href="./interactions.css?v=22" />
-    <link rel="stylesheet" href="./premium.css?v=18" />
+    <link rel="stylesheet" href="./premium.css?v=19" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -458,6 +458,50 @@
       <div class="confetti" id="confetti" aria-hidden="true"></div>
     </section>
 
+    <dialog class="welcome-dialog" id="welcome-dialog" aria-labelledby="welcome-title">
+      <div class="welcome-card">
+        <button class="welcome-skip" id="welcome-skip" type="button" aria-label="첫 사용 안내를 닫고 나중에 설정하기">나중에</button>
+        <div class="welcome-progress" role="progressbar" aria-label="첫 사용 안내" aria-valuemin="1" aria-valuemax="2" aria-valuenow="1">
+          <span class="is-current"></span><span></span>
+        </div>
+
+        <section class="welcome-step is-current" data-welcome-step="0">
+          <img src="./assets/generated/mongle-hero.webp" alt="블록을 쌓으며 웃는 몽글이" width="512" height="512" />
+          <span class="section-kicker">보호자와 1분 준비</span>
+          <h2 id="welcome-title" tabindex="-1">처음 만난 몽글 놀이터</h2>
+          <p>아이에게 화면을 건네기 전에 세 가지만 확인하면 오늘의 맞춤 놀이를 바로 시작할 수 있어요.</p>
+          <div class="welcome-trust-list" aria-label="몽글 놀이터의 특징">
+            <span><b>101</b><small>가지 손놀이</small></span>
+            <span><b>0</b><small>광고·외부 전송</small></span>
+            <span><b>10분</b><small>짧은 오늘 코스</small></span>
+          </div>
+          <button class="welcome-primary" id="welcome-next" type="button">우리 아이 맞춤 준비 <span aria-hidden="true">→</span></button>
+          <small class="welcome-privacy">계정 없이 이용하며 애칭과 놀이 기록은 이 기기에만 저장됩니다.</small>
+        </section>
+
+        <section class="welcome-step" data-welcome-step="1" hidden>
+          <span class="section-kicker">아이에게 맞춰 주세요</span>
+          <h2 tabindex="-1">애칭과 놀이 시간을 정해요</h2>
+          <label class="welcome-name-label" for="welcome-nickname"><span>아이 애칭</span><small>실명 대신 집에서 부르는 애칭을 권해요.</small></label>
+          <input class="welcome-name" id="welcome-nickname" type="text" maxlength="10" autocomplete="off" value="꼬마 탐험가" />
+          <fieldset class="welcome-time-field">
+            <legend>한 번에 놀 시간</legend>
+            <div class="welcome-time-choices">
+              <button type="button" data-welcome-limit="5">5분<small>가볍게</small></button>
+              <button type="button" data-welcome-limit="10">10분<small>추천</small></button>
+              <button type="button" data-welcome-limit="15">15분<small>넉넉히</small></button>
+            </div>
+          </fieldset>
+          <button class="welcome-sound-check" id="welcome-sound-check" type="button"><span aria-hidden="true">♪</span><span><strong>F1 말소리 확인</strong><small id="welcome-sound-status">눌러서 아이가 들을 소리를 확인해요.</small></span></button>
+          <div class="welcome-actions">
+            <button class="welcome-back" id="welcome-back" type="button">이전</button>
+            <button class="welcome-primary" id="welcome-finish" type="button">저장하고 오늘 코스 시작</button>
+          </div>
+          <button class="welcome-explore" id="welcome-explore" type="button">설정만 저장하고 놀이 둘러보기</button>
+        </section>
+      </div>
+    </dialog>
+
     <dialog class="parent-gate" id="parent-gate" aria-labelledby="parent-gate-title">
       <div class="parent-gate-panel">
         <button class="parent-gate-close" id="parent-gate-close" type="button" aria-label="보호자 확인 닫기">×</button>
@@ -644,12 +688,13 @@
         <section class="support-settings" aria-labelledby="support-settings-title">
           <div class="support-settings-heading">
             <span class="support-settings-icon" aria-hidden="true">?</span>
-            <span><strong id="support-settings-title">도움말 · 기기 점검</strong><small>몽글 놀이터 1.0.0 · 빌드 2026.07.19.5</small></span>
+            <span><strong id="support-settings-title">도움말 · 기기 점검</strong><small>몽글 놀이터 1.0.0 · 빌드 2026.07.19.6</small></span>
           </div>
           <p id="support-status" role="status">소리를 직접 확인하거나 개인정보 없는 문제 해결 정보를 복사할 수 있어요.</p>
           <div class="support-actions">
             <button id="test-parent-audio" type="button"><span aria-hidden="true">♪</span> 소리 확인</button>
             <button id="copy-support-diagnostics" type="button"><span aria-hidden="true">▣</span> 문제 해결 정보 복사</button>
+            <button id="reopen-welcome-guide" type="button"><span aria-hidden="true">↻</span> 첫 사용 안내 다시 보기</button>
           </div>
           <small class="support-privacy">복사되는 정보에는 애칭·진도·관찰 기록이 포함되지 않습니다. 음성은 Supertonic 3 F1로 미리 생성된 AI 음성이며 실행 중 문장을 외부로 보내지 않아요.</small>
         </section>
@@ -728,6 +773,6 @@
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
     <script src="./interaction-engine.js?v=30"></script>
-    <script src="./app.js?v=49"></script>
+    <script src="./app.js?v=50"></script>
   </body>
 </html>

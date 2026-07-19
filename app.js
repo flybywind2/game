@@ -571,6 +571,16 @@
   const MUSIC_VOLUME_KEY = "mongle-music-volume-v1";
   const PLAY_LIMIT_KEY = "mongle-play-limit-v1";
   const USABILITY_KEY = "mongle-usability-observations-v1";
+  const WELCOME_KEY = "mongle-welcome-v1";
+  const FIRST_VISIT_WITHOUT_DATA = (() => {
+    try {
+      return !localStorage.getItem(WELCOME_KEY)
+        && !localStorage.getItem(PROFILE_KEY)
+        && !localStorage.getItem(STORAGE_KEY);
+    } catch {
+      return false;
+    }
+  })();
   const LOCAL_DATA_KEYS = Object.freeze([
     STORAGE_KEY,
     PROFILE_KEY,
@@ -579,11 +589,12 @@
     MUSIC_VOLUME_KEY,
     PLAY_LIMIT_KEY,
     USABILITY_KEY,
+    WELCOME_KEY,
   ]);
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.19.5";
+  const APP_BUILD = "2026.07.19.6";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -638,6 +649,7 @@
   const confetti = document.querySelector("#confetti");
   const parentDialog = document.querySelector("#parent-dialog");
   const parentGate = document.querySelector("#parent-gate");
+  const welcomeDialog = document.querySelector("#welcome-dialog");
   const toast = document.querySelector("#toast");
 
   let promptElement;
@@ -685,6 +697,7 @@
   let playActiveSince = 0;
   let voicePackCachedCount = 0;
   let voicePackTotal = new Set(Object.values(window.MONGLE_TTS_AUDIO || {})).size;
+  let welcomeSelectedLimit = playLimitMinutes;
 
   function todayKey() {
     const now = new Date();
@@ -3070,6 +3083,78 @@
     else parentDialog.removeAttribute("open");
   }
 
+  function renderWelcomeStep(step) {
+    const safeStep = step === 1 ? 1 : 0;
+    welcomeDialog.querySelectorAll("[data-welcome-step]").forEach((panel) => {
+      const current = Number(panel.dataset.welcomeStep) === safeStep;
+      panel.hidden = !current;
+      panel.classList.toggle("is-current", current);
+    });
+    const progress = welcomeDialog.querySelector(".welcome-progress");
+    progress.setAttribute("aria-valuenow", String(safeStep + 1));
+    progress.querySelectorAll("span").forEach((dot, index) => dot.classList.toggle("is-current", index === safeStep));
+    window.setTimeout(() => welcomeDialog.querySelector(`[data-welcome-step="${safeStep}"] h2`)?.focus({ preventScroll: true }), 50);
+  }
+
+  function renderWelcomeLimit() {
+    welcomeDialog.querySelectorAll("[data-welcome-limit]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(Number(button.dataset.welcomeLimit) === welcomeSelectedLimit));
+    });
+  }
+
+  function openWelcomeGuide() {
+    if (parentDialog.open) closeParentDialog();
+    welcomeSelectedLimit = [5, 10, 15].includes(playLimitMinutes) ? playLimitMinutes : 10;
+    document.querySelector("#welcome-nickname").value = learnerProfile.nickname || "꼬마 탐험가";
+    document.querySelector("#welcome-sound-status").textContent = "눌러서 아이가 들을 소리를 확인해요.";
+    renderWelcomeLimit();
+    renderWelcomeStep(0);
+    if (typeof welcomeDialog.showModal === "function") welcomeDialog.showModal();
+    else welcomeDialog.setAttribute("open", "");
+  }
+
+  function markWelcomeSeen(value = "complete") {
+    try {
+      localStorage.setItem(WELCOME_KEY, value);
+    } catch {
+      // The guide can still close when storage is unavailable.
+    }
+  }
+
+  function closeWelcomeGuide({ remember = true } = {}) {
+    if (remember) markWelcomeSeen("dismissed");
+    stopVoice();
+    if (typeof welcomeDialog.close === "function") welcomeDialog.close();
+    else welcomeDialog.removeAttribute("open");
+  }
+
+  function finishWelcome(startCourse) {
+    const nickname = document.querySelector("#welcome-nickname").value.trim().slice(0, 10);
+    learnerProfile.nickname = nickname || "꼬마 탐험가";
+    welcomeSelectedLimit = [5, 10, 15].includes(welcomeSelectedLimit) ? welcomeSelectedLimit : 10;
+    playLimitMinutes = welcomeSelectedLimit;
+    resetPlayClock();
+    saveLearnerProfile();
+    savePlayLimit();
+    renderPlayLimitSettings();
+    updatePremiumDashboard();
+    markWelcomeSeen();
+    closeWelcomeGuide({ remember: false });
+    showToast(`${learnerProfile.nickname}의 ${playLimitMinutes}분 놀이 준비를 마쳤어요.`);
+    if (startCourse) window.setTimeout(() => startGame(recommendedGame()), 160);
+  }
+
+  function checkWelcomeSound() {
+    if (!soundEnabled) {
+      soundEnabled = true;
+      saveSoundPreference();
+      updateSoundButton();
+    }
+    playChime("prompt");
+    speak("빨간색 과일을 찾아볼까?");
+    document.querySelector("#welcome-sound-status").textContent = "이 말소리가 들리면 준비됐어요.";
+  }
+
   function showToast(message) {
     clearTimeout(toastTimer);
     toast.textContent = message;
@@ -3386,6 +3471,26 @@
   parentDialog.addEventListener("click", (event) => {
     if (event.target === parentDialog) closeParentDialog();
   });
+  document.querySelector("#welcome-next").addEventListener("click", () => renderWelcomeStep(1));
+  document.querySelector("#welcome-back").addEventListener("click", () => renderWelcomeStep(0));
+  document.querySelector("#welcome-skip").addEventListener("click", () => closeWelcomeGuide());
+  document.querySelector("#welcome-finish").addEventListener("click", () => finishWelcome(true));
+  document.querySelector("#welcome-explore").addEventListener("click", () => finishWelcome(false));
+  document.querySelector("#welcome-sound-check").addEventListener("click", checkWelcomeSound);
+  document.querySelectorAll("[data-welcome-limit]").forEach((button) => {
+    button.addEventListener("click", () => {
+      welcomeSelectedLimit = Number(button.dataset.welcomeLimit);
+      renderWelcomeLimit();
+    });
+  });
+  welcomeDialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    closeWelcomeGuide();
+  });
+  document.querySelector("#reopen-welcome-guide").addEventListener("click", () => {
+    closeParentDialog();
+    window.setTimeout(openWelcomeGuide, 170);
+  });
 
   document.querySelector("#reset-progress").addEventListener("click", () => {
     if (!window.confirm("오늘의 놀이 기록을 모두 지울까요?")) return;
@@ -3439,6 +3544,12 @@
   renderVoicePackState();
   cachePlayElements();
   updateConnectionState();
+
+  if (FIRST_VISIT_WITHOUT_DATA && !initialGameKey) {
+    window.setTimeout(() => {
+      if (!shell.classList.contains("is-open") && !parentDialog.open && !parentGate.open) openWelcomeGuide();
+    }, 450);
+  }
 
   if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
     installButton.hidden = true;

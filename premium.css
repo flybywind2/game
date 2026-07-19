@@ -1,5 +1,350 @@
 /* Premium progression, collection, and parent growth experience. */
 
+.welcome-dialog {
+  width: min(calc(100% - 24px), 680px);
+  max-width: none;
+  max-height: calc(100dvh - 24px);
+  padding: 0;
+  border: 0;
+  border-radius: 32px;
+  background: transparent;
+  color: var(--ink);
+  overflow: visible;
+}
+
+.welcome-dialog::backdrop {
+  background: rgba(54, 43, 36, 0.58);
+  backdrop-filter: blur(5px);
+}
+
+.welcome-card {
+  position: relative;
+  max-height: calc(100dvh - 24px);
+  padding: 22px 28px 26px;
+  border: 3px solid white;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 10% 8%, rgba(255, 212, 93, 0.26), transparent 30%),
+    linear-gradient(155deg, #fffaf0, #f8fffb);
+  box-shadow: 0 22px 70px rgba(54, 43, 36, 0.24);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.welcome-skip {
+  position: absolute;
+  z-index: 2;
+  top: 16px;
+  right: 17px;
+  min-width: 64px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #ddd3c7;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.welcome-progress {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+  margin-bottom: 6px;
+}
+
+.welcome-progress span {
+  width: 28px;
+  height: 7px;
+  border-radius: 999px;
+  background: #ddd7cf;
+}
+
+.welcome-progress span.is-current {
+  background: var(--coral);
+}
+
+.welcome-step {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.welcome-step[hidden] {
+  display: none;
+}
+
+.welcome-step > img {
+  width: 150px;
+  height: 126px;
+  margin: 0 auto 4px;
+  object-fit: cover;
+  object-position: 50% 40%;
+  border-radius: 34px;
+}
+
+.welcome-step h2 {
+  margin: 6px 0 8px;
+  font-size: clamp(27px, 5vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -1.4px;
+  text-wrap: balance;
+}
+
+.welcome-step h2:focus {
+  outline: none;
+}
+
+.welcome-step > p {
+  max-width: 510px;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.welcome-trust-list {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin: 18px 0;
+}
+
+.welcome-trust-list span {
+  min-width: 0;
+  padding: 13px 6px;
+  border: 1px solid #e9dfd2;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.welcome-trust-list b,
+.welcome-trust-list small {
+  display: block;
+}
+
+.welcome-trust-list b {
+  color: var(--coral-dark);
+  font-size: 21px;
+}
+
+.welcome-trust-list small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.welcome-primary,
+.welcome-back {
+  min-height: 58px;
+  padding: 10px 18px;
+  border-radius: 17px;
+  font-size: 13px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.welcome-primary {
+  width: min(100%, 410px);
+  border: 0;
+  background: var(--purple);
+  box-shadow: 0 6px 0 #72579f;
+  color: white;
+}
+
+.welcome-back {
+  border: 2px solid #d9cee9;
+  background: white;
+  color: var(--purple-dark);
+}
+
+.welcome-privacy {
+  margin-top: 14px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.welcome-name-label {
+  width: 100%;
+  margin-top: 8px;
+  text-align: left;
+}
+
+.welcome-name-label span,
+.welcome-name-label small {
+  display: block;
+}
+
+.welcome-name-label span,
+.welcome-time-field legend {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 950;
+}
+
+.welcome-name-label small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.welcome-name {
+  width: 100%;
+  min-height: 54px;
+  margin-top: 8px;
+  padding: 0 15px;
+  border: 2px solid #dcd2c5;
+  border-radius: 16px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.welcome-name:focus {
+  border-color: var(--purple);
+  outline: 3px solid rgba(142, 113, 190, 0.16);
+}
+
+.welcome-time-field {
+  width: 100%;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+  text-align: left;
+}
+
+.welcome-time-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.welcome-time-choices button {
+  min-height: 58px;
+  padding: 8px 5px;
+  border: 2px solid #ddd4c9;
+  border-radius: 16px;
+  background: white;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.welcome-time-choices small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 8px;
+}
+
+.welcome-time-choices button[aria-pressed="true"] {
+  border-color: var(--mint);
+  background: var(--mint-soft);
+  box-shadow: 0 4px 0 #a8decc;
+  color: var(--mint-dark);
+}
+
+.welcome-sound-check {
+  display: grid;
+  width: 100%;
+  min-height: 62px;
+  grid-template-columns: 38px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-top: 15px;
+  padding: 8px 12px;
+  border: 2px solid #bfd9ed;
+  border-radius: 17px;
+  background: #f5fbff;
+  color: #326f9b;
+  text-align: left;
+  cursor: pointer;
+}
+
+.welcome-sound-check > span:first-child {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 13px;
+  background: #4387b8;
+  color: white;
+  font-size: 18px;
+}
+
+.welcome-sound-check strong,
+.welcome-sound-check small {
+  display: block;
+}
+
+.welcome-sound-check strong {
+  font-size: 11px;
+}
+
+.welcome-sound-check small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 8px;
+  font-weight: 700;
+}
+
+.welcome-actions {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(90px, 0.35fr) minmax(0, 1fr);
+  gap: 9px;
+  margin-top: 17px;
+}
+
+.welcome-actions .welcome-primary {
+  width: 100%;
+}
+
+.welcome-explore {
+  min-height: 42px;
+  margin-top: 10px;
+  padding: 5px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 850;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (max-width: 420px) {
+  .welcome-card {
+    padding: 18px 15px 20px;
+    border-radius: 26px;
+  }
+
+  .welcome-step > img {
+    width: 125px;
+    height: 105px;
+  }
+
+  .welcome-step h2 {
+    font-size: 27px;
+  }
+
+  .welcome-actions {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+}
+
 .adventure-hub {
   margin-top: 34px;
   padding: 28px;
@@ -1207,6 +1552,10 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 9px;
+}
+
+#reopen-welcome-guide {
+  grid-column: 1 / -1;
 }
 
 .support-actions button {
