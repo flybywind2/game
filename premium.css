@@ -326,7 +326,7 @@
 .story-node {
   position: relative;
   min-width: 0;
-  min-height: 114px;
+  min-height: 172px;
   display: grid;
   align-content: space-between;
   padding: 12px;
@@ -351,6 +351,10 @@
 }
 
 .story-node-number {
+  position: absolute;
+  z-index: 2;
+  top: 18px;
+  left: 18px;
   width: 28px;
   height: 28px;
   display: grid;
@@ -360,6 +364,7 @@
   color: var(--yellow);
   font-size: 11px;
   font-weight: 950;
+  box-shadow: 0 3px 0 rgba(40, 29, 23, 0.18);
 }
 
 .story-node.is-complete .story-node-number {
@@ -367,9 +372,17 @@
   color: #243d34;
 }
 
+.story-node-art {
+  width: 100%;
+  height: 82px;
+  display: block;
+  border-radius: 13px;
+  object-fit: cover;
+}
+
 .story-node span:last-child {
   display: block;
-  margin-top: 13px;
+  margin-top: 9px;
 }
 
 .story-node strong,
@@ -849,13 +862,22 @@
   }
 
   .story-node {
-    min-height: 96px;
+    min-height: 151px;
     padding: 10px;
     border-radius: 17px;
   }
 
   .story-node span:last-child {
-    margin-top: 8px;
+    margin-top: 7px;
+  }
+
+  .story-node-number {
+    top: 15px;
+    left: 15px;
+  }
+
+  .story-node-art {
+    height: 70px;
   }
 
   .story-continue {
