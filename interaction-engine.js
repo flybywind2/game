@@ -947,6 +947,7 @@
     controller.later(coverCards, initialPreviewDuration);
     return {
       requiredActions: pairOptions.length * 2,
+      completion: "같은 그림 " + pairOptions.length + "쌍을 모두 찾았어!",
       prompt: "같은 그림 두 장을 찾아 짝을 모두 맞춰 볼까?",
       helper: "한 번에 두 장씩 뒤집고 자리를 기억해요.",
       speech: "먼저 그림 위치를 보여줄게요. 어디에 있는지 기억한 뒤 같은 그림 두 장씩 찾아 보자.",
@@ -1122,6 +1123,7 @@
     stage.append(track, tray);
     return {
       requiredActions: targets.length,
+      completion: "빠진 " + targets.length + "칸을 찾아 규칙을 완성했어!",
       demo: {
         source: sources.find((item) => item.dataset.targetIndex !== "extra"),
         target: targets.find((item) => item.dataset.activityDrop === sources.find((source) => source.dataset.targetIndex !== "extra")?.dataset.targetIndex),
@@ -1253,6 +1255,7 @@
     stage.append(task, counter, tray, bins);
     return {
       requiredActions: items.length,
+      completion: "그림 " + items.length + "개를 두 바구니에 모두 알맞게 나눴어!",
       demo: {
         source: sources[0],
         target: targets[sources[0]?.dataset.expected === "correct" ? 0 : 1],
@@ -1483,6 +1486,9 @@
     stage.append(tray, targetsBoard);
     return {
       requiredActions: pairCount,
+      completion: isSafetyJourney
+        ? "상황 " + pairCount + "개에 도움이 되는 행동을 모두 연결했어!"
+        : "단서 " + pairCount + "개와 알맞은 그림을 모두 연결했어!",
       demo: {
         source: sources[0],
         target: targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
@@ -1595,6 +1601,7 @@
     );
     stage.append(task, slots, tray);
     return {
+      completion: "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓았어!",
       demo: {
         source: sources.find((item) => item.dataset.step === "0"),
         target: targets[0],
@@ -1757,6 +1764,7 @@
     stage.append(tray, slots);
     return {
       requiredActions: ordered.length,
+      completion: "그림 " + ordered.length + "개를 실제 크기 순서대로 잘 놓았어!",
       demo: {
         source: sources.find((item) => item.dataset.rank === "0"),
         target: targets[0],
@@ -2846,6 +2854,7 @@
       prompt: activity?.prompt || "",
       helper: activity?.helper || "",
       speech: activity?.speech || activity?.prompt || "",
+      completion: activity?.completion || "",
       hint: activity?.hint || (() => {}),
       replay: activity?.replay || (() => {}),
       destroy() {

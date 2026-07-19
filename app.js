@@ -1470,7 +1470,8 @@
     });
     source?.classList.add("is-correct");
     replayButton.disabled = true;
-    feedbackElement.textContent = "★ " + round.success;
+    const successMessage = activeActivity?.completion || round.success;
+    feedbackElement.textContent = "★ " + successMessage;
     feedbackElement.className = "feedback success";
     guideCharacter.classList.add("celebrate");
     playChime("success");
@@ -1484,7 +1485,7 @@
       if (roundIndex >= GAMES[gameKey].rounds.length) completeGame();
       else renderRound();
     };
-    const spoken = speak(round.success, {
+    const spoken = speak(successMessage, {
       onended: () => {
         clearTimeout(advanceTimer);
         advanceTimer = window.setTimeout(advance, 280);
