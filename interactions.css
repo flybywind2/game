@@ -715,6 +715,7 @@ body.is-keyboard-nav .count-piece:focus {
 }
 
 .math-piece {
+  position: relative;
   width: 58px;
   height: 58px;
   display: grid;
@@ -741,6 +742,33 @@ body.is-keyboard-nav .count-piece:focus {
   box-shadow: 0 5px 0 #a8decc;
 }
 
+.math-piece.is-counted,
+.math-result-piece.is-counted {
+  border-color: var(--purple);
+  background: #f5f0ff;
+  box-shadow: 0 3px 0 #d2c3e8;
+  opacity: 0.78;
+  transform: scale(0.94);
+}
+
+.math-piece.is-counted::after,
+.math-result-piece.is-counted::after {
+  content: attr(data-count-order);
+  position: absolute;
+  top: -8px;
+  right: -7px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: var(--purple-dark);
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+}
+
 .math-result-basket {
   grid-column: 1 / -1;
   min-height: 112px;
@@ -757,11 +785,34 @@ body.is-keyboard-nav .count-piece:focus {
   background: var(--mint-soft);
 }
 
-.math-result-items span,
+.math-result-piece,
 .math-taken-items span {
+  position: relative;
   font-size: 39px;
   line-height: 1;
   animation: scene-pop 240ms ease both;
+}
+
+.math-result-piece {
+  width: 52px;
+  height: 55px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid #e4d5c1;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 0 #e4d5c1;
+  cursor: pointer;
+}
+
+.math-result-piece:disabled:not(.is-counted) {
+  opacity: 0.78;
+}
+
+.math-result-basket.is-ready .math-result-piece:not(:disabled) {
+  opacity: 1;
+  filter: none;
 }
 
 .math-live-count {
@@ -867,9 +918,15 @@ body.is-keyboard-nav .count-piece:focus {
     min-height: 87px;
   }
 
-  .math-result-items span,
+  .math-result-piece,
   .math-taken-items span {
     font-size: 30px;
+  }
+
+  .math-result-piece {
+    width: 40px;
+    height: 43px;
+    border-radius: 12px;
   }
 }
 
@@ -960,9 +1017,14 @@ body.is-keyboard-nav .count-piece:focus {
     min-height: 41px;
   }
 
-  .activity-stage[data-mode="add"] .math-result-items span,
+  .activity-stage[data-mode="add"] .math-result-piece,
   .activity-stage[data-mode="subtract"] .math-taken-items span {
     font-size: 25px;
+  }
+
+  .activity-stage[data-mode="add"] .math-result-piece {
+    width: 42px;
+    height: 44px;
   }
 
   .activity-stage[data-mode="add"] .math-confirm,

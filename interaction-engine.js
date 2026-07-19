@@ -960,12 +960,31 @@
     workspace.className = "math-workspace add-workspace";
     const basket = document.createElement("section");
     basket.className = "math-result-basket";
-    basket.innerHTML = '<strong>모두 모으는 바구니</strong><div class="math-result-items" aria-hidden="true"></div><span class="math-live-count">0개</span>';
+    basket.innerHTML = '<strong>모두 모으는 바구니</strong><div class="math-result-items" role="group" aria-label="모은 그림을 다시 세는 곳"></div><span class="math-live-count">0개 모음</span>';
     basket.setAttribute("aria-label", "현재 가운데 바구니에 0개");
     const resultItems = basket.querySelector(".math-result-items");
     const liveCount = basket.querySelector(".math-live-count");
     const pieceButtons = [];
+    const resultButtons = [];
     let moved = 0;
+    let counted = 0;
+
+    const countResult = (button) => {
+      if (button.disabled || button.classList.contains("is-counted")) return;
+      button.disabled = true;
+      button.classList.add("is-counted");
+      counted += 1;
+      button.dataset.countOrder = String(counted);
+      liveCount.textContent = `${counted} / ${total} 셈`;
+      basket.setAttribute("aria-label", `모은 그림 ${total}개 중 ${counted}개를 다시 셌어요`);
+      onProgress("prompt");
+      announce(`${counted}개.`);
+      if (counted === total) {
+        confirm.disabled = false;
+        confirm.textContent = `${total}개, 모두 다 셌어요!`;
+        basket.classList.add("is-counted-result");
+      }
+    };
 
     const makeGroup = (count, label) => {
       const group = document.createElement("section");
@@ -984,18 +1003,29 @@
           if (button.disabled) return;
           button.disabled = true;
           button.classList.add("is-moved");
-          const movedItem = document.createElement("span");
+          const movedItem = document.createElement("button");
+          movedItem.type = "button";
+          movedItem.className = "math-result-piece";
           movedItem.textContent = item;
+          movedItem.disabled = true;
+          movedItem.setAttribute("aria-label", `바구니에 모은 ${moved + 1}번째 그림`);
+          controller.on(movedItem, "click", () => countResult(movedItem));
           resultItems.appendChild(movedItem);
+          resultButtons.push(movedItem);
           moved += 1;
-          liveCount.textContent = `${moved}개`;
+          liveCount.textContent = `${moved} / ${total} 모음`;
           basket.setAttribute("aria-label", `현재 가운데 바구니에 ${moved}개`);
           onProgress("prompt");
           announce(`${moved}개를 모았어요.`);
           if (moved === total) {
-            confirm.disabled = false;
-            confirm.textContent = `${total}개, 모두 모았어요!`;
+            resultButtons.forEach((resultButton, index) => {
+              resultButton.disabled = false;
+              resultButton.setAttribute("aria-label", `모은 ${index + 1}번째 그림 세기`);
+            });
+            liveCount.textContent = `0 / ${total} 다시 세기`;
+            confirm.textContent = "바구니 그림을 하나씩 세어 봐요";
             basket.classList.add("is-ready");
+            announce("한곳에 모두 모았어요. 바구니 그림을 하나씩 다시 세어 봐요.");
           }
         });
         pieces.appendChild(button);
@@ -1025,9 +1055,9 @@
     });
     stage.append(formula, workspace, confirm);
     return {
-      requiredActions: total + 1,
+      requiredActions: total * 2 + 1,
       completion: round.success,
-      hint: () => pulse(pieceButtons.find((button) => !button.disabled) || confirm),
+      hint: () => pulse(pieceButtons.find((button) => !button.disabled) || resultButtons.find((button) => !button.disabled) || confirm),
       replay: () => pulse([leftGroup, rightGroup, basket], "is-replay"),
     };
   }
@@ -1055,6 +1085,7 @@
     const liveCount = takeBox.querySelector(".math-live-count");
     const pieceButtons = [];
     let removed = 0;
+    let counted = 0;
 
     Array.from({ length: start }, (_, index) => {
       const button = document.createElement("button");
@@ -1063,6 +1094,22 @@
       button.textContent = item;
       button.setAttribute("aria-label", `${index + 1}번째 그림 빼내기`);
       controller.on(button, "click", () => {
+        if (button.classList.contains("is-remaining")) {
+          if (button.disabled || button.classList.contains("is-counted")) return;
+          button.disabled = true;
+          button.classList.add("is-counted");
+          counted += 1;
+          button.dataset.countOrder = String(counted);
+          heading.textContent = `남은 그림 세기 ${counted} / ${remaining}`;
+          onProgress("prompt");
+          announce(`${counted}개.`);
+          if (counted === remaining) {
+            confirm.disabled = false;
+            confirm.textContent = `${remaining}개 남았어요!`;
+            startGroup.classList.add("is-counted-result");
+          }
+          return;
+        }
         if (button.disabled || removed >= take) return;
         button.disabled = true;
         button.classList.add("is-removed");
@@ -1074,11 +1121,18 @@
         onProgress("prompt");
         announce(`${removed}개를 뺐어요.`);
         if (removed === take) {
-          pieceButtons.filter((piece) => !piece.disabled).forEach((piece) => piece.classList.add("is-remaining"));
-          confirm.disabled = false;
-          confirm.textContent = "남은 그림을 다 셌어요!";
+          pieceButtons.filter((piece) => !piece.disabled).forEach((piece, remainingIndex) => {
+            piece.classList.add("is-remaining");
+            piece.setAttribute("aria-label", `남은 ${remainingIndex + 1}번째 그림 세기`);
+          });
+          heading.textContent = `남은 그림을 하나씩 세요 · 0 / ${remaining}`;
+          confirm.textContent = "남은 그림을 하나씩 세어 봐요";
           takeBox.classList.add("is-ready");
           announce(`${take}개를 모두 뺐어요. 남은 그림을 세어 봐요.`);
+          if (remaining === 0) {
+            confirm.disabled = false;
+            confirm.textContent = "남은 그림이 없어요!";
+          }
         }
       });
       pieces.appendChild(button);
@@ -1104,9 +1158,9 @@
     });
     stage.append(formula, workspace, confirm);
     return {
-      requiredActions: take + 1,
+      requiredActions: take + remaining + 1,
       completion: round.success,
-      hint: () => pulse(pieceButtons.find((button) => !button.disabled) || confirm),
+      hint: () => pulse(pieceButtons.find((button) => !button.disabled && (removed < take || button.classList.contains("is-remaining"))) || confirm),
       replay: () => pulse([startGroup, takeBox], "is-replay"),
     };
   }
