@@ -790,7 +790,7 @@
         "success": "그래! 받거나 먹지 말고 내 보호자에게 바로 가서 알려요.",
         "options": [
           {"label": "바로 받아먹기", "visual": "😮", "subtitle": "모르는 것은 먹지 않아요"},
-          {"label": "받지 않고 보호자에게 알리기", "visual": "🧑‍🧒", "subtitle": "보호자가 확인해요", "correct": true},
+          {"label": "받지 않고 보호자에게 알리기", "visual": "🛑", "subtitle": "멈추고 보호자에게 알려요", "correct": true},
           {"label": "친구에게 주기", "visual": "🤲", "subtitle": "친구도 먹으면 안 돼요"}
         ]
       },

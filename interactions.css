@@ -268,6 +268,33 @@ body.is-keyboard-nav .count-piece:focus {
   filter: drop-shadow(0 5px 0 rgba(75, 59, 48, 0.08));
 }
 
+.activity-visual-stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.04em;
+  line-height: 0.72;
+}
+
+.activity-visual-contained {
+  position: relative;
+  isolation: isolate;
+}
+
+.activity-visual-container {
+  font-size: 1.08em;
+}
+
+.activity-visual-inside {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: 54%;
+  font-size: 0.43em;
+  filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.9));
+  transform: translate(-50%, -50%);
+}
+
 .activity-token-label {
   max-width: 100%;
   overflow: hidden;

@@ -310,7 +310,27 @@
       shape.className = "play-shape play-" + option.visual;
       visual.appendChild(shape);
     } else {
-      visual.textContent = cleanVisual(option?.visual ?? option?.label);
+      const value = cleanVisual(option?.visual ?? option?.label);
+      const contained = value.match(/^(.+?)\((.+)\)$/u);
+      if (contained) {
+        visual.classList.add("activity-visual-contained");
+        const container = document.createElement("span");
+        container.className = "activity-visual-container";
+        container.textContent = contained[1].trim();
+        const inside = document.createElement("span");
+        inside.className = "activity-visual-inside";
+        inside.textContent = contained[2].trim();
+        visual.append(container, inside);
+      } else if (value.includes("\n")) {
+        visual.classList.add("activity-visual-stack");
+        value.split(/\n+/u).filter(Boolean).forEach((part) => {
+          const row = document.createElement("span");
+          row.textContent = part.trim();
+          visual.appendChild(row);
+        });
+      } else {
+        visual.textContent = value;
+      }
     }
     return visual;
   }
@@ -1281,13 +1301,15 @@
       sources,
       targets,
       (source, target) => {
-        if (source.dataset.targetIndex !== target.dataset.activityDrop) {
+        const item = sourceItems[Number(source.dataset.sourceIndex)];
+        const expectedVisual = completed[Number(target.dataset.activityDrop)];
+        const selectedVisual = cleanVisual(item.option.visual);
+        if (selectedVisual !== expectedVisual) {
           const expected = targets.find((item) => item.dataset.activityDrop === source.dataset.targetIndex)
             || sources.find((item) => item.dataset.targetIndex !== "extra" && !item.disabled);
           onMistake(source, expected);
           return false;
         }
-        const item = sourceItems[Number(source.dataset.sourceIndex)];
         source.disabled = true;
         source.classList.add("is-placed");
         target.textContent = "";

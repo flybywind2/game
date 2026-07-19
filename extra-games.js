@@ -7172,8 +7172,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
           },
           {
             "label": "받지 않고 보호자에게 알리기",
-            "visual": "🧑‍🧒",
-            "subtitle": "보호자가 확인해요",
+            "visual": "🛑",
+            "subtitle": "멈추고 보호자에게 알려요",
             "correct": true
           },
           {
