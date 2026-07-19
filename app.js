@@ -1089,9 +1089,7 @@
     }
 
     speakRoundInstruction(round);
-    window.setTimeout(() => {
-      answersElement.querySelector("button:not([disabled])")?.focus({ preventScroll: true });
-    }, 80);
+    window.setTimeout(() => promptElement.focus({ preventScroll: true }), 80);
   }
 
   function renderScene(items) {
@@ -1192,7 +1190,7 @@
         advanceTimer = window.setTimeout(advance, 280);
       },
     });
-    advanceTimer = window.setTimeout(advance, spoken ? 7000 : 1200);
+    advanceTimer = window.setTimeout(advance, spoken ? 7000 : 1900);
   }
 
   function reportRoundMistake(source, hintTargets) {
@@ -1203,7 +1201,7 @@
     if (source) void source.offsetWidth;
     source?.classList.add("try-again");
     feedbackElement.textContent =
-      wrongAttempts === 1 ? "괜찮아! 놓인 그림은 그대로 두고 다시 해봐요." : "한 단계만 반짝여 줄게요.";
+      wrongAttempts === 1 ? "괜찮아! 그림을 천천히 다시 살펴봐요." : "정답과 이어지는 곳을 반짝여 줄게요.";
     feedbackElement.className = "feedback retry";
     playChime("retry");
     speak(wrongAttempts === 1 ? "괜찮아. 다시 한번 찾아볼까?" : "정답 친구가 살짝 움직일 거야.");
@@ -1550,11 +1548,16 @@
   });
 
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Tab") document.body.classList.add("is-keyboard-nav");
     if (event.key === "Escape" && shell.classList.contains("is-open")) {
       event.preventDefault();
       closeGame();
     }
   });
+
+  document.addEventListener("pointerdown", () => {
+    document.body.classList.remove("is-keyboard-nav");
+  }, { passive: true });
 
   updateTodayCard();
   updateSoundButton();

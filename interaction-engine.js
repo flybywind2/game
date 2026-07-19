@@ -481,7 +481,7 @@
   }
 
   function renderSpot(context) {
-    const { controller, stage, round, seed, onComplete, onMistake, announce } = context;
+    const { controller, stage, game, round, seed, onComplete, onMistake, announce } = context;
     const correct = correctOption(round);
     const items = round.options.map((option) => ({ option, target: option === correct }));
     const board = document.createElement("div");
@@ -507,6 +507,22 @@
       });
       board.appendChild(button);
     });
+    const scenarioVisuals = game.category === "heart"
+      ? (round.scene || []).map(cleanVisual).filter(Boolean)
+      : [];
+    if (scenarioVisuals.length) {
+      const scenario = document.createElement("div");
+      scenario.className = "spot-scenario";
+      scenario.setAttribute("role", "img");
+      scenario.setAttribute("aria-label", "상황 그림: " + scenarioVisuals.join(", "));
+      scenarioVisuals.forEach((visual) => {
+        const item = document.createElement("span");
+        item.textContent = visual;
+        item.setAttribute("aria-hidden", "true");
+        scenario.appendChild(item);
+      });
+      stage.append(scenario);
+    }
     stage.append(board);
     return {
       requiredActions: 1,

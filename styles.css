@@ -1237,6 +1237,9 @@ img {
   display: none;
   background: var(--cream);
   overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 }
 
 .game-shell.is-open {
@@ -1449,6 +1452,10 @@ img {
   line-height: 1.25;
   letter-spacing: -2px;
   text-wrap: balance;
+}
+
+.play-prompt:focus {
+  outline: none;
 }
 
 .question-scene {
@@ -2113,6 +2120,10 @@ img {
 }
 
 @media (max-width: 720px) {
+  .game-shell::after {
+    display: none;
+  }
+
   .container {
     width: min(100% - 30px, var(--container));
   }
@@ -2326,7 +2337,7 @@ img {
   }
 
   .play-header {
-    min-height: 82px;
+    min-height: 72px;
     grid-template-columns: 48px 1fr 48px;
     gap: 11px;
   }
@@ -2346,17 +2357,32 @@ img {
   }
 
   .play-main {
-    padding: 21px 4px 34px;
+    padding: 10px 4px 30px;
   }
 
   .guide-character {
-    width: 60px;
-    height: 55px;
+    width: 50px;
+    height: 46px;
+    margin-bottom: 9px;
+    font-size: 11px;
+  }
+
+  .guide-character::before,
+  .guide-character::after {
+    top: -7px;
+    width: 19px;
+    height: 22px;
+  }
+
+  .prompt-helper {
+    margin-bottom: 6px;
+    font-size: 12px;
   }
 
   .play-prompt {
-    font-size: clamp(29px, 9vw, 39px);
-    letter-spacing: -1.5px;
+    font-size: clamp(26px, 8vw, 34px);
+    line-height: 1.18;
+    letter-spacing: -1.2px;
   }
 
   .question-scene {

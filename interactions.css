@@ -79,11 +79,11 @@
 }
 
 .activity-token:hover,
-.activity-token:focus-visible,
 .spot-tile:hover,
-.spot-tile:focus-visible,
 .count-piece:hover,
-.count-piece:focus-visible {
+body.is-keyboard-nav .activity-token:focus,
+body.is-keyboard-nav .spot-tile:focus,
+body.is-keyboard-nav .count-piece:focus {
   border-color: var(--blue);
   box-shadow: 0 9px 0 #bddcf2;
   transform: translateY(-3px);
@@ -215,6 +215,24 @@
 .spot-board.spot-single-target {
   width: min(100%, 620px);
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.spot-scenario {
+  width: min(100%, 480px);
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 10px 18px;
+  border: 3px dashed #e3cdb2;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.spot-scenario span {
+  font-size: clamp(38px, 10vw, 54px);
+  line-height: 1;
 }
 
 .spot-tile {
@@ -1248,18 +1266,24 @@ button.pattern-cell {
 
 @media (max-width: 640px) {
   .interaction-hint {
-    max-width: calc(100% - 12px);
+    width: calc(100% - 8px);
+    max-width: none;
     min-height: 38px;
     margin-top: 12px;
     padding: 7px 12px;
+    box-sizing: border-box;
+    flex-wrap: wrap;
     font-size: 11px;
     line-height: 1.25;
+    white-space: normal;
+    text-wrap: balance;
   }
 
   .activity-stage {
-    min-height: 240px;
-    gap: 15px;
-    margin-top: 18px;
+    min-height: 0;
+    align-content: start;
+    gap: 13px;
+    margin-top: 14px;
   }
 
   .activity-tray {
@@ -1323,6 +1347,12 @@ button.pattern-cell {
 
   .spot-board {
     gap: 7px;
+  }
+
+  .spot-scenario {
+    min-height: 62px;
+    gap: 10px;
+    padding: 7px 12px;
   }
 
   .spot-tile {
