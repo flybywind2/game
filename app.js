@@ -585,9 +585,9 @@
     words: "word",
     emotions: "heart",
     patterns: "look",
-    more: "look",
+    more: "number",
     matching: "look",
-    sizes: "number",
+    sizes: "look",
     routines: "heart",
     body: "word",
   });
@@ -655,6 +655,8 @@
   let musicEnabled = loadMusicPreference();
   let musicVolume = loadMusicVolume();
   let bgmAudio = null;
+  let bgmGameKey = null;
+  let bgmSeekToken = 0;
   let deferredInstallPrompt = null;
   let parentUnlockedUntil = 0;
 
@@ -948,11 +950,14 @@
   }
 
   function updateMusicControls() {
+    const plan = musicPlanForGame(activeGameKey);
     musicToggle.setAttribute("aria-pressed", String(musicEnabled));
     musicLabel.textContent = musicEnabled ? "음악 켬" : "음악 끔";
     musicToggle.querySelector(".music-icon").textContent = musicEnabled ? "♫" : "×";
     gameMusicToggle.setAttribute("aria-pressed", String(musicEnabled));
-    gameMusicToggle.setAttribute("aria-label", musicEnabled ? "배경음악 끄기" : "배경음악 켜기");
+    gameMusicToggle.setAttribute("aria-label", (musicEnabled ? "배경음악 끄기" : "배경음악 켜기") + ", " + plan.label);
+    gameMusicToggle.dataset.musicTheme = plan.theme;
+    gameMusicToggle.dataset.musicOffset = plan.offset.toFixed(3);
     gameMusicToggle.textContent = musicEnabled ? "♫" : "×";
     const percent = Math.round((musicVolume / 0.35) * 100);
     musicVolumeInput.value = String(percent);
@@ -999,6 +1004,44 @@
     return bgmAudio;
   }
 
+  const BGM_BAR_SECONDS = (60 / 82) * 4;
+  const BGM_PLANS = Object.freeze({
+    look: { label: "반짝 오르골", bars: [0, 2, 4, 6] },
+    number: { label: "통통 마림바", bars: [8, 10, 12, 14] },
+    word: { label: "별빛 벨", bars: [16, 18, 20, 22] },
+    heart: { label: "포근 오르골", bars: [1, 3, 5, 7] },
+  });
+
+  function musicPlanForGame(key) {
+    const category = key ? gameCategory(key) : "look";
+    const source = BGM_PLANS[category] || BGM_PLANS.look;
+    const hash = String(key || "home").split("").reduce((sum, character) => sum + character.codePointAt(0), 0);
+    const bar = source.bars[hash % source.bars.length];
+    return {
+      theme: category,
+      label: source.label,
+      offset: bar * BGM_BAR_SECONDS,
+    };
+  }
+
+  function selectBgmForGame(audio, key) {
+    if (!key || bgmGameKey === key) return;
+    bgmGameKey = key;
+    const plan = musicPlanForGame(key);
+    const token = ++bgmSeekToken;
+    const applyOffset = () => {
+      if (token !== bgmSeekToken || bgmGameKey !== key) return;
+      const maximum = Number.isFinite(audio.duration) ? Math.max(0, audio.duration - 0.25) : plan.offset;
+      try {
+        audio.currentTime = Math.min(plan.offset, maximum);
+      } catch {
+        // The metadata listener below will try again when seeking becomes available.
+      }
+    };
+    if (audio.readyState >= 1) applyOffset();
+    else audio.addEventListener("loadedmetadata", applyOffset, { once: true });
+  }
+
   function setBgmDucked(ducked) {
     if (!bgmAudio) return;
     bgmAudio.volume = musicVolume * (ducked ? 0.22 : 1);
@@ -1007,6 +1050,7 @@
   function startBgm() {
     if (!musicEnabled || document.hidden) return;
     const audio = ensureBgm();
+    selectBgmForGame(audio, activeGameKey);
     audio.volume = musicVolume;
     audio.play().catch(() => {});
   }
@@ -1014,7 +1058,11 @@
   function stopBgm(reset = false) {
     if (!bgmAudio) return;
     bgmAudio.pause();
-    if (reset) bgmAudio.currentTime = 0;
+    if (reset) {
+      bgmSeekToken += 1;
+      bgmGameKey = null;
+      bgmAudio.currentTime = 0;
+    }
   }
 
   function stopVoice() {
@@ -1179,12 +1227,13 @@
     if (!shell.classList.contains("is-open")) {
       returnFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     }
+    activeGameKey = key;
+    activeStoryMode = Boolean(story && STORY_BY_KEY[key]);
+    updateMusicControls();
     startBgm();
     playChime("start");
     clearTimeout(advanceTimer);
     clearIdleHint();
-    activeGameKey = key;
-    activeStoryMode = Boolean(story && STORY_BY_KEY[key]);
     roundIndex = 0;
     wrongAttempts = 0;
     roundSettled = false;

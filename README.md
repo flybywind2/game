@@ -50,7 +50,7 @@ cd /home/ubuntu/project/toddler-learning-games
 /home/ubuntu/project/.venv-supertonic/bin/python scripts/generate_supertonic_audio.py
 ```
 
-배경음악은 외부 곡을 사용하지 않고 저장소의 합성 스크립트로 만든 24초 루프입니다.
+배경음악은 외부 곡을 사용하지 않고 저장소의 합성 스크립트로 만든 약 70초 루프입니다.
 
 ```bash
 python3 scripts/generate_bgm.py /tmp/mongle-meadow.wav
@@ -59,6 +59,8 @@ ffmpeg -y -i /tmp/mongle-meadow.wav -codec:a libmp3lame -b:a 128k audio/music/mo
 
 The generated loop is about 70 seconds long and moves through music-box,
 marimba, and starlight-bell sections before returning to the start.
+게임을 시작할 때 관찰·수·말·마음 영역에 맞는 악기 구간을 선택하고,
+게임 키에 따라 네 가지 마디 위치 중 하나에서 시작하므로 매번 같은 도입부만 반복하지 않습니다.
 
 각 게임은 `#game/게임키` 형식의 고유 주소를 사용합니다. 예를 들어
 `#game/colors`와 `#game/extra021`을 붙인 주소를 열면 해당 게임이 바로 시작됩니다.
