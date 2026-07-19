@@ -884,6 +884,33 @@ button.pattern-cell {
   font-weight: 950;
 }
 
+.sort-deck-tray {
+  width: min(100%, 360px);
+  min-height: 150px;
+  grid-template-columns: 1fr !important;
+  place-items: center;
+  padding: 12px;
+  border: 3px dashed #efcf8b;
+  border-radius: 28px;
+  background: linear-gradient(145deg, #fffaf0, #fff1c9);
+}
+
+.sort-deck-card {
+  width: min(100%, 230px);
+  min-height: 126px;
+  border-color: #efc864;
+  box-shadow: 0 8px 0 #e6bd56, 0 14px 28px rgba(103, 75, 36, 0.12);
+  cursor: default;
+}
+
+.sort-deck-card[hidden] {
+  display: none !important;
+}
+
+.sort-deck-card.is-current-card {
+  animation: activity-pop 420ms ease both;
+}
+
 .bin-contents {
   grid-column: 1 / -1;
   min-height: 62px;
@@ -1019,6 +1046,40 @@ button.pattern-cell {
 .size-tray .size-token.size-3 .activity-visual,
 .sequence-slot-visual.size-3 {
   transform: scale(1.08);
+}
+
+.sequence-storyboard {
+  position: relative;
+  gap: 14px;
+  padding: 14px 10px 20px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, #f7f0ff, #fff9ec);
+}
+
+.sequence-story-frame {
+  border-color: #bca9df;
+  background: #fffdf9;
+  box-shadow: 0 7px 0 #d6caeb;
+  transform: rotate(-1.5deg);
+}
+
+.sequence-story-frame:nth-child(even) {
+  transform: translateY(8px) rotate(1.5deg);
+}
+
+.sequence-story-frame::after {
+  content: "";
+  position: absolute;
+  right: -15px;
+  top: 50%;
+  width: 16px;
+  height: 4px;
+  border-radius: 99px;
+  background: #c7b6e4;
+}
+
+.sequence-story-frame:last-child::after {
+  display: none;
 }
 
 .trace-board {
@@ -1309,6 +1370,65 @@ button.pattern-cell {
   text-align: center;
 }
 
+.relation-journey-targets {
+  counter-reset: journey-step;
+  position: relative;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-left: 34px;
+}
+
+.relation-journey-targets::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  top: 24px;
+  bottom: 24px;
+  width: 7px;
+  border-radius: 99px;
+  background: repeating-linear-gradient(to bottom, #8bcfb5 0 13px, #d9f1e8 13px 22px);
+}
+
+.relation-journey-step {
+  counter-increment: journey-step;
+  position: relative;
+  width: calc(100% - 3px);
+  min-width: 0;
+  box-sizing: border-box;
+  justify-self: start;
+  opacity: 0.48;
+  filter: grayscale(0.4);
+  transition: opacity 180ms ease, filter 180ms ease, transform 180ms ease;
+}
+
+.relation-journey-step::before {
+  content: counter(journey-step);
+  position: absolute;
+  left: -39px;
+  top: 50%;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #a8b9b2;
+  box-shadow: 0 3px 0 rgba(69, 99, 87, 0.22);
+  color: white;
+  font-size: 14px;
+  font-weight: 950;
+  transform: translateY(-50%);
+}
+
+.relation-journey-step.is-unlocked {
+  opacity: 1;
+  filter: none;
+}
+
+.relation-journey-step.is-unlocked::before {
+  background: var(--mint);
+}
+
 .connect-board {
   position: relative;
   width: min(100%, 720px);
@@ -1399,6 +1519,57 @@ button.pattern-cell {
     opacity: 0;
     scale: 0 1;
   }
+}
+
+.connect-spotlight {
+  width: min(100%, 660px);
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+}
+
+.spotlight-clue {
+  width: min(100%, 540px);
+  min-height: 112px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-color: #efc75c;
+  background: linear-gradient(145deg, #fffdf4, #fff0bd);
+  box-shadow: 0 7px 0 #e2bd54;
+  text-align: left;
+}
+
+.spotlight-clue-number {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: white;
+  color: #8b6a16;
+  font-size: 13px;
+  font-weight: 950;
+}
+
+.spotlight-clue strong {
+  font-size: clamp(17px, 3.5vw, 23px);
+  line-height: 1.35;
+}
+
+.spotlight-choice-tray {
+  width: min(100%, 590px);
+}
+
+.spotlight-choice {
+  min-height: 118px;
+}
+
+.spotlight-choice.is-solved {
+  opacity: 0.34;
+  transform: scale(0.94);
 }
 
 .pattern-answer-tray .activity-token {
@@ -1794,6 +1965,55 @@ button.pattern-cell {
 
   .activity-token-label {
     font-size: 11px;
+  }
+
+  .sort-deck-tray {
+    min-height: 126px;
+    padding: 8px;
+  }
+
+  .sort-deck-card {
+    min-height: 108px;
+  }
+
+  .spotlight-clue {
+    min-height: 88px;
+    gap: 10px;
+    padding: 11px 13px;
+  }
+
+  .spotlight-clue-number {
+    width: 40px;
+    height: 40px;
+    font-size: 11px;
+  }
+
+  .spotlight-choice {
+    min-height: 96px;
+  }
+
+  .relation-journey-targets {
+    padding-left: 27px;
+  }
+
+  .relation-journey-targets::before {
+    left: 10px;
+  }
+
+  .relation-journey-step::before {
+    left: -31px;
+    width: 26px;
+    height: 26px;
+  }
+
+  .sequence-storyboard {
+    gap: 8px;
+    padding: 9px 6px 15px;
+  }
+
+  .sequence-story-frame::after {
+    right: -10px;
+    width: 11px;
   }
 
   .drawing-board {

@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.19.10";
+  const APP_BUILD = "2026.07.19.11";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -1385,25 +1385,36 @@
     return hash >>> 0;
   }
 
+  function interactionModeFor(key) {
+    return window.MONGLE_INTERACTIONS?.resolveMode(key) || "choice";
+  }
+
   function ensureDailyPlan() {
     const saved = Array.isArray(dailyProgress.plan)
       ? dailyProgress.plan.filter((key, index, keys) => GAMES[key] && keys.indexOf(key) === index).slice(0, 3)
       : [];
-    if (saved.length === 3) return saved;
+    const savedModes = new Set(saved.map(interactionModeFor));
+    const savedHasProgress = saved.some((key) => Number(dailyProgress.completed[key]) > 0);
+    if (saved.length === 3 && (savedModes.size === 3 || savedHasProgress)) return saved;
 
     const alternatingCategory = dailySeed() % 2 === 0 ? "word" : "heart";
     const categories = ["look", "number", alternatingCategory];
     const rotation = dailySeed("order") % categories.length;
     const orderedCategories = [...categories.slice(rotation), ...categories.slice(0, rotation)];
-    const plan = orderedCategories.map((category) => {
+    const plan = [];
+    const usedModes = new Set();
+    orderedCategories.forEach((category) => {
       const candidates = Object.keys(GAMES).filter((key) => gameCategory(key) === category);
       candidates.sort((left, right) => {
         const completionGap = (learnerProfile.completed[left] || 0) - (learnerProfile.completed[right] || 0);
         if (completionGap) return completionGap;
         return dailySeed(left) - dailySeed(right) || left.localeCompare(right);
       });
-      return candidates[0];
-    }).filter(Boolean);
+      const candidate = candidates.find((key) => !usedModes.has(interactionModeFor(key))) || candidates[0];
+      if (!candidate) return;
+      plan.push(candidate);
+      usedModes.add(interactionModeFor(candidate));
+    });
     dailyProgress.plan = plan;
     persistProgress();
     return plan;
@@ -2318,7 +2329,9 @@
   }
 
   function recommendedGame() {
-    const dailyNext = ensureDailyPlan().find((key) => !dailyProgress.completed[key]);
+    const lastMode = dailyProgress.lastPlayed ? interactionModeFor(dailyProgress.lastPlayed) : null;
+    const pendingDaily = ensureDailyPlan().filter((key) => !dailyProgress.completed[key]);
+    const dailyNext = pendingDaily.find((key) => interactionModeFor(key) !== lastMode) || pendingDaily[0];
     if (dailyNext) return dailyNext;
     const category = Object.keys(CATEGORY_NAMES)
       .map((key) => ({ key, ...categoryProgress(key) }))
@@ -2377,12 +2390,14 @@
     if (!category) return recommendedGame();
     const dailyCandidate = ensureDailyPlan().find((key) => gameCategory(key) === category && !dailyProgress.completed[key]);
     if (dailyCandidate) return dailyCandidate;
+    const lastMode = dailyProgress.lastPlayed ? interactionModeFor(dailyProgress.lastPlayed) : null;
     return Object.keys(GAMES)
       .filter((key) => gameCategory(key) === category)
       .sort((left, right) => {
         const leftStats = learnerProfile.gameStats[left] || {};
         const rightStats = learnerProfile.gameStats[right] || {};
-        return (learnerProfile.completed[left] || 0) - (learnerProfile.completed[right] || 0)
+        return Number(interactionModeFor(left) === lastMode) - Number(interactionModeFor(right) === lastMode)
+          || (learnerProfile.completed[left] || 0) - (learnerProfile.completed[right] || 0)
           || (leftStats.attempts || 0) - (rightStats.attempts || 0)
           || left.localeCompare(right);
       })[0] || recommendedGame();
@@ -3397,10 +3412,30 @@
   let catalogSearch = "";
   let catalogVisibleLimit = CATALOG_PAGE_SIZE;
 
+  function interleavedCatalogEntries(entries) {
+    const buckets = new Map();
+    entries.forEach((entry) => {
+      const [key] = entry;
+      const mode = interactionModeFor(key);
+      const style = window.MONGLE_INTERACTIONS?.metaFor(mode, key)?.label || mode;
+      if (!buckets.has(style)) buckets.set(style, []);
+      buckets.get(style).push(entry);
+    });
+    const styles = [...buckets.keys()];
+    const result = [];
+    while (result.length < entries.length) {
+      styles.forEach((style) => {
+        const next = buckets.get(style)?.shift();
+        if (next) result.push(next);
+      });
+    }
+    return result;
+  }
+
   function renderExtraGameCards() {
     const grid = document.querySelector(".game-grid");
     const fragment = document.createDocumentFragment();
-    const entries = Object.entries(GAMES).filter(([key]) => key.startsWith("extra"));
+    const entries = interleavedCatalogEntries(Object.entries(GAMES).filter(([key]) => key.startsWith("extra")));
 
     entries.forEach(([key, game], index) => {
       const article = document.createElement("article");

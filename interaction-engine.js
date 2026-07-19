@@ -192,9 +192,75 @@
     "extra058",
   ]);
 
+  const CONNECT_SPOTLIGHT_KEYS = new Set([
+    "sounds",
+    "extra033",
+    "extra042",
+    "extra045",
+    "extra055",
+    "extra058",
+  ]);
+
+  const SORT_DECK_KEYS = new Set([
+    "words",
+    "extra029",
+    "extra036",
+    "extra046",
+    "extra057",
+    "extra059",
+    "extra060",
+    "extra066",
+  ]);
+
+  const RELATION_JOURNEY_KEYS = new Set([
+    "extra061",
+    "extra067",
+    "extra075",
+    "extra076",
+    "extra077",
+    "extra078",
+    "extra079",
+    "extra080",
+    "extra084",
+    "extra085",
+  ]);
+
+  const SEQUENCE_STORYBOARD_KEYS = new Set([
+    "extra047",
+    "extra064",
+    "extra069",
+    "extra074",
+    "extra087",
+    "extra088",
+  ]);
+
   let activeController = null;
 
   function metaFor(mode, gameKey) {
+    if (mode === "sort" && SORT_DECK_KEYS.has(gameKey)) {
+      return {
+        label: "한 장씩 분류",
+        instruction: "나오는 그림을 보고 알맞은 바구니를 바로 눌러요.",
+      };
+    }
+    if (mode === "connect" && CONNECT_SPOTLIGHT_KEYS.has(gameKey)) {
+      return {
+        label: "단서 카드 탐정",
+        instruction: "한 장씩 나타나는 말 단서를 보고 알맞은 그림을 찾아요.",
+      };
+    }
+    if (mode === "drag" && RELATION_JOURNEY_KEYS.has(gameKey)) {
+      return {
+        label: "차례차례 길찾기",
+        instruction: "열린 상황부터 알맞은 그림을 놓아 다음 길을 열어요.",
+      };
+    }
+    if (mode === "sequence" && SEQUENCE_STORYBOARD_KEYS.has(gameKey)) {
+      return {
+        label: "이야기 장면 만들기",
+        instruction: "장면 카드를 처음·다음·마지막 액자에 놓아요.",
+      };
+    }
     if (mode === "trace" && gameKey === "extra050") {
       return {
         label: "몸으로 따라 하기",
@@ -1383,6 +1449,8 @@
     const deepLabels = DEEP_SORT_CONFIG[gameKey];
     const roundLabels = ROUND_SORT_CONFIG[gameKey]?.[roundIndex];
     const labels = deepLabels || roundLabels || ["질문에 맞아요", "다른 그림이에요"];
+    const deckMode = SORT_DECK_KEYS.has(gameKey);
+    if (deckMode) tray.classList.add("sort-deck-tray");
     const bins = document.createElement("div");
     bins.className = "sort-bins";
     const targets = labels.map((label, index) => {
@@ -1430,51 +1498,97 @@
       return token;
     });
 
-    setupPickAndDrop(
-      controller,
-      sources,
-      targets,
-      (source, target) => {
-        const item = items[Number(source.dataset.itemIndex)];
-        const option = item.option;
-        const expected = item.expected;
-        if (target.dataset.activityDrop !== expected) {
-          onMistake(source, targets.find((item) => item.dataset.activityDrop === expected));
-          return false;
-        }
-        source.disabled = true;
-        source.classList.add("is-placed");
-        target.querySelector(".bin-contents").appendChild(createVisual(option, "bin-mini-visual"));
-        const placedNames = target.dataset.placedNames ? target.dataset.placedNames.split("|") : [];
-        placedNames.push(optionName(option));
-        target.dataset.placedNames = placedNames.join("|");
-        target.setAttribute("aria-label", target.querySelector("strong").textContent + " 바구니, " + placedNames.join(", ") + " 넣음");
-        placed += 1;
-        setCounter(counter, placed, items.length);
-        announce(optionName(option) + ", " + target.querySelector("strong").textContent + " 바구니.");
-        onProgress("prompt");
-        if (placed === sources.length) onComplete(target);
-        return true;
-      },
-      announce,
-    );
+    const placeItem = (source, target) => {
+      const item = items[Number(source.dataset.itemIndex)];
+      const option = item.option;
+      source.disabled = true;
+      source.classList.add("is-placed");
+      target.querySelector(".bin-contents").appendChild(createVisual(option, "bin-mini-visual"));
+      const placedNames = target.dataset.placedNames ? target.dataset.placedNames.split("|") : [];
+      placedNames.push(optionName(option));
+      target.dataset.placedNames = placedNames.join("|");
+      target.setAttribute("aria-label", target.querySelector("strong").textContent + " 바구니, " + placedNames.join(", ") + " 넣음");
+      placed += 1;
+      setCounter(counter, placed, items.length);
+      announce(optionName(option) + ", " + target.querySelector("strong").textContent + " 바구니.");
+      onProgress("prompt");
+    };
+
+    let currentDeckIndex = 0;
+    const revealDeckCard = () => {
+      sources.forEach((source, index) => {
+        source.hidden = index !== currentDeckIndex || source.disabled;
+        source.classList.toggle("is-current-card", index === currentDeckIndex && !source.disabled);
+      });
+      const current = sources[currentDeckIndex];
+      if (current && !current.disabled) {
+        announce(`${placed + 1}번째 그림, ${current.dataset.label}. 어느 바구니에 넣을까요?`);
+      }
+    };
+
+    if (deckMode) {
+      tray.setAttribute("aria-label", "한 장씩 나오는 분류 카드");
+      sources.forEach((source) => {
+        source.classList.add("sort-deck-card");
+        source.setAttribute("aria-disabled", "true");
+      });
+      targets.forEach((target) => {
+        controller.on(target, "click", () => {
+          const source = sources[currentDeckIndex];
+          if (!source || source.disabled) return;
+          if (target.dataset.activityDrop !== source.dataset.expected) {
+            onMistake(target, targets.find((item) => item.dataset.activityDrop === source.dataset.expected));
+            announce("그림을 다시 보고 다른 바구니를 골라요.");
+            return;
+          }
+          placeItem(source, target);
+          source.hidden = true;
+          currentDeckIndex += 1;
+          if (placed === sources.length) {
+            onComplete(target);
+            return;
+          }
+          controller.later(revealDeckCard, 180);
+        });
+      });
+      revealDeckCard();
+    } else {
+      setupPickAndDrop(
+        controller,
+        sources,
+        targets,
+        (source, target) => {
+          const item = items[Number(source.dataset.itemIndex)];
+          if (target.dataset.activityDrop !== item.expected) {
+            onMistake(source, targets.find((candidate) => candidate.dataset.activityDrop === item.expected));
+            return false;
+          }
+          placeItem(source, target);
+          if (placed === sources.length) onComplete(target);
+          return true;
+        },
+        announce,
+      );
+    }
     stage.append(task, counter, tray, bins);
     return {
       requiredActions: items.length,
       completion: "그림 " + items.length + "개를 두 바구니에 모두 알맞게 나눴어!",
-      demo: {
+      demo: deckMode ? null : {
         source: sources[0],
         target: targets[sources[0]?.dataset.expected === "correct" ? 0 : 1],
         text: "그림을 누르고, 어울리는 바구니를 눌러요",
       },
-      prompt: deepLabels || roundLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
-      helper: "그림 하나를 고른 뒤 알맞은 바구니를 눌러요.",
+      prompt: deckMode
+        ? "그림 카드가 한 장씩 나와요. 두 바구니 중 알맞은 곳을 골라 볼까?"
+        : deepLabels || roundLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
+      helper: deckMode ? "지금 보이는 그림을 보고 바구니를 바로 눌러요." : "그림 하나를 고른 뒤 알맞은 바구니를 눌러요.",
       hint: () => {
-        const source = sources.find((item) => !item.disabled);
+        const source = deckMode ? sources[currentDeckIndex] : sources.find((item) => !item.disabled);
         if (!source) return;
         pulse([source, targets[source.dataset.expected === "correct" ? 0 : 1]]);
       },
-      replay: () => pulse(sources.filter((source) => !source.disabled), "is-replay"),
+      replay: () => pulse(deckMode ? sources[currentDeckIndex] : sources.filter((source) => !source.disabled), "is-replay"),
     };
   }
 
@@ -1617,7 +1731,86 @@
     };
   }
 
+  function renderConnectSpotlight(context) {
+    const { controller, stage, game, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
+    const pairCount = difficulty === "support"
+      ? 2
+      : difficulty === "challenge"
+        ? Math.min(3, game.rounds.length)
+        : roundIndex < 2 ? 2 : Math.min(3, game.rounds.length);
+    const pairs = Array.from({ length: pairCount }, (_, offset) => {
+      const item = game.rounds[(roundIndex + offset) % game.rounds.length];
+      return { prompt: item.prompt, option: correctOption(item), match: offset };
+    });
+    const board = document.createElement("div");
+    board.className = "connect-spotlight";
+    board.dataset.pairCount = String(pairCount);
+    const progress = createCounter("찾은 단서", 0, pairCount);
+    const clue = document.createElement("div");
+    clue.className = "connect-target spotlight-clue";
+    clue.setAttribute("role", "status");
+    const clueNumber = document.createElement("span");
+    clueNumber.className = "spotlight-clue-number";
+    const clueText = document.createElement("strong");
+    clue.append(clueNumber, clueText);
+    const tray = document.createElement("div");
+    tray.className = "activity-tray spotlight-choice-tray";
+    tray.style.gridTemplateColumns = "repeat(" + pairCount + ", minmax(0, 1fr))";
+    const sources = shuffled(pairs, seed + ":spotlight").map((pair) => {
+      const source = createToken(pair.option, "connect-source spotlight-choice");
+      source.dataset.match = String(pair.match);
+      source.dataset.label = optionName(pair.option);
+      tray.appendChild(source);
+      return source;
+    });
+    let step = 0;
+
+    const showClue = () => {
+      const pair = pairs[step];
+      clue.dataset.match = String(pair.match);
+      clueNumber.textContent = `${step + 1} / ${pairCount}`;
+      clueText.textContent = pair.prompt;
+      sources.forEach((source) => source.classList.toggle("is-current-answer", source.dataset.match === String(pair.match)));
+      announce(`${step + 1}번째 단서. ${pair.prompt}`);
+    };
+
+    sources.forEach((source) => {
+      controller.on(source, "click", () => {
+        if (source.disabled) return;
+        const pair = pairs[step];
+        if (source.dataset.match !== String(pair.match)) {
+          onMistake(source, sources.find((candidate) => candidate.dataset.match === String(pair.match)));
+          return;
+        }
+        source.disabled = true;
+        source.classList.add("is-solved");
+        step += 1;
+        setCounter(progress, step, pairCount);
+        onProgress("prompt");
+        announce(`${optionName(pair.option)} 정답! 다음 단서를 열어요.`);
+        if (step === pairCount) {
+          controller.later(() => onComplete(source), 260);
+          return;
+        }
+        controller.later(showClue, 220);
+      });
+    });
+
+    showClue();
+    board.append(progress, clue, tray);
+    stage.append(board);
+    return {
+      requiredActions: pairCount,
+      completion: "말 단서 " + pairCount + "개를 차례로 모두 풀었어!",
+      prompt: gameKey === "sounds" ? "소리 단서를 한 장씩 듣고 동물 탐정이 되어 볼까?" : "말 단서를 한 장씩 열어 알맞은 그림을 찾아볼까?",
+      helper: "가운데 단서를 보고 아래 그림 하나를 눌러요.",
+      hint: () => pulse([clue, sources.find((source) => source.dataset.match === String(pairs[step]?.match))].filter(Boolean)),
+      replay: () => pulse(clue, "is-replay"),
+    };
+  }
+
   function renderConnect(context) {
+    if (CONNECT_SPOTLIGHT_KEYS.has(context.gameKey)) return renderConnectSpotlight(context);
     const { controller, stage, game, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     const pairCount = difficulty === "support"
       ? 2
@@ -1760,6 +1953,7 @@
     const { controller, stage, game, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     const isSafetyJourney = SAFETY_RELATION_KEYS.has(gameKey);
     const usesTextClues = isSafetyJourney || SEMANTIC_RELATION_KEYS.has(gameKey);
+    const stepJourney = RELATION_JOURNEY_KEYS.has(gameKey);
     const pairCount = difficulty === "support"
       ? 2
       : difficulty === "challenge"
@@ -1777,26 +1971,35 @@
 
     const targetsBoard = document.createElement("div");
     targetsBoard.className = "sequence-slots relation-targets";
+    if (stepJourney) targetsBoard.classList.add("relation-journey-targets");
     if (isSafetyJourney) targetsBoard.classList.add("safety-relation-targets");
     if (usesTextClues) targetsBoard.classList.add("text-relation-targets");
     targetsBoard.style.gridTemplateColumns = usesTextClues ? "1fr" : "repeat(" + pairCount + ", minmax(0, 1fr))";
-    const targets = shuffled(pairs, seed + ":clues").map((pair) => {
+    const targetPairs = stepJourney ? pairs : shuffled(pairs, seed + ":clues");
+    const targets = targetPairs.map((pair, targetIndex) => {
       const target = document.createElement("button");
       target.type = "button";
       target.className = "sequence-slot relation-target";
       if (isSafetyJourney) target.classList.add("safety-relation-target");
       if (usesTextClues) target.classList.add("text-relation-target");
+      if (stepJourney) target.classList.add("relation-journey-step");
       target.dataset.activityDrop = String(pair.match);
       const clue = document.createElement("span");
       clue.className = pair.clue.length ? "relation-clue-visual" : "relation-clue-text";
       clue.textContent = pair.clue.length ? pair.clue.join(" ") : pair.prompt;
       const caption = document.createElement("small");
-      caption.textContent = "알맞은 그림 자리";
+      caption.textContent = stepJourney ? `${targetIndex + 1}번째 길` : "알맞은 그림 자리";
       target.append(clue, caption);
       target.setAttribute("aria-label", pair.prompt + ", 알맞은 그림 놓는 자리");
       targetsBoard.appendChild(target);
       return target;
     });
+    if (stepJourney) {
+      targets.forEach((target, index) => {
+        target.disabled = index !== 0;
+        target.classList.toggle("is-unlocked", index === 0);
+      });
+    }
 
     const tray = document.createElement("div");
     tray.className = "activity-tray relation-tray";
@@ -1815,6 +2018,7 @@
       sources,
       targets,
       (source, target) => {
+        if (stepJourney && target.disabled) return false;
         if (source.dataset.match !== target.dataset.activityDrop) {
           onMistake(source, targets.find((item) => item.dataset.activityDrop === source.dataset.match));
           return false;
@@ -1830,6 +2034,12 @@
         onProgress("prompt");
         announce(optionName(pair.option) + " 연결 완료. " + placed + "개 했어요.");
         if (placed === pairCount) onComplete(target);
+        else if (stepJourney) {
+          const nextTarget = targets[placed];
+          nextTarget.disabled = false;
+          nextTarget.classList.add("is-unlocked");
+          announce(`${placed + 1}번째 길이 열렸어요.`);
+        }
         return true;
       },
       announce,
@@ -1838,8 +2048,8 @@
     let relationPrompt = "단서 " + pairCount + "개와 알맞은 그림을 모두 연결해 볼까?";
     let relationHelper = "단서를 하나씩 보고 어울리는 그림을 놓아요.";
     if (isSafetyJourney) {
-      relationPrompt = "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?";
-      relationHelper = pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요.";
+      relationPrompt = stepJourney ? "안전 길을 첫 칸부터 차례로 열어 볼까?" : "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?";
+      relationHelper = stepJourney ? "반짝이는 열린 상황부터 행동 그림을 놓아요." : pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요.";
     } else if (gameKey === "sounds") {
       relationPrompt = "소리 말과 동물 친구를 모두 연결해 볼까?";
       relationHelper = "멍멍, 음메 같은 소리를 보고 동물 그림을 놓아요.";
@@ -1855,14 +2065,17 @@
         ? "상황 " + pairCount + "개에 도움이 되는 행동을 모두 연결했어!"
         : "단서 " + pairCount + "개와 알맞은 그림을 모두 연결했어!",
       demo: {
-        source: sources[0],
-        target: targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
+        source: stepJourney ? sources.find((item) => item.dataset.match === targets[0]?.dataset.activityDrop) : sources[0],
+        target: stepJourney ? targets[0] : targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
       },
       prompt: relationPrompt,
       helper: relationHelper,
       hint: () => {
-        const source = sources.find((item) => !item.disabled);
-        if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
+        const target = stepJourney ? targets.find((item) => !item.disabled) : null;
+        const source = stepJourney
+          ? sources.find((item) => !item.disabled && item.dataset.match === target?.dataset.activityDrop)
+          : sources.find((item) => !item.disabled);
+        if (source) pulse([source, target || targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
       },
       replay: () => pulse(targets.filter((target) => !target.disabled), "is-replay"),
     };
@@ -1881,6 +2094,7 @@
     const { controller, stage, game, round, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     let steps;
     let distractor = null;
+    const storyboard = SEQUENCE_STORYBOARD_KEYS.has(gameKey);
 
     if (ROUND_SEQUENCE_KEYS.has(gameKey)) {
       const answer = correctOption(round);
@@ -1903,7 +2117,9 @@
 
     const task = document.createElement("p");
     task.className = "sequence-task";
-    task.textContent = ROUND_SEQUENCE_KEYS.has(gameKey)
+    task.textContent = storyboard
+      ? "흩어진 장면을 이야기 액자에 처음부터 놓아요."
+      : ROUND_SEQUENCE_KEYS.has(gameKey)
       ? "그림 조각을 처음부터 차례대로 놓아요."
       : steps.length === 2
         ? "지금 장면과 다음 장면을 차례대로 놓아요."
@@ -1911,13 +2127,15 @@
 
     const slots = document.createElement("div");
     slots.className = "sequence-slots";
+    if (storyboard) slots.classList.add("sequence-storyboard");
     slots.style.gridTemplateColumns = "repeat(" + steps.length + ", minmax(0, 1fr))";
     const targets = steps.map((_, index) => {
       const target = document.createElement("button");
       target.type = "button";
       target.className = "sequence-slot";
+      if (storyboard) target.classList.add("sequence-story-frame");
       target.dataset.activityDrop = String(index);
-      target.innerHTML = '<span class="slot-number">' + (index + 1) + '</span><small>' + (index === 0 ? "먼저" : index === steps.length - 1 ? "마지막" : "다음") + '</small>';
+      target.innerHTML = '<span class="slot-number">' + (index + 1) + '</span><small>' + (index === 0 ? (storyboard ? "이야기 시작" : "먼저") : index === steps.length - 1 ? (storyboard ? "이야기 끝" : "마지막") : "다음") + '</small>';
       target.setAttribute("aria-label", index + 1 + "번째 자리");
       slots.appendChild(target);
       return target;
@@ -1971,9 +2189,9 @@
     stage.append(task, slots, tray);
     return {
       requiredActions: steps.length,
-      prompt: "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓아 볼까?",
-      helper: "먼저 할 그림부터 하나씩 번호 자리에 놓아요.",
-      completion: "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓았어!",
+      prompt: storyboard ? "그림 " + steps.length + "장으로 작은 이야기를 완성해 볼까?" : "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓아 볼까?",
+      helper: storyboard ? "이야기 시작 장면부터 액자에 하나씩 놓아요." : "먼저 할 그림부터 하나씩 번호 자리에 놓아요.",
+      completion: storyboard ? "처음·다음·마지막 장면으로 이야기를 완성했어!" : "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓았어!",
       demo: {
         source: sources.find((item) => item.dataset.step === "0"),
         target: targets[0],
