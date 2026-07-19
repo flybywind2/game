@@ -1090,6 +1090,91 @@
   cursor: pointer;
 }
 
+.course-completion {
+  border-color: #d9cee9;
+  background: linear-gradient(150deg, #fbf8ff, #fffdf4);
+}
+
+.course-completion.is-course-complete {
+  border-color: #eed281;
+  background: linear-gradient(150deg, #fff9e8, #f4fcf8);
+}
+
+.course-completion-progress {
+  display: grid;
+  width: min(100%, 650px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 17px auto;
+}
+
+.course-completion-progress > span {
+  display: grid;
+  min-width: 0;
+  min-height: 78px;
+  place-items: center;
+  align-content: center;
+  gap: 5px;
+  padding: 9px 6px;
+  border: 1px solid #e5dde9;
+  border-radius: 16px;
+  background: white;
+  color: var(--ink-soft);
+}
+
+.course-completion-progress i {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eee8f3;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+}
+
+.course-completion-progress small {
+  width: 100%;
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.course-completion-progress > span.is-done {
+  border-color: #bfe6d8;
+  background: var(--mint-soft);
+  color: var(--mint-dark);
+}
+
+.course-completion-progress > span.is-done i {
+  background: var(--mint);
+  color: white;
+}
+
+.course-completion-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.course-completion-actions:has(.completion-home:only-child) {
+  grid-template-columns: minmax(220px, 360px);
+  justify-content: center;
+}
+
+.completion-course-next {
+  min-height: 58px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 17px;
+  background: var(--purple);
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
 .parent-observation-heading {
   display: flex;
   align-items: center;
@@ -1574,6 +1659,19 @@
   }
 
   .break-promise-list {
+    grid-template-columns: 1fr;
+  }
+
+  .course-completion-progress {
+    gap: 5px;
+  }
+
+  .course-completion-progress > span {
+    min-height: 70px;
+    padding-inline: 4px;
+  }
+
+  .course-completion-actions {
     grid-template-columns: 1fr;
   }
 

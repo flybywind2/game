@@ -1097,6 +1097,14 @@
     return plan.filter((key) => Number(dailyProgress.completed[key]) > 0).length;
   }
 
+  function dailyCourseState(key) {
+    const plan = ensureDailyPlan();
+    if (!plan.includes(key)) return null;
+    const completed = dailyPlanCompletedCount(plan);
+    const next = plan.find((gameKey) => !(Number(dailyProgress.completed[gameKey]) > 0)) || null;
+    return { plan, completed, next, complete: completed === plan.length };
+  }
+
   function renderDailyPlan(plan) {
     const container = document.querySelector("#daily-plan");
     if (!container) return;
@@ -1917,6 +1925,34 @@
       });
       playChime("success");
       speak("놀이 약속 시간이 되었어. 몽글이와 눈과 몸을 쉬어 볼까?");
+      return;
+    }
+
+    const dailyCourse = storyMode ? null : dailyCourseState(activeGameKey);
+    if (dailyCourse) {
+      const nextGame = dailyCourse.next ? GAMES[dailyCourse.next] : null;
+      const courseMessage = dailyCourse.complete
+        ? "오늘의 세 가지 힘을 모두 만나 코스를 완성했어요."
+        : `${dailyCourse.completed}번째 놀이를 마쳤어요. 다음 놀이도 준비되어 있어요.`;
+      playMain.innerHTML = `
+        <div class="completion-card course-completion ${dailyCourse.complete ? "is-course-complete" : ""}">
+          <div class="completion-sticker ${isNewSticker ? "is-new-sticker" : ""}" aria-hidden="true">${dailyCourse.complete ? "🏅" : (isNewSticker ? game.icon : "★")}</div>
+          <p class="completion-label">오늘 코스 ${dailyCourse.completed} / ${dailyCourse.plan.length}</p>
+          <h2>${dailyCourse.complete ? "오늘 코스 완성!" : "한 걸음 더 자랐어!"}</h2>
+          <div class="course-completion-progress" role="progressbar" aria-label="오늘 코스 ${dailyCourse.plan.length}개 중 ${dailyCourse.completed}개 완료" aria-valuemin="0" aria-valuemax="${dailyCourse.plan.length}" aria-valuenow="${dailyCourse.completed}">
+            ${dailyCourse.plan.map((key, index) => `<span class="${Number(dailyProgress.completed[key]) > 0 ? "is-done" : ""}"><i>${Number(dailyProgress.completed[key]) > 0 ? "✓" : index + 1}</i><small>${GAMES[key].title}</small></span>`).join("")}
+          </div>
+          <span class="completion-reward">+${isNewSticker ? 100 : 30} XP · LEVEL ${profileLevel()}</span>
+          <p>${courseMessage}</p>
+          <div class="completion-actions course-completion-actions">
+            ${nextGame ? `<button class="completion-course-next" type="button">다음 오늘 놀이 · ${nextGame.title}</button>` : ""}
+            <button class="completion-home" type="button">${dailyCourse.complete ? "오늘 코스 마치기" : "잠깐 쉬고 홈으로"}</button>
+          </div>
+        </div>`;
+      playMain.querySelector(".completion-home").addEventListener("click", closeGame);
+      playMain.querySelector(".completion-course-next")?.addEventListener("click", () => startGame(dailyCourse.next));
+      launchConfetti();
+      speak(dailyCourse.complete ? "오늘 코스 완성! 세 가지 놀이를 모두 해냈어!" : `${game.title} 완료! 다음 오늘 놀이도 만나 볼까?`);
       return;
     }
 

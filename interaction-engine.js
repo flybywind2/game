@@ -842,7 +842,6 @@
       ]),
       seed + ":pairs",
     );
-    const initialPreviewDuration = cards.length <= 4 ? 2200 : 3000;
     const replayPreviewDuration = cards.length <= 4 ? 1600 : 2200;
     const counter = createCounter("찾은 짝", 0, pairOptions.length);
     const previewNote = document.createElement("p");
@@ -857,6 +856,11 @@
     let first = null;
     let locked = true;
     let matched = 0;
+    const startButton = document.createElement("button");
+    startButton.type = "button";
+    startButton.className = "activity-confirm memory-start";
+    startButton.textContent = "다 봤어요! 시작";
+    startButton.setAttribute("aria-label", "그림을 모두 기억했어요. 카드 짝맞추기 시작");
 
     cards.forEach((card, index) => {
       const button = document.createElement("button");
@@ -934,6 +938,14 @@
       announce("그림을 모두 덮었어요. 같은 그림 두 장을 찾아요.");
     };
 
+    controller.on(startButton, "click", () => {
+      if (!locked) return;
+      startButton.disabled = true;
+      startButton.hidden = true;
+      coverCards();
+      cardButtons[0]?.focus({ preventScroll: true });
+    });
+
     const previewCards = () => {
       if (locked) return;
       locked = true;
@@ -949,9 +961,8 @@
       controller.later(coverCards, replayPreviewDuration);
     };
 
-    stage.append(previewNote, counter, board);
-    announce("먼저 모든 그림을 보여줄게요. 어디에 있는지 기억해요.");
-    controller.later(coverCards, initialPreviewDuration);
+    stage.append(previewNote, counter, board, startButton);
+    announce("먼저 모든 그림을 보여줄게요. 천천히 기억하고 다 봤어요 시작 버튼을 눌러요.");
     return {
       requiredActions: pairOptions.length * 2,
       completion: "같은 그림 " + pairOptions.length + "쌍을 모두 찾았어!",
