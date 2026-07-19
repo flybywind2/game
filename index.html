@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
     <link rel="stylesheet" href="./interactions.css?v=19" />
-    <link rel="stylesheet" href="./premium.css?v=7" />
+    <link rel="stylesheet" href="./premium.css?v=9" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -435,6 +435,7 @@
           <button class="round-button home-button" id="game-close" type="button" aria-label="놀이를 그만하고 홈으로 돌아가기">⌂</button>
           <div class="play-progress-wrap">
             <span class="play-game-name" id="play-game-name">놀이 이름</span>
+            <span class="play-time-chip" id="play-time-chip">잎 10분 놀이 약속</span>
             <div class="play-progress" id="play-progress" aria-label="놀이 진행률"></div>
           </div>
           <div class="play-audio-actions">
@@ -562,6 +563,20 @@
           <p id="backup-status" role="status">파일은 서버로 전송되지 않으며 보호자가 직접 보관해요.</p>
         </section>
 
+        <section class="playtime-settings" aria-labelledby="playtime-settings-title">
+          <div class="playtime-settings-heading">
+            <span class="playtime-settings-icon" aria-hidden="true">◷</span>
+            <span><strong id="playtime-settings-title">놀이 시간 약속</strong><small>문제를 끊지 않고 게임이 끝난 뒤 쉬는 시간을 알려줘요.</small></span>
+          </div>
+          <div class="playtime-choices" role="group" aria-labelledby="playtime-settings-title">
+            <button type="button" data-play-limit="5">5분</button>
+            <button type="button" data-play-limit="10">10분</button>
+            <button type="button" data-play-limit="15">15분</button>
+            <button type="button" data-play-limit="0">제한 없음</button>
+          </div>
+          <p id="playtime-status" role="status">10분 뒤 현재 게임을 마치면 눈과 몸을 쉬도록 안내해요.</p>
+        </section>
+
         <section class="offline-settings" aria-labelledby="offline-settings-title">
           <div>
             <span class="offline-settings-icon" aria-hidden="true">⌂</span>
@@ -632,6 +647,6 @@
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
     <script src="./interaction-engine.js?v=26"></script>
-    <script src="./app.js?v=34"></script>
+    <script src="./app.js?v=36"></script>
   </body>
 </html>

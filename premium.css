@@ -963,6 +963,133 @@
   color: #a4453b;
 }
 
+.playtime-settings {
+  margin: 14px 0;
+  padding: 16px;
+  border: 1px solid #e7dce9;
+  border-radius: 21px;
+  background: #fcf8fd;
+}
+
+.playtime-settings-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.playtime-settings-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.playtime-settings-heading strong,
+.playtime-settings-heading small {
+  display: block;
+}
+
+.playtime-settings-heading strong {
+  font-size: 13px;
+}
+
+.playtime-settings-heading small {
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.playtime-choices {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.playtime-choices button {
+  min-height: 46px;
+  padding: 7px 5px;
+  border: 1px solid #ded2e4;
+  border-radius: 12px;
+  background: white;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.playtime-choices button[aria-pressed="true"] {
+  border-color: var(--purple);
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  box-shadow: 0 0 0 2px rgba(164, 140, 231, 0.12);
+}
+
+.playtime-settings > p {
+  margin: 9px 2px 0;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.play-time-chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.play-time-chip[hidden] {
+  display: none;
+}
+
+.completion-card.break-completion {
+  border-color: #cde9dd;
+  background: linear-gradient(150deg, #f3fcf7, #fffdf5);
+}
+
+.break-completion .completion-sticker {
+  background: var(--mint-soft);
+}
+
+.break-promise-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: min(100%, 570px);
+  margin: 17px auto 0;
+}
+
+.break-promise-list span {
+  padding: 11px 7px;
+  border-radius: 14px;
+  background: white;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.completion-more {
+  min-height: 52px;
+  padding: 0 18px;
+  border: 1px solid #dacfee;
+  border-radius: 16px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .parent-observation-heading {
   display: flex;
   align-items: center;
@@ -1436,6 +1563,18 @@
 
   .backup-actions button {
     min-height: 48px;
+  }
+
+  .playtime-choices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .playtime-choices button {
+    min-height: 48px;
+  }
+
+  .break-promise-list {
+    grid-template-columns: 1fr;
   }
 
   .observation-choices {

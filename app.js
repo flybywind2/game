@@ -569,6 +569,7 @@
   const SOUND_KEY = "mongle-sound-v1";
   const MUSIC_KEY = "mongle-music-v1";
   const MUSIC_VOLUME_KEY = "mongle-music-volume-v1";
+  const PLAY_LIMIT_KEY = "mongle-play-limit-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
   const CATEGORY_NAMES = Object.freeze({
@@ -618,6 +619,7 @@
   const musicLabel = musicToggle.querySelector(".music-label");
   const musicVolumeInput = document.querySelector("#music-volume");
   const musicVolumeValue = document.querySelector("#music-volume-value");
+  const playTimeChip = document.querySelector("#play-time-chip");
   const confetti = document.querySelector("#confetti");
   const parentDialog = document.querySelector("#parent-dialog");
   const parentGate = document.querySelector("#parent-gate");
@@ -659,6 +661,11 @@
   let bgmSeekToken = 0;
   let deferredInstallPrompt = null;
   let parentUnlockedUntil = 0;
+  let pendingParentAction = null;
+  let playLimitMinutes = loadPlayLimit();
+  let playExtensionMinutes = 0;
+  let playAccumulatedMs = 0;
+  let playActiveSince = 0;
 
   function todayKey() {
     const now = new Date();
@@ -949,6 +956,83 @@
     } catch {
       // A preference is optional.
     }
+  }
+
+  function loadPlayLimit() {
+    try {
+      const value = Number(localStorage.getItem(PLAY_LIMIT_KEY));
+      return [0, 5, 10, 15].includes(value) ? value : 10;
+    } catch {
+      return 10;
+    }
+  }
+
+  function savePlayLimit() {
+    try {
+      localStorage.setItem(PLAY_LIMIT_KEY, String(playLimitMinutes));
+    } catch {
+      // A family preference is optional when storage is unavailable.
+    }
+  }
+
+  function elapsedPlayMs() {
+    return playAccumulatedMs + (playActiveSince ? Math.max(0, Date.now() - playActiveSince) : 0);
+  }
+
+  function startPlayClock() {
+    if (document.hidden || playActiveSince) return;
+    playActiveSince = Date.now();
+  }
+
+  function pausePlayClock() {
+    if (!playActiveSince) return;
+    playAccumulatedMs += Math.max(0, Date.now() - playActiveSince);
+    playActiveSince = 0;
+  }
+
+  function resetPlayClock() {
+    playAccumulatedMs = 0;
+    playActiveSince = 0;
+    playExtensionMinutes = 0;
+  }
+
+  function playLimitReached() {
+    if (!playLimitMinutes) return false;
+    return elapsedPlayMs() >= (playLimitMinutes + playExtensionMinutes) * 60 * 1000;
+  }
+
+  function updatePlayTimeChip() {
+    if (!playLimitMinutes) {
+      playTimeChip.hidden = true;
+      return;
+    }
+    playTimeChip.hidden = false;
+    const total = playLimitMinutes + playExtensionMinutes;
+    playTimeChip.textContent = `잎 ${total}분 놀이 약속`;
+    playTimeChip.setAttribute("aria-label", `보호자가 정한 놀이 시간 ${total}분`);
+  }
+
+  function renderPlayLimitSettings() {
+    document.querySelectorAll("[data-play-limit]").forEach((button) => {
+      button.setAttribute("aria-pressed", String(Number(button.dataset.playLimit) === playLimitMinutes));
+    });
+    document.querySelector("#playtime-status").textContent = playLimitMinutes
+      ? `${playLimitMinutes}분 뒤 현재 게임을 마치면 눈과 몸을 쉬도록 안내해요.`
+      : "시간 알림 없이 보호자가 직접 마무리해요.";
+    document.querySelector("#rest-title").textContent = playLimitMinutes
+      ? `${playLimitMinutes}분 놀았다면, 눈과 몸도 쭉쭉!`
+      : "놀이 뒤에는 눈과 몸도 쭉쭉!";
+    updatePlayTimeChip();
+  }
+
+  function setPlayLimit(minutes) {
+    if (![0, 5, 10, 15].includes(minutes)) return;
+    playLimitMinutes = minutes;
+    resetPlayClock();
+    savePlayLimit();
+    renderPlayLimitSettings();
+    if (shell.classList.contains("is-open")) startPlayClock();
+    showToast(minutes ? `${minutes}분 놀이 약속을 정했어요.` : "놀이 시간 알림을 껐어요.");
   }
 
   function cachePlayElements() {
@@ -1406,14 +1490,21 @@
 
   function startGame(key, { updateUrl = true, story = false } = {}) {
     if (!GAMES[key]) return;
+    const shellAlreadyOpen = shell.classList.contains("is-open");
     if (updateUrl && gameKeyFromLocation() !== key) {
-      window.history.pushState({ mongleGame: key, returnToCatalog: true }, "", gameUrl(key));
+      if (shellAlreadyOpen) {
+        window.history.replaceState({ ...(window.history.state || {}), mongleGame: key }, "", gameUrl(key));
+      } else {
+        window.history.pushState({ mongleGame: key, returnToCatalog: true }, "", gameUrl(key));
+      }
     }
-    if (!shell.classList.contains("is-open")) {
+    if (!shellAlreadyOpen) {
       returnFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     }
     activeGameKey = key;
     activeStoryMode = Boolean(story && STORY_BY_KEY[key]);
+    updatePlayTimeChip();
+    startPlayClock();
     updateMusicControls();
     startBgm();
     playChime("start");
@@ -1444,6 +1535,7 @@
     }
     clearTimeout(advanceTimer);
     clearIdleHint();
+    pausePlayClock();
     roundInstructionToken += 1;
     activeActivity?.destroy();
     window.MONGLE_INTERACTIONS?.cleanup();
@@ -1787,12 +1879,46 @@
     recordActivity("completion");
     saveProgress();
     saveLearnerProfile();
+    pausePlayClock();
     replayButton.disabled = true;
     renderProgress(game.rounds.length, game.rounds.length);
     progressBar.querySelectorAll(".progress-dot").forEach((dot) => {
       dot.classList.remove("current");
       dot.classList.add("done");
     });
+
+    if (playLimitReached()) {
+      playMain.innerHTML = `
+        <div class="completion-card break-completion">
+          <div class="completion-sticker ${isNewSticker ? "is-new-sticker" : ""}" aria-hidden="true">${isNewSticker ? game.icon : "🌿"}</div>
+          <p class="completion-label">${game.title} 놀이도 멋지게 끝냈어요!</p>
+          <h2>몽글이도 쉬는 시간이야</h2>
+          <span class="completion-reward">+${isNewSticker ? 100 : 30} XP · LEVEL ${profileLevel()}</span>
+          <p>약속한 놀이 시간이 되었어요.<br>눈과 몸을 편안하게 쉬어 줄까요?</p>
+          <div class="break-promise-list" aria-label="쉬는 시간 약속">
+            <span>👀 먼 곳 바라보기</span><span>🙆 두 팔 쭉 펴기</span><span>💧 물 한 모금</span>
+          </div>
+          <div class="completion-actions">
+            <button class="completion-home" type="button">오늘은 여기까지</button>
+            <button class="completion-more" type="button">보호자와 5분 더</button>
+          </div>
+        </div>`;
+      playMain.querySelector(".completion-home").addEventListener("click", () => {
+        resetPlayClock();
+        closeGame();
+      });
+      playMain.querySelector(".completion-more").addEventListener("click", () => {
+        requestParentAccess(() => {
+          playExtensionMinutes += 5;
+          updatePlayTimeChip();
+          startGame(recommendedGame());
+          showToast("보호자와 5분 더 놀기로 했어요.");
+        });
+      });
+      playChime("success");
+      speak("놀이 약속 시간이 되었어. 몽글이와 눈과 몸을 쉬어 볼까?");
+      return;
+    }
 
     playMain.innerHTML = `
       <div class="completion-card">
@@ -2151,6 +2277,7 @@
         soundEnabled,
         musicEnabled,
         musicVolume,
+        playLimitMinutes,
       },
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -2184,6 +2311,9 @@
       if (typeof payload.settings?.musicEnabled === "boolean") musicEnabled = payload.settings.musicEnabled;
       const importedVolume = Number(payload.settings?.musicVolume);
       if (Number.isFinite(importedVolume) && importedVolume >= 0 && importedVolume <= 0.35) musicVolume = importedVolume;
+      const importedPlayLimit = Number(payload.settings?.playLimitMinutes);
+      if ([0, 5, 10, 15].includes(importedPlayLimit)) playLimitMinutes = importedPlayLimit;
+      resetPlayClock();
       persistProgress();
       try {
         localStorage.setItem(PROFILE_KEY, JSON.stringify(learnerProfile));
@@ -2193,6 +2323,7 @@
       saveSoundPreference();
       saveMusicPreference();
       saveMusicVolume();
+      savePlayLimit();
       updateSoundButton();
       updateMusicControls();
       if (!musicEnabled) stopBgm();
@@ -2272,6 +2403,7 @@
 
     const nicknameInput = document.querySelector("#child-nickname");
     nicknameInput.value = learnerProfile.nickname || "꼬마 탐험가";
+    renderPlayLimitSettings();
     document.querySelector("#parent-level").textContent = String(profileLevel());
     renderWeeklyReport();
     renderParentObservation();
@@ -2348,9 +2480,18 @@
     else parentGate.removeAttribute("open");
   }
 
-  function requestParentAccess() {
+  function cancelParentAccess() {
+    pendingParentAction = null;
+    closeParentGate();
+  }
+
+  function requestParentAccess(action) {
+    pendingParentAction = typeof action === "function" ? action : null;
     if (Date.now() < parentUnlockedUntil) {
-      openParentDialog();
+      const approvedAction = pendingParentAction;
+      pendingParentAction = null;
+      if (approvedAction) approvedAction();
+      else openParentDialog();
       return;
     }
     const problems = [[2, 3], [3, 4], [4, 2], [5, 3]];
@@ -2374,8 +2515,11 @@
           return;
         }
         parentUnlockedUntil = Date.now() + 5 * 60 * 1000;
+        const approvedAction = pendingParentAction;
+        pendingParentAction = null;
         closeParentGate();
-        openParentDialog();
+        if (approvedAction) approvedAction();
+        else openParentDialog();
       });
       wrap.appendChild(button);
     });
@@ -2659,9 +2803,12 @@
   document.querySelectorAll("[data-observation]").forEach((button) => {
     button.addEventListener("click", () => recordParentObservation(button.dataset.observation));
   });
-  document.querySelector("#parent-gate-close").addEventListener("click", closeParentGate);
+  document.querySelectorAll("[data-play-limit]").forEach((button) => {
+    button.addEventListener("click", () => setPlayLimit(Number(button.dataset.playLimit)));
+  });
+  document.querySelector("#parent-gate-close").addEventListener("click", cancelParentAccess);
   parentGate.addEventListener("click", (event) => {
-    if (event.target === parentGate) closeParentGate();
+    if (event.target === parentGate) cancelParentAccess();
   });
   parentDialog.addEventListener("click", (event) => {
     if (event.target === parentDialog) closeParentDialog();
@@ -2680,8 +2827,13 @@
   });
 
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopBgm();
-    else if (shell.classList.contains("is-open")) startBgm();
+    if (document.hidden) {
+      stopBgm();
+      pausePlayClock();
+    } else if (shell.classList.contains("is-open")) {
+      startBgm();
+      startPlayClock();
+    }
   });
 
   window.addEventListener("pagehide", () => {
@@ -2705,6 +2857,7 @@
   updatePremiumDashboard();
   updateSoundButton();
   updateMusicControls();
+  renderPlayLimitSettings();
   cachePlayElements();
   updateConnectionState();
 
