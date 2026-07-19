@@ -36,8 +36,8 @@
       instruction: "맞는 그림을 고른 뒤 빈칸에 쏙 넣어요.",
     },
     spot: {
-      label: "여러 개 찾기",
-      instruction: "같은 그림을 세 개 모두 톡톡 눌러요.",
+      label: "그림 속에서 찾기",
+      instruction: "여러 그림을 살펴보고 정답 그림 하나를 찾아요.",
     },
     trace: {
       label: "손가락 그리기",
@@ -356,6 +356,7 @@
     const removeGhost = () => {
       ghost?.remove();
       ghost = null;
+      button.classList.remove("is-grabbed", "is-dragging");
       document.body.classList.remove("activity-is-dragging");
     };
     controller.addCleanup(removeGhost);
@@ -375,11 +376,13 @@
       startX = event.clientX;
       startY = event.clientY;
       moved = false;
+      button.classList.add("is-grabbed");
       button.setPointerCapture?.(pointerId);
     });
 
     controller.on(button, "pointermove", (event) => {
       if (event.pointerId !== pointerId) return;
+      if (event.cancelable) event.preventDefault();
       const distance = Math.hypot(event.clientX - startX, event.clientY - startY);
       if (!moved && distance < 9) return;
       if (!moved) {
@@ -399,7 +402,10 @@
       if (event.pointerId !== pointerId) return;
       pointerId = null;
       button.releasePointerCapture?.(event.pointerId);
-      if (!moved) return;
+      if (!moved) {
+        button.classList.remove("is-grabbed");
+        return;
+      }
       button.dataset.suppressClick = "true";
       button.classList.remove("is-dragging");
       removeGhost();
@@ -472,12 +478,10 @@
   }
 
   function renderSpot(context) {
-    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, round, seed, onComplete, onMistake, announce } = context;
     const correct = correctOption(round);
     const wrong = round.options.filter((option) => option !== correct);
     const items = [
-      { option: correct, target: true },
-      { option: correct, target: true },
       { option: correct, target: true },
       { option: wrong[0] || round.options[0], target: false },
       { option: wrong[0] || round.options[0], target: false },
@@ -485,10 +489,9 @@
       { option: wrong[1] || wrong[0] || round.options[0], target: false },
       { option: wrong[0] || round.options[0], target: false },
     ];
-    const counter = createCounter("찾았어요", 0, 3);
     const board = document.createElement("div");
-    board.className = "spot-board";
-    let found = 0;
+    board.className = "spot-board spot-single-target";
+    board.setAttribute("aria-label", "여섯 그림 중 정답 하나 찾기");
     const targetButtons = [];
 
     shuffled(items, seed).forEach((item, index) => {
@@ -504,16 +507,14 @@
         }
         button.disabled = true;
         button.classList.add("is-found");
-        found += 1;
-        setCounter(counter, found, 3);
-        announce("같은 그림 " + found + "개를 찾았어요.");
-        onProgress("prompt");
-        if (found === 3) onComplete(button);
+        announce(optionName(correct) + " 그림을 찾았어요.");
+        onComplete(button);
       });
       board.appendChild(button);
     });
-    stage.append(counter, board);
+    stage.append(board);
     return {
+      requiredActions: 1,
       hint: () => pulse(targetButtons.filter((button) => !button.disabled)),
       replay: () => pulse(targetButtons.filter((button) => !button.disabled), "is-replay"),
     };
@@ -2515,7 +2516,7 @@
       sequence: 2,
       memory: 4,
       pattern: 2,
-      spot: 3,
+      spot: 1,
       trace: 2,
       order: 2,
       draw: 3,

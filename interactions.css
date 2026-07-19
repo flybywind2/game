@@ -90,7 +90,26 @@
 }
 
 .activity-token {
-  touch-action: pan-y;
+  /* Drag cards own the gesture; scrolling remains available from the empty board. */
+  touch-action: none;
+}
+
+.activity-token::after {
+  content: "⠿";
+  position: absolute;
+  top: 7px;
+  right: 8px;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 19px;
+  font-weight: 950;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .activity-token.is-picked {
@@ -102,6 +121,12 @@
 
 .activity-token.is-dragging {
   opacity: 0.38;
+}
+
+.activity-token.is-grabbed:not(.is-dragging) {
+  border-color: var(--purple);
+  background: var(--purple-soft);
+  transform: translateY(-3px) scale(1.02);
 }
 
 .activity-token.is-placed {
@@ -153,6 +178,11 @@
   cursor: grabbing;
 }
 
+.activity-is-dragging .game-shell {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
 .activity-counter {
   min-height: 44px;
   display: flex;
@@ -180,6 +210,11 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+}
+
+.spot-board.spot-single-target {
+  width: min(100%, 620px);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .spot-tile {
