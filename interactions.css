@@ -1096,6 +1096,98 @@ button.pattern-cell {
   text-align: center;
 }
 
+.connect-board {
+  position: relative;
+  width: min(100%, 720px);
+  display: grid;
+  grid-template-columns: minmax(92px, 0.72fr) minmax(150px, 1.28fr);
+  gap: 42px;
+  isolation: isolate;
+}
+
+.connect-column {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: stretch;
+  gap: 10px;
+}
+
+.connect-source,
+.connect-target {
+  min-height: 88px;
+  border: 3px solid #d9cdea;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 5px 0 #d9cdea;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.connect-source {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 7px;
+}
+
+.connect-source .activity-visual {
+  min-height: 46px;
+  font-size: clamp(38px, 7vw, 54px);
+}
+
+.connect-source .activity-token-label {
+  font-size: 12px;
+}
+
+.connect-target {
+  display: grid;
+  place-items: center start;
+  padding: 11px 14px;
+  text-align: left;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.connect-source.is-picked {
+  border-color: var(--yellow);
+  background: var(--yellow-soft);
+  box-shadow: 0 5px 0 #e2bd54, 0 0 0 5px rgba(255, 212, 93, 0.2);
+  transform: translateY(-2px);
+}
+
+.connect-source.is-connected,
+.connect-target.is-connected {
+  border-color: var(--connect-color);
+  background: white;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--connect-color) 45%, white);
+}
+
+.connect-line-layer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.connect-line {
+  position: absolute;
+  height: 6px;
+  border-radius: 999px;
+  box-shadow: 0 2px 0 rgba(77, 57, 46, 0.1);
+  transform-origin: 0 50%;
+  animation: connect-line-grow 260ms ease both;
+}
+
+@keyframes connect-line-grow {
+  from {
+    opacity: 0;
+    scale: 0 1;
+  }
+}
+
 .pattern-answer-tray .activity-token {
   min-height: 100px;
 }
@@ -1535,6 +1627,26 @@ button.pattern-cell {
   .safety-relation-target .relation-clue-text,
   .text-relation-target .relation-clue-text {
     font-size: 12px;
+  }
+
+  .connect-board {
+    grid-template-columns: minmax(84px, 0.68fr) minmax(142px, 1.32fr);
+    gap: 32px;
+  }
+
+  .connect-column {
+    gap: 7px;
+  }
+
+  .connect-source,
+  .connect-target {
+    min-height: 80px;
+    border-radius: 18px;
+  }
+
+  .connect-target {
+    padding: 8px 9px;
+    font-size: 11px;
   }
 
   .pattern-answer-tray {

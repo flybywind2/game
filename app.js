@@ -596,12 +596,12 @@
     { key: "colors", title: "아침 열매 찾기", subtitle: "색깔 관찰", art: "./assets/generated/story/chapter-01-morning-fruit.webp", intro: "햇살이 비치자 몽글이의 소풍 바구니가 알록달록 빛났어요. 잘 익은 열매를 찾아 아침 준비를 도와줄까요?", mission: "색을 자세히 보고 꼭 맞는 과일을 찾아요." },
     { key: "shapes", title: "모양 기차 출발", subtitle: "손가락 그리기", art: "./assets/generated/story/chapter-02-shape-train.webp", intro: "열매를 싣고 떠날 기차의 표지판이 비어 있어요. 동그라미, 세모, 네모 길을 손가락으로 그려 완성해요.", mission: "모양을 찾은 뒤 굵은 길을 끝까지 따라 그려요." },
     { key: "counting", title: "병아리 다리 건너기", subtitle: "1~5 세기", art: "./assets/generated/story/chapter-03-five-chicks.webp", intro: "기차역 앞에서 병아리들이 차례를 기다려요. 한 마리씩 세어 모두 안전하게 건너게 해 주세요.", mission: "필요한 수만큼 직접 눌러 바구니를 채워요." },
-    { key: "sounds", title: "숲속 소리 편지", subtitle: "기억·집중", art: "./assets/generated/story/chapter-04-forest-sounds.webp", intro: "숲에서 멍멍, 음메, 꽥꽥 소리가 들려왔어요. 그림의 자리를 기억해 소리 편지의 주인을 찾아요.", mission: "그림을 기억하고 뒤집힌 카드에서 소리 주인을 찾아요." },
+    { key: "sounds", title: "숲속 소리 편지", subtitle: "소리 짝 연결", art: "./assets/generated/story/chapter-04-forest-sounds.webp", intro: "숲에서 멍멍, 음메, 꽥꽥 소리가 들려왔어요. 동물 친구와 꼭 맞는 소리 편지를 선으로 이어 주세요.", mission: "동물 그림과 알맞은 소리 말을 하나씩 선으로 이어요." },
     { key: "words", title: "소풍 가방 꾸리기", subtitle: "낱말 분류", art: "./assets/generated/story/chapter-05-picnic-sorting.webp", intro: "소풍 가방에 먹는 것과 타는 것, 입는 것이 뒤섞였어요. 말의 쓰임을 생각해 두 바구니로 나눠요.", mission: "세 그림을 빠짐없이 알맞은 바구니에 나눠요." },
     { key: "patterns", title: "깃발 규칙 잇기", subtitle: "규칙 완성", art: "./assets/generated/story/chapter-06-flag-pattern.webp", intro: "소풍길의 깃발 두 칸이 바람에 날아갔어요. 반복되는 순서를 살펴보고 빠진 깃발을 되돌려 놓아요.", mission: "규칙을 찾아 비어 있는 두 칸을 모두 채워요." },
     { key: "sizes", title: "동물 친구 줄 세우기", subtitle: "크기 비교", art: "./assets/generated/story/chapter-07-size-lineup.webp", intro: "친구들이 사진을 찍으려고 모였지만 어디에 설지 모르겠대요. 실제 크기를 생각해 차례대로 세워요.", mission: "작은 친구부터 큰 친구까지 순서대로 놓아요." },
     { key: "body", title: "몸 친구 도움 작전", subtitle: "관계 연결", art: "./assets/generated/story/chapter-08-body-mission.webp", intro: "보고, 듣고, 걸으며 숲길을 지나야 해요. 눈과 귀와 발이 어떤 일을 하는지 알맞게 이어 주세요.", mission: "질문 그림과 알맞은 몸 부분을 모두 연결해요." },
-    { key: "emotions", title: "친구 마음 안아주기", subtitle: "감정 이해", art: "./assets/generated/story/chapter-09-feelings.webp", intro: "소풍 중 친구의 표정이 자꾸 달라져요. 기쁜지, 슬픈지, 놀랐는지 마음을 살펴 따뜻하게 불러 주세요.", mission: "표정을 기억하고 알맞은 마음 이름을 찾아요." },
+    { key: "emotions", title: "친구 마음 안아주기", subtitle: "마음 상황 연결", art: "./assets/generated/story/chapter-09-feelings.webp", intro: "소풍 중 친구의 표정이 자꾸 달라져요. 마음 얼굴과 꼭 어울리는 상황을 선으로 이어 따뜻하게 불러 주세요.", mission: "마음 얼굴과 어울리는 상황을 하나씩 선으로 이어요." },
     { key: "routines", title: "포근한 하루 마무리", subtitle: "생활 습관", art: "./assets/generated/story/chapter-10-bedtime.webp", intro: "신나게 논 뒤에는 손을 씻고 이를 닦고 잠자리를 준비해요. 몽글이와 하루를 포근하게 마무리해요.", mission: "생활 그림을 살펴 알맞은 곳에 모두 나눠요." },
   ]);
   const STORY_BY_KEY = Object.freeze(Object.fromEntries(STORY_CHAPTERS.map((chapter, index) => [chapter.key, { ...chapter, index }])));
@@ -1526,6 +1526,8 @@
     shell.classList.remove("is-closing");
     shell.classList.add("is-open");
     shell.setAttribute("aria-hidden", "false");
+    shell.scrollTop = 0;
+    shell.scrollLeft = 0;
     document.body.style.overflow = "hidden";
     document.title = GAMES[key].title + " | 몽글몽글 배움 놀이터";
     if (activeStoryMode) renderStoryIntro(key);
@@ -1598,6 +1600,7 @@
       count: "●●●",
       compare: "⚖",
       countCompare: "●⚖●",
+      connect: "↗",
       drag: "↘",
       sort: "🧺",
       sequence: "1·2·3",
@@ -1640,7 +1643,7 @@
     const modeMeta = engine?.metaFor(mode, activeGameKey) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
     interactionHintElement.textContent = modeMeta.label + " · " + modeMeta.instruction;
     interactionHintElement.dataset.icon = interactionIcon(mode);
-    const ownsScene = ["count", "countCompare", "compare", "memory", "pattern", "spot", "trace", "order", "sequence", "draw"].includes(mode);
+    const ownsScene = ["count", "countCompare", "compare", "connect", "memory", "pattern", "spot", "trace", "order", "sequence", "draw"].includes(mode);
     renderScene(ownsScene ? [] : round.scene);
 
     if (!engine || mode === "choice") {

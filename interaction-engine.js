@@ -23,6 +23,10 @@
       label: "관계 연결",
       instruction: "그림을 누른 뒤 알맞은 자리를 눌러 모두 연결해요.",
     },
+    connect: {
+      label: "선으로 짝 연결",
+      instruction: "왼쪽 그림과 오른쪽 말 단서를 차례로 눌러 선을 이어요.",
+    },
     sort: {
       label: "두 바구니 분류",
       instruction: "그림을 누른 뒤 알맞은 바구니를 눌러 모두 나눠요.",
@@ -67,36 +71,38 @@
       "extra020",
     ]),
     countCompare: new Set(["extra021", "extra022"]),
-    drag: new Set([
-      "body",
+    connect: new Set([
       "sounds",
       "emotions",
+      "extra033",
+      "extra039",
+      "extra042",
+      "extra044",
+      "extra045",
+      "extra054",
+      "extra055",
+      "extra056",
+      "extra058",
+    ]),
+    drag: new Set([
+      "body",
       "extra004",
       "extra008",
       "extra027",
       "extra028",
       "extra031",
       "extra032",
-      "extra033",
       "extra034",
       "extra035",
       "extra038",
-      "extra039",
       "extra040",
       "extra041",
-      "extra042",
       "extra043",
-      "extra044",
-      "extra045",
       "extra048",
       "extra049",
       "extra051",
       "extra052",
       "extra053",
-      "extra054",
-      "extra055",
-      "extra056",
-      "extra058",
       "extra067",
       "extra061",
       "extra075",
@@ -207,19 +213,19 @@
         instruction: "질문 그림을 보고 알맞은 몸 부분을 빈자리에 놓아요.",
       };
     }
-    if (mode === "drag" && gameKey === "sounds") {
+    if (mode === "connect" && gameKey === "sounds") {
       return {
         label: "소리 짝 연결",
         instruction: "소리 말과 알맞은 동물을 하나씩 연결해요.",
       };
     }
-    if (mode === "drag" && gameKey === "emotions") {
+    if (mode === "connect" && gameKey === "emotions") {
       return {
         label: "마음 상황 연결",
         instruction: "상황을 읽고 어울리는 마음 얼굴을 연결해요.",
       };
     }
-    if (mode === "drag" && SEMANTIC_RELATION_KEYS.has(gameKey)) {
+    if (mode === "connect" && SEMANTIC_RELATION_KEYS.has(gameKey)) {
       return {
         label: "뜻 연결",
         instruction: "말 단서와 알맞은 그림을 하나씩 연결해요.",
@@ -1464,6 +1470,145 @@
         if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
       },
       replay: () => pulse(sources.filter((source) => !source.disabled), "is-replay"),
+    };
+  }
+
+  function renderConnect(context) {
+    const { controller, stage, game, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
+    const pairCount = difficulty === "support"
+      ? 2
+      : difficulty === "challenge"
+        ? Math.min(3, game.rounds.length)
+        : roundIndex < 2 ? 2 : Math.min(3, game.rounds.length);
+    const selectedRounds = Array.from({ length: pairCount }, (_, offset) =>
+      game.rounds[(roundIndex + offset) % game.rounds.length],
+    );
+    const pairs = selectedRounds.map((item, match) => ({
+      prompt: item.prompt,
+      option: correctOption(item),
+      match,
+    }));
+    const board = document.createElement("div");
+    board.className = "connect-board";
+    board.dataset.pairCount = String(pairCount);
+    board.setAttribute("aria-label", pairCount + "개의 그림과 말 단서 선 연결");
+    const sourceColumn = document.createElement("div");
+    sourceColumn.className = "connect-column connect-source-column";
+    const targetColumn = document.createElement("div");
+    targetColumn.className = "connect-column connect-target-column";
+    const lineLayer = document.createElement("div");
+    lineLayer.className = "connect-line-layer";
+    lineLayer.setAttribute("aria-hidden", "true");
+    const sources = shuffled(pairs, seed + ":connect-sources").map((pair) => {
+      const source = createToken(pair.option, "connect-source");
+      source.dataset.match = String(pair.match);
+      source.dataset.label = optionName(pair.option);
+      sourceColumn.appendChild(source);
+      return source;
+    });
+    const targets = shuffled(pairs, seed + ":connect-targets").map((pair) => {
+      const target = document.createElement("button");
+      target.type = "button";
+      target.className = "connect-target";
+      target.dataset.match = String(pair.match);
+      target.textContent = pair.prompt;
+      target.setAttribute("aria-label", pair.prompt + ", 선 연결 자리");
+      targetColumn.appendChild(target);
+      return target;
+    });
+    board.append(sourceColumn, targetColumn, lineLayer);
+    const completed = [];
+    const lineColors = ["#ef765f", "#4cae8b", "#8a72c9"];
+    let picked = null;
+    let placed = 0;
+
+    const drawConnections = () => {
+      lineLayer.innerHTML = "";
+      const boardRect = board.getBoundingClientRect();
+      completed.forEach(({ source, target, color }) => {
+        const sourceRect = source.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const startX = sourceRect.right - boardRect.left - 3;
+        const startY = sourceRect.top + sourceRect.height / 2 - boardRect.top;
+        const endX = targetRect.left - boardRect.left + 3;
+        const endY = targetRect.top + targetRect.height / 2 - boardRect.top;
+        const distance = Math.hypot(endX - startX, endY - startY);
+        const angle = Math.atan2(endY - startY, endX - startX) * 180 / Math.PI;
+        const line = document.createElement("span");
+        line.className = "connect-line";
+        line.style.left = startX + "px";
+        line.style.top = startY + "px";
+        line.style.width = distance + "px";
+        line.style.background = color;
+        line.style.transform = "rotate(" + angle + "deg)";
+        lineLayer.appendChild(line);
+      });
+    };
+
+    sources.forEach((source) => {
+      controller.on(source, "click", () => {
+        if (source.disabled) return;
+        sources.forEach((item) => item.classList.remove("is-picked"));
+        picked = source;
+        source.classList.add("is-picked");
+        announce(source.dataset.label + " 그림을 골랐어요. 오른쪽 말 단서를 눌러요.");
+      });
+    });
+    targets.forEach((target) => {
+      controller.on(target, "click", () => {
+        if (target.disabled) return;
+        if (!picked) {
+          pulse(sources.filter((source) => !source.disabled), "needs-item");
+          announce("먼저 왼쪽 그림을 골라요.");
+          return;
+        }
+        if (picked.dataset.match !== target.dataset.match) {
+          const correctTarget = targets.find((item) => item.dataset.match === picked.dataset.match);
+          onMistake(target, correctTarget);
+          return;
+        }
+        const source = picked;
+        picked = null;
+        source.disabled = true;
+        target.disabled = true;
+        source.classList.remove("is-picked");
+        source.classList.add("is-connected");
+        target.classList.add("is-connected");
+        const color = lineColors[placed % lineColors.length];
+        source.style.setProperty("--connect-color", color);
+        target.style.setProperty("--connect-color", color);
+        completed.push({ source, target, color });
+        placed += 1;
+        onProgress("prompt");
+        announce(source.dataset.label + "와 말 단서를 연결했어요. " + placed + "개 완료.");
+        controller.later(drawConnections, 0);
+        if (placed === pairCount) controller.later(() => onComplete(target), 260);
+      });
+    });
+    controller.on(window, "resize", drawConnections, { passive: true });
+
+    let prompt = "그림과 알맞은 말 단서를 선으로 모두 이어 볼까?";
+    let helper = "왼쪽 그림을 누르고 어울리는 오른쪽 말을 눌러요.";
+    if (gameKey === "sounds") {
+      prompt = "동물과 알맞은 소리 말을 선으로 이어 볼까?";
+      helper = "동물 그림을 누르고 멍멍, 음메 같은 소리를 눌러요.";
+    } else if (gameKey === "emotions") {
+      prompt = "마음 얼굴과 어울리는 상황을 선으로 이어 볼까?";
+      helper = "마음 얼굴을 누르고 어울리는 상황을 눌러요.";
+    }
+
+    stage.append(board);
+    return {
+      requiredActions: pairCount * 2,
+      completion: "그림과 말 단서 " + pairCount + "쌍을 선으로 모두 이었어!",
+      prompt,
+      helper,
+      hint: () => {
+        const source = picked || sources.find((item) => !item.disabled);
+        const target = source && targets.find((item) => !item.disabled && item.dataset.match === source.dataset.match);
+        pulse([source, target].filter(Boolean));
+      },
+      replay: () => pulse(targets.filter((target) => !target.disabled), "is-replay"),
     };
   }
 
@@ -2882,6 +3027,7 @@
     count: renderCount,
     countCompare: renderCountCompare,
     compare: renderCompare,
+    connect: renderConnect,
     drag: renderDrag,
     sort: renderSort,
     sequence: renderSequence,
@@ -2919,6 +3065,7 @@
       count: 2,
       countCompare: 4,
       compare: 3,
+      connect: 4,
       drag: 2,
       sort: 6,
       sequence: 2,
