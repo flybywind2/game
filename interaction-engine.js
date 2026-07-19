@@ -11,6 +11,10 @@
       label: "개수 만들기",
       instruction: "필요한 수만큼 그림을 톡톡 누르고 다 셌어요를 눌러요.",
     },
+    quantity: {
+      label: "묶음 세어 고르기",
+      instruction: "그림을 하나씩 눌러 세고 질문에 맞는 묶음이나 숫자를 골라요.",
+    },
     compare: {
       label: "두 무리 비교",
       instruction: "양쪽 그림을 하나씩 세고 알맞은 관계를 골라요.",
@@ -64,12 +68,8 @@
   const MODE_KEYS = Object.freeze({
     count: new Set([
       "counting",
-      "extra016",
-      "extra017",
-      "extra018",
-      "extra019",
-      "extra020",
     ]),
+    quantity: new Set(["extra016", "extra017", "extra018", "extra019", "extra020"]),
     countCompare: new Set(["extra021", "extra022"]),
     connect: new Set([
       "sounds",
@@ -718,6 +718,125 @@
     const answerUnits = visualTokens(correct.visual);
     const units = scene.length ? scene : answerUnits.length ? answerUnits : ["⭐"];
     return Array.from({ length: total }, (_, index) => cleanVisual(units[index % units.length]));
+  }
+
+  function renderQuantity(context) {
+    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const options = shuffled(round.options, seed + ":quantity");
+    const numericRound = options.every((option) => /^[1-5]$/u.test(cleanVisual(option.visual)));
+    const board = document.createElement("div");
+    board.className = `quantity-board${numericRound ? " is-number-round" : ""}`;
+    const targets = [];
+
+    if (numericRound && round.scene?.length) {
+      const reference = document.createElement("div");
+      reference.className = "quantity-reference";
+      reference.setAttribute("role", "img");
+      reference.setAttribute("aria-label", `먼저 셀 그림 ${round.scene.length}개`);
+      const label = document.createElement("strong");
+      label.textContent = "먼저 그림을 하나씩 세어요";
+      const pictures = document.createElement("span");
+      pictures.setAttribute("aria-hidden", "true");
+      pictures.textContent = round.scene.join(" ");
+      reference.append(label, pictures);
+      stage.appendChild(reference);
+    }
+
+    if (numericRound) {
+      options.forEach((option) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "quantity-number-card";
+        button.textContent = cleanVisual(option.visual);
+        button.setAttribute("aria-label", optionName(option));
+        if (option === correct) targets.push(button);
+        controller.on(button, "click", () => {
+          if (option !== correct) {
+            onMistake(button, targets);
+            return;
+          }
+          button.classList.add("is-correct");
+          onComplete(button);
+        });
+        board.appendChild(button);
+      });
+      stage.appendChild(board);
+      return {
+        requiredActions: 1,
+        completion: round.success,
+        hint: () => pulse(targets),
+        replay: () => pulse(round.scene?.length ? [stage.querySelector(".quantity-reference")] : targets, "is-replay"),
+      };
+    }
+
+    options.forEach((option, optionIndex) => {
+      const visuals = visualTokens(option.visual);
+      const group = document.createElement("section");
+      group.className = "quantity-group";
+      group.dataset.count = String(visuals.length);
+      const count = document.createElement("strong");
+      count.className = "quantity-count";
+      count.innerHTML = `<span>0</span><small> / ${visuals.length}</small>`;
+      const pieces = document.createElement("div");
+      pieces.className = "quantity-pieces";
+      let counted = 0;
+      const pieceButtons = visuals.map((visual, pieceIndex) => {
+        const piece = document.createElement("button");
+        piece.type = "button";
+        piece.className = "quantity-piece";
+        piece.textContent = visual;
+        piece.setAttribute("aria-label", `${optionName(option)}의 ${pieceIndex + 1}번째 그림 세기`);
+        controller.on(piece, "click", () => {
+          if (piece.disabled) return;
+          piece.disabled = true;
+          piece.classList.add("is-counted");
+          counted += 1;
+          count.querySelector("span").textContent = String(counted);
+          onProgress("prompt");
+          announce(`${optionIndex + 1}번째 묶음, ${counted}개.`);
+          if (counted === visuals.length) {
+            select.disabled = false;
+            select.textContent = `${visuals.length}개 묶음 고르기`;
+            announce(`${optionIndex + 1}번째 묶음은 ${visuals.length}개예요. 이 묶음을 고를 수 있어요.`);
+          }
+        });
+        pieces.appendChild(piece);
+        return piece;
+      });
+      const select = document.createElement("button");
+      select.type = "button";
+      select.className = "quantity-select";
+      select.textContent = "먼저 세어 봐요";
+      select.disabled = true;
+      select.setAttribute("aria-label", `${optionName(option)} 묶음 고르기`);
+      controller.on(select, "click", () => {
+        if (select.disabled) return;
+        if (option !== correct) {
+          onMistake(select, targets[0]?.group || targets[0]?.select);
+          announce(`${visuals.length}개 묶음이에요. 질문에서 찾는 개수를 다시 확인해요.`);
+          return;
+        }
+        select.classList.add("is-correct");
+        onComplete(select);
+      });
+      const target = { group, select, pieces: pieceButtons };
+      if (option === correct) targets.push(target);
+      group.append(count, pieces, select);
+      board.appendChild(group);
+    });
+
+    stage.appendChild(board);
+    return {
+      requiredActions: visualTokens(correct.visual).length + 1,
+      completion: round.success,
+      hint: () => {
+        const target = targets[0];
+        const uncounted = target?.pieces.find((piece) => !piece.disabled);
+        pulse(uncounted ? [uncounted, target.group] : [target?.select]);
+      },
+      replay: () => pulse(targets.map((target) => target.group), "is-replay"),
+    };
   }
 
   function renderCount(context) {
@@ -3028,6 +3147,7 @@
 
   const RENDERERS = Object.freeze({
     count: renderCount,
+    quantity: renderQuantity,
     countCompare: renderCountCompare,
     compare: renderCompare,
     connect: renderConnect,
@@ -3066,6 +3186,7 @@
     if (activity?.demo) showTapToPlaceDemo(context, activity.demo);
     const minimumActions = {
       count: 2,
+      quantity: 2,
       countCompare: 4,
       compare: 3,
       connect: 4,
