@@ -1656,6 +1656,15 @@ img {
   color: #a87820;
 }
 
+.feedback.gentle-help {
+  color: #7b5b1f;
+}
+
+.summary-help-count {
+  color: #73539a;
+  font-weight: 950;
+}
+
 @keyframes correct-pop {
   50% {
     transform: scale(1.07) rotate(-2deg);

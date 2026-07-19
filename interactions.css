@@ -33,6 +33,20 @@
   font-size: 18px;
 }
 
+.interaction-hint.is-auto-help {
+  border-color: #efb84e;
+  background: #fff2b8;
+  color: #76561d;
+  animation: auto-help-pulse 760ms ease-in-out 3;
+}
+
+@keyframes auto-help-pulse {
+  50% {
+    transform: translateY(-4px) scale(1.025);
+    box-shadow: 0 7px 0 rgba(239, 184, 78, 0.25);
+  }
+}
+
 .activity-stage {
   width: min(100%, 820px);
   min-height: 280px;

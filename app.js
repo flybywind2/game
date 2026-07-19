@@ -640,7 +640,10 @@
   let roundIndex = 0;
   let wrongAttempts = 0;
   let advanceTimer = null;
+  let idleHintTimer = null;
   let toastTimer = null;
+  let roundHasInteraction = false;
+  let roundAssistRecorded = false;
   let soundEnabled = loadSoundPreference();
   let dailyProgress = loadProgress();
   let learnerProfile = loadLearnerProfile();
@@ -668,6 +671,7 @@
       date: todayKey(),
       completed: {},
       attempts: 0,
+      hints: 0,
       lastPlayed: null,
     };
   }
@@ -680,6 +684,7 @@
         date: saved.date,
         completed: saved.completed || {},
         attempts: Number(saved.attempts) || 0,
+        hints: Number(saved.hints) || 0,
         lastPlayed: saved.lastPlayed || null,
       };
     } catch {
@@ -705,6 +710,7 @@
       stickers: [],
       totalAttempts: 0,
       totalCorrect: 0,
+      totalHints: 0,
       gameStats: {},
     };
   }
@@ -736,8 +742,9 @@
 
   function gameStat(key) {
     if (!learnerProfile.gameStats[key]) {
-      learnerProfile.gameStats[key] = { attempts: 0, correct: 0, recent: [] };
+      learnerProfile.gameStats[key] = { attempts: 0, correct: 0, hints: 0, recent: [] };
     }
+    learnerProfile.gameStats[key].hints = Number(learnerProfile.gameStats[key].hints) || 0;
     return learnerProfile.gameStats[key];
   }
 
@@ -833,6 +840,9 @@
     guideCharacter = playMain.querySelector(".guide-character");
     interactionHintElement = document.querySelector("#interaction-hint");
     activityAnnouncer = document.querySelector("#activity-announcer");
+    answersElement.addEventListener("pointerdown", markRoundInteraction, { passive: true });
+    answersElement.addEventListener("click", markRoundInteraction);
+    answersElement.addEventListener("keydown", markRoundInteraction);
   }
 
   function restorePlayTemplate() {
@@ -1172,6 +1182,7 @@
     startBgm();
     playChime("start");
     clearTimeout(advanceTimer);
+    clearIdleHint();
     activeGameKey = key;
     activeStoryMode = Boolean(story && STORY_BY_KEY[key]);
     roundIndex = 0;
@@ -1198,6 +1209,7 @@
       clearGameUrl();
     }
     clearTimeout(advanceTimer);
+    clearIdleHint();
     roundInstructionToken += 1;
     activeActivity?.destroy();
     window.MONGLE_INTERACTIONS?.cleanup();
@@ -1319,6 +1331,7 @@
     }
 
     speakRoundInstruction(round);
+    scheduleIdleHint();
     window.setTimeout(() => promptElement.focus({ preventScroll: true }), 80);
   }
 
@@ -1381,6 +1394,55 @@
     });
   }
 
+  function clearIdleHint() {
+    clearTimeout(idleHintTimer);
+    idleHintTimer = null;
+  }
+
+  function markRoundInteraction() {
+    if (roundSettled) return;
+    roundHasInteraction = true;
+    clearIdleHint();
+  }
+
+  function recordRoundAssist() {
+    if (roundAssistRecorded || !activeGameKey) return;
+    roundAssistRecorded = true;
+    dailyProgress.hints = (Number(dailyProgress.hints) || 0) + 1;
+    learnerProfile.totalHints = (Number(learnerProfile.totalHints) || 0) + 1;
+    gameStat(activeGameKey).hints += 1;
+    saveProgress();
+    saveLearnerProfile();
+  }
+
+  function scheduleIdleHint() {
+    clearIdleHint();
+    roundHasInteraction = false;
+    roundAssistRecorded = false;
+    const gameKey = activeGameKey;
+    const activeRound = roundIndex;
+    const level = adaptiveLevelForGame(gameKey);
+    const delay = level === "support" ? 5000 : level === "challenge" ? 9000 : 7000;
+    idleHintTimer = window.setTimeout(() => {
+      if (
+        document.hidden ||
+        roundSettled ||
+        roundHasInteraction ||
+        activeGameKey !== gameKey ||
+        roundIndex !== activeRound
+      ) return;
+      recordRoundAssist();
+      activeActivity?.hint();
+      const hintPill = interactionHintElement;
+      hintPill?.classList.add("is-auto-help");
+      feedbackElement.textContent = "괜찮아, 반짝이는 곳부터 천천히 시작해 봐요.";
+      feedbackElement.className = "feedback gentle-help";
+      announceActivity("반짝이는 곳부터 시작해 봐요.");
+      speak("반짝이는 곳부터 천천히 시작해 볼까?");
+      window.setTimeout(() => hintPill?.classList.remove("is-auto-help"), 2200);
+    }, delay);
+  }
+
   function recordAttempt(correct = false) {
     dailyProgress.attempts += 1;
     dailyProgress.lastPlayed = activeGameKey;
@@ -1398,6 +1460,7 @@
     const round = currentRound();
     if (!round || roundSettled) return;
     if (record) recordAttempt(true);
+    clearIdleHint();
     roundSettled = true;
     roundInstructionToken += 1;
     answersElement.classList.add("is-resolved");
@@ -1444,6 +1507,7 @@
     speak(wrongAttempts === 1 ? "괜찮아. 다시 한번 찾아볼까?" : "정답 친구가 살짝 움직일 거야.");
 
     if (wrongAttempts >= 2) {
+      recordRoundAssist();
       if (hintTargets) {
         const targets =
           hintTargets instanceof Element
@@ -1469,6 +1533,7 @@
   }
 
   function completeGame() {
+    clearIdleHint();
     roundInstructionToken += 1;
     activeActivity?.destroy();
     activeActivity = null;
@@ -1542,6 +1607,7 @@
   function updateParentDashboard() {
     document.querySelector("#parent-completed").textContent = `${completedCount()}`;
     document.querySelector("#parent-answers").textContent = `${dailyProgress.attempts}`;
+    document.querySelector("#parent-hints").textContent = `${Number(dailyProgress.hints) || 0}`;
 
     const message = document.querySelector("#parent-message");
     const count = completedCount();
@@ -1584,8 +1650,8 @@
     const list = document.querySelector("#parent-game-list");
     list.innerHTML = "";
     const playedGames = Object.entries(learnerProfile.gameStats)
-      .filter(([key, stats]) => GAMES[key] && stats.attempts)
-      .sort((a, b) => (b[1].attempts || 0) - (a[1].attempts || 0))
+      .filter(([key, stats]) => GAMES[key] && (stats.attempts || stats.hints))
+      .sort((a, b) => ((b[1].attempts || 0) + (b[1].hints || 0)) - ((a[1].attempts || 0) + (a[1].hints || 0)))
       .slice(0, 12);
     playedGames.forEach(([key, stats]) => {
       const game = GAMES[key];
@@ -1593,10 +1659,11 @@
       const accuracy = stats.attempts ? Math.round((stats.correct / stats.attempts) * 100) : 0;
       const item = document.createElement("div");
       item.className = "parent-game-item";
+      const state = complete ? `${accuracy}% · 완료` : stats.attempts ? `${stats.attempts}번 시도` : "정답 시도 전";
       item.innerHTML = `
         <span class="parent-game-icon" aria-hidden="true">${game.icon}</span>
         <span><strong>${game.title}</strong><small>${game.skill}</small></span>
-        <span class="game-state ${complete ? "complete" : ""}">${complete ? `${accuracy}% · 완료` : `${stats.attempts}번 시도`}</span>`;
+        <span class="game-state ${complete ? "complete" : ""}">${state}${stats.hints ? ` · 도움 ${stats.hints}회` : ""}</span>`;
       list.appendChild(item);
     });
     if (!playedGames.length) {
@@ -1793,6 +1860,8 @@
   replayButton.addEventListener("click", () => {
     const round = currentRound();
     if (round) {
+      markRoundInteraction();
+      recordRoundAssist();
       playChime("prompt");
       speakRoundInstruction(round);
       activeActivity?.replay();
