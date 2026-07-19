@@ -811,6 +811,59 @@
   font-size: 10px;
 }
 
+.weekly-export {
+  display: grid;
+  width: 100%;
+  min-height: 58px;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 9px;
+  padding: 9px 12px;
+  border: 1px solid #dce8df;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.weekly-export > span:first-child {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--mint-soft);
+  color: var(--mint-dark);
+  font-size: 16px;
+}
+
+.weekly-export strong,
+.weekly-export small {
+  display: block;
+}
+
+.weekly-export strong {
+  font-size: 11px;
+}
+
+.weekly-export small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 8px;
+}
+
+.weekly-export > b {
+  color: var(--mint-dark);
+  font-size: 17px;
+}
+
+.weekly-export:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .weekly-privacy {
   margin: 9px 2px 0;
   color: var(--ink-soft);

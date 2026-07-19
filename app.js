@@ -1922,6 +1922,180 @@
     document.querySelector("#weekly-recommendation-title").textContent = `${recommendation.icon} ${recommendation.title}`;
   }
 
+  function roundedCanvasRect(context, x, y, width, height, radius, fill) {
+    const corner = Math.min(radius, width / 2, height / 2);
+    context.beginPath();
+    context.moveTo(x + corner, y);
+    context.arcTo(x + width, y, x + width, y + height, corner);
+    context.arcTo(x + width, y + height, x, y + height, corner);
+    context.arcTo(x, y + height, x, y, corner);
+    context.arcTo(x, y, x + width, y, corner);
+    context.closePath();
+    context.fillStyle = fill;
+    context.fill();
+  }
+
+  function drawWrappedText(context, text, x, y, maxWidth, lineHeight, maxLines = 2) {
+    const characters = [...String(text)];
+    const lines = [];
+    let line = "";
+    characters.forEach((character) => {
+      const next = line + character;
+      if (line && context.measureText(next).width > maxWidth) {
+        lines.push(line);
+        line = character;
+      } else {
+        line = next;
+      }
+    });
+    if (line) lines.push(line);
+    const visible = lines.slice(0, maxLines);
+    if (lines.length > maxLines) {
+      let last = visible[maxLines - 1];
+      while (last && context.measureText(last + "…").width > maxWidth) last = last.slice(0, -1);
+      visible[maxLines - 1] = last + "…";
+    }
+    visible.forEach((value, index) => context.fillText(value, x, y + index * lineHeight));
+    return y + visible.length * lineHeight;
+  }
+
+  function createWeeklyReportCanvas() {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1080;
+    canvas.height = 1350;
+    const context = canvas.getContext("2d");
+    const snapshot = weeklySnapshot();
+    const nickname = learnerProfile.nickname || "꼬마 탐험가";
+    const recommendationKey = document.querySelector("#weekly-recommendation").dataset.weeklyGame || recommendedGame();
+    const recommendation = GAMES[recommendationKey];
+    const dateFormat = new Intl.DateTimeFormat("ko-KR", { month: "long", day: "numeric" });
+    const startDate = new Date(`${snapshot.days[0].date}T12:00:00`);
+    const endDate = new Date(`${snapshot.days[6].date}T12:00:00`);
+    const font = '"Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif';
+
+    context.fillStyle = "#f6fbf7";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const glow = context.createRadialGradient(940, 100, 10, 940, 100, 380);
+    glow.addColorStop(0, "rgba(255, 212, 93, 0.30)");
+    glow.addColorStop(1, "rgba(255, 212, 93, 0)");
+    context.fillStyle = glow;
+    context.fillRect(0, 0, canvas.width, 500);
+
+    roundedCanvasRect(context, 70, 64, 240, 64, 32, "#dff5eb");
+    context.fillStyle = "#247a60";
+    context.font = `800 28px ${font}`;
+    context.fillText("몽글 · 최근 7일", 105, 106);
+    context.fillStyle = "#352f2a";
+    context.font = `900 54px ${font}`;
+    drawWrappedText(context, `${nickname}의 성장 발자국`, 70, 190, 900, 68, 2);
+    context.fillStyle = "#746c66";
+    context.font = `650 25px ${font}`;
+    context.fillText(`${dateFormat.format(startDate)} – ${dateFormat.format(endDate)} · 이 기기에서 만든 비공개 리포트`, 72, 290);
+
+    roundedCanvasRect(context, 70, 340, 940, 280, 36, "#ffffff");
+    context.fillStyle = "#746c66";
+    context.font = `800 24px ${font}`;
+    context.fillText("이번 주 놀이", 108, 390);
+    context.fillStyle = "#247a60";
+    context.font = `900 72px ${font}`;
+    context.fillText(String(snapshot.activeDays), 108, 475);
+    context.font = `800 29px ${font}`;
+    context.fillText("일 함께했어요", 182, 472);
+
+    const scores = snapshot.days.map((day) => day.correct + day.completions * 2);
+    const maxScore = Math.max(1, ...scores);
+    const chartX = 430;
+    const chartBottom = 550;
+    const chartWidth = 510;
+    snapshot.days.forEach((day, index) => {
+      const score = scores[index];
+      const x = chartX + index * (chartWidth / 7) + 15;
+      const height = score ? Math.max(22, Math.round((score / maxScore) * 132)) : 8;
+      roundedCanvasRect(context, x, chartBottom - height, 42, height, 12, score ? "#62c9a6" : "#e7ede9");
+      context.fillStyle = index === 6 ? "#247a60" : "#8b837d";
+      context.font = `800 18px ${font}`;
+      const label = index === 6 ? "오늘" : new Intl.DateTimeFormat("ko-KR", { weekday: "short" }).format(new Date(`${day.date}T12:00:00`));
+      context.fillText(label, x + 2, 585);
+    });
+
+    roundedCanvasRect(context, 70, 650, 455, 250, 32, "#e8f7f0");
+    context.fillStyle = "#247a60";
+    context.font = `800 22px ${font}`;
+    context.fillText("잘 자라는 힘", 108, 700);
+    context.fillStyle = "#352f2a";
+    context.font = `900 37px ${font}`;
+    drawWrappedText(context, document.querySelector("#weekly-strength").textContent, 108, 758, 375, 48, 2);
+    context.fillStyle = "#746c66";
+    context.font = `650 21px ${font}`;
+    drawWrappedText(context, document.querySelector("#weekly-strength-detail").textContent, 108, 840, 375, 30, 2);
+
+    roundedCanvasRect(context, 555, 650, 455, 250, 32, "#f1ecfa");
+    context.fillStyle = "#7359a5";
+    context.font = `800 22px ${font}`;
+    context.fillText("다음에 도와줄 힘", 593, 700);
+    context.fillStyle = "#352f2a";
+    context.font = `900 35px ${font}`;
+    drawWrappedText(context, document.querySelector("#weekly-focus").textContent, 593, 758, 375, 46, 2);
+    context.fillStyle = "#746c66";
+    context.font = `650 21px ${font}`;
+    drawWrappedText(context, document.querySelector("#weekly-focus-detail").textContent, 593, 840, 375, 30, 2);
+
+    roundedCanvasRect(context, 70, 940, 940, 160, 32, "#40362f");
+    context.fillStyle = "rgba(255,255,255,0.72)";
+    context.font = `800 21px ${font}`;
+    context.fillText("이번 주 맞춤 추천", 108, 992);
+    context.fillStyle = "#ffffff";
+    context.font = `900 39px ${font}`;
+    drawWrappedText(context, `${recommendation.icon} ${recommendation.title}`, 108, 1054, 820, 46, 1);
+
+    context.fillStyle = "#352f2a";
+    context.font = `900 28px ${font}`;
+    context.fillText("짧게, 즐겁게, 아이의 속도로.", 70, 1175);
+    context.fillStyle = "#746c66";
+    context.font = `650 20px ${font}`;
+    drawWrappedText(context, "이 리포트는 정답 경험과 도움 기록을 바탕으로 기기 안에서만 만들었어요. 아이를 평가하거나 다른 아이와 비교하는 자료가 아니에요.", 70, 1220, 930, 31, 3);
+    context.fillStyle = "#247a60";
+    context.font = `850 19px ${font}`;
+    context.fillText("MONGLE PLAYGROUND · 개인정보 외부 전송 없음", 70, 1310);
+    return canvas;
+  }
+
+  async function saveWeeklyReport() {
+    const button = document.querySelector("#save-weekly-report");
+    if (button.disabled) return;
+    button.disabled = true;
+    try {
+      const canvas = createWeeklyReportCanvas();
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      if (!blob) throw new Error("PNG creation failed");
+      const filename = `mongle-growth-${todayKey()}.png`;
+      const file = new File([blob], filename, { type: "image/png" });
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        try {
+          await navigator.share({ title: "몽글 주간 성장 리포트", text: "최근 7일 성장 발자국이에요.", files: [file] });
+          showToast("성장 카드를 공유했어요.");
+          return;
+        } catch (error) {
+          if (error?.name === "AbortError") {
+            showToast("공유를 취소했어요.");
+            return;
+          }
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("성장 카드를 저장했어요.");
+    } catch {
+      showToast("성장 카드를 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
   function renderParentObservation() {
     const key = dailyProgress.lastPlayed && GAMES[dailyProgress.lastPlayed] ? dailyProgress.lastPlayed : null;
     const gameLabel = document.querySelector("#observation-game");
@@ -2365,6 +2539,7 @@
     closeParentDialog();
     startGame(key);
   });
+  document.querySelector("#save-weekly-report").addEventListener("click", saveWeeklyReport);
   document.querySelectorAll("[data-observation]").forEach((button) => {
     button.addEventListener("click", () => recordParentObservation(button.dataset.observation));
   });
