@@ -4,18 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#fff8ea" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta
       name="description"
       content="40개월 아이가 보고, 듣고, 세고, 그리고, 마음을 익히는 101가지 짧은 학습 놀이 모음"
     />
     <title>몽글 놀이터 | 40개월 맞춤 학습 놀이</title>
     <link rel="icon" href="./assets/generated/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/generated/app-icon-192.png" />
+    <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="preload" href="./assets/generated/mongle-hero.webp" as="image" type="image/webp" fetchpriority="high" />
     <link rel="stylesheet" href="./styles.css?v=5" />
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
-    <link rel="stylesheet" href="./interactions.css?v=15" />
-    <link rel="stylesheet" href="./premium.css?v=2" />
+    <link rel="stylesheet" href="./interactions.css?v=16" />
+    <link rel="stylesheet" href="./premium.css?v=3" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -444,6 +449,18 @@
       <div class="confetti" id="confetti" aria-hidden="true"></div>
     </section>
 
+    <dialog class="parent-gate" id="parent-gate" aria-labelledby="parent-gate-title">
+      <div class="parent-gate-panel">
+        <button class="parent-gate-close" id="parent-gate-close" type="button" aria-label="보호자 확인 닫기">×</button>
+        <span class="parent-gate-icon" aria-hidden="true">🔒</span>
+        <span class="section-kicker">보호자 확인</span>
+        <h2 id="parent-gate-title">어른과 함께 열어 주세요</h2>
+        <p id="parent-gate-question">별 2개와 별 3개를 합치면 모두 몇 개일까요?</p>
+        <div class="parent-gate-choices" id="parent-gate-choices"></div>
+        <small id="parent-gate-feedback" aria-live="polite">성장 기록과 설정을 안전하게 보호해요.</small>
+      </div>
+    </dialog>
+
     <dialog class="parent-dialog" id="parent-dialog">
       <div class="parent-panel">
         <header class="parent-header">
@@ -473,6 +490,14 @@
             <span><strong id="child-profile-title">아이 애칭</strong><small>이 기기에만 저장되며 언제든 바꿀 수 있어요.</small></span>
           </div>
           <label><span class="sr-only">아이 애칭</span><input id="child-nickname" type="text" maxlength="10" autocomplete="off" value="꼬마 탐험가" /></label>
+        </section>
+
+        <section class="offline-settings" aria-labelledby="offline-settings-title">
+          <div>
+            <span class="offline-settings-icon" aria-hidden="true">⌂</span>
+            <span><strong id="offline-settings-title">홈 화면 앱 · 오프라인 놀이</strong><small id="offline-ready-status">오프라인 준비 상태를 확인하고 있어요.</small></span>
+          </div>
+          <button id="install-app" type="button" hidden>앱으로 설치</button>
         </section>
 
         <section class="growth-report" aria-labelledby="growth-report-title">
@@ -536,7 +561,7 @@
 
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
-    <script src="./interaction-engine.js?v=15"></script>
-    <script src="./app.js?v=18"></script>
+    <script src="./interaction-engine.js?v=19"></script>
+    <script src="./app.js?v=20"></script>
   </body>
 </html>

@@ -1,0 +1,27 @@
+{
+  "name": "몽글 놀이터 · 40개월 맞춤 배움 놀이",
+  "short_name": "몽글 놀이터",
+  "description": "아이의 속도에 맞춰 보고, 세고, 그리고, 마음을 익히는 프리미엄 배움 놀이",
+  "lang": "ko-KR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#fff8ea",
+  "theme_color": "#fff8ea",
+  "categories": ["education", "kids", "games"],
+  "icons": [
+    {
+      "src": "./assets/generated/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./assets/generated/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

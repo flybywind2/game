@@ -32,8 +32,8 @@
       instruction: "처음부터 마지막까지 차례대로 놓아요.",
     },
     memory: {
-      label: "정답 기억하기",
-      instruction: "그림들의 자리를 기억한 뒤 질문의 정답 하나를 찾아요.",
+      label: "기억 카드 짝맞추기",
+      instruction: "카드를 두 장씩 뒤집어 같은 그림 짝을 모두 찾아요.",
     },
     pattern: {
       label: "규칙 완성",
@@ -87,6 +87,14 @@
       "extra052",
       "extra053",
       "extra067",
+      "extra061",
+      "extra075",
+      "extra076",
+      "extra077",
+      "extra078",
+      "extra079",
+      "extra080",
+      "extra084",
       "extra085",
     ]),
     sort: new Set([
@@ -146,20 +154,23 @@
       "extra002",
       "extra003",
       "extra037",
-      "extra061",
-      "extra075",
-      "extra076",
-      "extra077",
-      "extra078",
-      "extra079",
-      "extra080",
-      "extra084",
     ]),
     trace: new Set(["shapes", "extra005", "extra006", "extra007", "extra050"]),
     order: new Set(["sizes", "extra012", "extra013", "extra014"]),
     compare: new Set(["more", "extra023"]),
     draw: new Set(["extra089"]),
   });
+
+  const SAFETY_RELATION_KEYS = new Set([
+    "extra061",
+    "extra075",
+    "extra076",
+    "extra077",
+    "extra078",
+    "extra079",
+    "extra080",
+    "extra084",
+  ]);
 
   let activeController = null;
 
@@ -180,6 +191,12 @@
       return {
         label: "몸의 쓰임 연결",
         instruction: "질문 그림을 보고 알맞은 몸 부분을 빈자리에 놓아요.",
+      };
+    }
+    if (mode === "drag" && SAFETY_RELATION_KEYS.has(gameKey)) {
+      return {
+        label: "안전 상황 연결",
+        instruction: "여러 상황을 읽고 도움이 되는 행동을 각각 연결해요.",
       };
     }
     return MODE_META[mode] || MODE_META.choice;
@@ -740,38 +757,38 @@
   }
 
   function renderMemory(context) {
-    const { controller, stage, round, roundIndex, difficulty, seed, onAttempt, onComplete, onMistake, announce } = context;
-    const requested = correctOption(round);
-    const baseCount = [3, 4, 6][Math.min(2, roundIndex || 0)];
-    const desiredCount = Math.max(3, Math.min(6, baseCount + (difficulty === "challenge" ? 1 : difficulty === "support" ? -1 : 0)));
-    const indexedOptions = round.options.map((option, optionIndex) => ({ option, optionIndex }));
-    const wrongCards = indexedOptions.filter((card) => card.option !== requested);
-    const cardPool = [...indexedOptions];
-    let extraIndex = 0;
-    while (cardPool.length < desiredCount && wrongCards.length) {
-      const source = wrongCards[extraIndex % wrongCards.length];
-      cardPool.push({ option: { ...source.option }, optionIndex: source.optionIndex });
-      extraIndex += 1;
-    }
+    const { controller, stage, game, round, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
+    const desiredPairs = difficulty === "support" && roundIndex === 0 ? 2 : Math.min(3, 2 + roundIndex);
+    const candidates = [];
+    [...game.rounds.map(correctOption), ...round.options].forEach((option) => {
+      const visual = cleanVisual(option?.visual);
+      if (!candidates.some((item) => cleanVisual(item.visual) === visual)) candidates.push(option);
+    });
+    const pairOptions = candidates.slice(0, Math.max(2, Math.min(desiredPairs, candidates.length)));
     const cards = shuffled(
-      cardPool,
-      seed,
+      pairOptions.flatMap((option, pair) => [
+        { option, pair, copy: 0 },
+        { option, pair, copy: 1 },
+      ]),
+      seed + ":pairs",
     );
-    const counter = createCounter("정답 찾기", 0, 1);
+    const counter = createCounter("찾은 짝", 0, pairOptions.length);
     const board = document.createElement("div");
-    board.className = "memory-board memory-answer-board";
+    board.className = "memory-board memory-pair-board";
     board.dataset.cardCount = String(cards.length);
-    board.setAttribute("aria-label", cards.length + "장 기억 카드");
+    board.setAttribute("aria-label", cards.length + "장 카드에서 " + pairOptions.length + "쌍 찾기");
     const cardButtons = [];
-    let locked = true;
+    let first = null;
+    let locked = false;
+    let matched = 0;
 
     cards.forEach((card, index) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "memory-card is-preview";
-      button.dataset.optionIndex = String(card.optionIndex);
-      button.disabled = true;
-      button.setAttribute("aria-label", optionName(card.option) + " 그림 미리 보기");
+      button.className = "memory-card";
+      button.dataset.pair = String(card.pair);
+      button.dataset.copy = String(card.copy);
+      button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
       const front = document.createElement("span");
       front.className = "memory-front";
       front.textContent = "?";
@@ -780,85 +797,66 @@
       button.append(front, back);
 
       controller.on(button, "click", () => {
-        if (locked || button.disabled) return;
+        if (locked || button.disabled || button === first) return;
         button.classList.add("is-open");
-        button.setAttribute("aria-label", optionName(card.option));
-        if (card.option === requested) {
-          onAttempt(true);
-          locked = true;
-          button.disabled = true;
-          button.classList.add("is-matched");
-          setCounter(counter, 1, 1);
-          announce(optionName(requested) + " 정답 그림을 기억해 냈어요.");
-          controller.later(() => onComplete(button, { record: false }), 320);
+        button.setAttribute("aria-label", optionName(card.option) + " 카드");
+        if (!first) {
+          first = button;
+          announce(optionName(card.option) + " 카드예요. 같은 그림을 찾아요.");
           return;
         }
+
+        const previous = first;
+        first = null;
         locked = true;
+        if (previous.dataset.pair === button.dataset.pair) {
+          previous.disabled = true;
+          button.disabled = true;
+          previous.classList.add("is-matched");
+          button.classList.add("is-matched");
+          matched += 1;
+          setCounter(counter, matched, pairOptions.length);
+          onProgress("prompt");
+          announce(optionName(card.option) + " 짝을 찾았어요. " + matched + "쌍 완료.");
+          controller.later(() => {
+            locked = false;
+            if (matched === pairOptions.length) onComplete(button);
+          }, 300);
+          return;
+        }
+
+        previous.classList.add("is-miss");
         button.classList.add("is-miss");
-        const answer = cardButtons.find(
-          (item) => Number(item.dataset.optionIndex) === round.options.indexOf(requested),
+        const matchingCard = cardButtons.find(
+          (item) => item !== previous && !item.disabled && item.dataset.pair === previous.dataset.pair,
         );
-        onMistake(button, answer);
-        announce("이 그림은 질문의 답이 아니에요. 다른 자리를 기억해 봐요.");
+        onMistake(button, matchingCard);
+        announce("그림이 달라요. 두 자리를 기억해 두었다가 다시 찾아요.");
         controller.later(() => {
-          button.classList.remove("is-open", "is-miss", "try-again");
-          button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 다시 뒤집기");
+          [previous, button].forEach((item) => {
+            item.classList.remove("is-open", "is-miss", "try-again");
+            const cardIndex = cardButtons.indexOf(item);
+            item.setAttribute("aria-label", "기억 카드 " + (cardIndex + 1) + " 뒤집기");
+          });
           locked = false;
-        }, 650);
+        }, 720);
       });
       cardButtons.push(button);
       board.appendChild(button);
     });
 
-    const startButton = document.createElement("button");
-    startButton.type = "button";
-    startButton.className = "activity-confirm memory-start";
-    startButton.textContent = "자리를 기억했어요!";
-
-    const coverCards = () => {
-      cardButtons.forEach((button, index) => {
-        button.classList.remove("is-preview");
-        button.disabled = false;
-        button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
-      });
-      locked = false;
-      startButton.hidden = true;
-      announce("이제 질문의 정답 그림이 있던 카드를 찾아요.");
-      cardButtons[0]?.focus({ preventScroll: true });
-    };
-    controller.on(startButton, "click", coverCards);
-
-    const previewCards = () => {
-      if (!startButton.hidden || locked) {
-        pulse(cardButtons, "is-replay");
-        return;
-      }
-      locked = true;
-      cardButtons.forEach((button) => {
-        button.classList.remove("is-open", "is-miss", "try-again");
-        button.classList.add("is-preview");
-        button.disabled = true;
-      });
-      announce(cards.length + "개 그림을 다시 보여줄게요. 정답 자리를 기억해요.");
-      controller.later(() => {
-        cardButtons.forEach((button, index) => {
-          button.classList.remove("is-preview");
-          button.disabled = false;
-          button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
-        });
-        locked = false;
-        cardButtons[0]?.focus({ preventScroll: true });
-      }, 1300);
-    };
-
-    stage.append(counter, board, startButton);
-    announce(cards.length + "개 그림을 보고 질문의 정답이 어디 있는지 기억해요.");
+    stage.append(counter, board);
+    announce("카드를 두 장씩 뒤집어 같은 그림 " + pairOptions.length + "쌍을 모두 찾아요.");
     return {
-      requiredActions: 2,
-      hint: () => pulse(cardButtons.find(
-        (item) => Number(item.dataset.optionIndex) === round.options.indexOf(requested),
-      )),
-      replay: previewCards,
+      requiredActions: pairOptions.length * 2,
+      prompt: "같은 그림 두 장을 찾아 짝을 모두 맞춰 볼까?",
+      helper: "한 번에 두 장씩 뒤집고 자리를 기억해요.",
+      hint: () => {
+        const source = first || cardButtons.find((item) => !item.disabled);
+        const match = source && cardButtons.find((item) => item !== source && !item.disabled && item.dataset.pair === source.dataset.pair);
+        pulse([source, match].filter(Boolean));
+      },
+      replay: () => pulse(cardButtons.filter((button) => !button.disabled), "is-replay"),
     };
   }
 
@@ -1033,11 +1031,29 @@
     };
   }
 
+  const DEEP_SORT_CONFIG = Object.freeze({
+    routines: ["몸을 지키는 행동", "다른 행동"],
+    extra036: ["빵집 음식", "다른 음식"],
+    extra057: ["동물", "동물이 아니에요"],
+    extra059: ["입는 것", "입지 않아요"],
+    extra060: ["놀이감", "놀이감이 아니에요"],
+    extra063: ["차례를 지키는 행동", "다른 행동"],
+    extra065: ["실수를 다정하게 고치는 행동", "도움이 되지 않아요"],
+    extra066: ["고마움을 전하는 행동", "다른 행동"],
+    extra070: ["몸을 편안하게 돕는 행동", "도움이 되지 않아요"],
+    extra071: ["젖은 옷을 보송하게 하는 행동", "도움이 되지 않아요"],
+    extra073: ["상쾌한 아침을 돕는 행동", "다른 행동"],
+    extra081: ["비 오는 날 안전한 준비", "안전하지 않아요"],
+    extra083: ["추운 날 따뜻한 선택", "따뜻하게 돕지 않아요"],
+    extra086: ["식탁 준비를 돕는 행동", "어린이가 하면 위험해요"],
+  });
+
   function renderSort(context) {
-    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, game, gameKey, round, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
     const tray = document.createElement("div");
     tray.className = "activity-tray sort-tray";
-    const labels = ["질문에 맞아요", "다른 그림이에요"];
+    const deepLabels = DEEP_SORT_CONFIG[gameKey];
+    const labels = deepLabels || ["질문에 맞아요", "다른 그림이에요"];
     const bins = document.createElement("div");
     bins.className = "sort-bins";
     const targets = labels.map((label, index) => {
@@ -1055,10 +1071,25 @@
       bins.appendChild(target);
       return target;
     });
-    const items = round.options.map((option) => ({
-      option,
-      expected: option.correct ? "correct" : "other",
-    }));
+    const chosenRounds = roundIndex === 0 ? game.rounds.slice(0, 2) : game.rounds;
+    const items = deepLabels
+      ? chosenRounds.flatMap((item, itemIndex) => {
+          const correct = correctOption(item);
+          const wrongs = item.options.filter((option) => option !== correct);
+          const wrong = wrongs[(roundIndex + itemIndex) % wrongs.length];
+          return [
+            { option: correct, expected: "correct" },
+            { option: wrong, expected: "other" },
+          ];
+        })
+      : round.options.map((option) => ({
+          option,
+          expected: option.correct ? "correct" : "other",
+        }));
+    const task = document.createElement("p");
+    task.className = "sequence-task sort-task";
+    task.textContent = items.length + "개 그림을 하나도 남기지 말고 두 바구니에 나눠요.";
+    const counter = createCounter("나눈 그림", 0, items.length);
     let placed = 0;
     const sources = shuffled(items, seed).map((item) => {
       const token = createToken(item.option);
@@ -1089,6 +1120,7 @@
         target.dataset.placedNames = placedNames.join("|");
         target.setAttribute("aria-label", target.querySelector("strong").textContent + " 바구니, " + placedNames.join(", ") + " 넣음");
         placed += 1;
+        setCounter(counter, placed, items.length);
         announce(optionName(option) + ", " + target.querySelector("strong").textContent + " 바구니.");
         onProgress("prompt");
         if (placed === sources.length) onComplete(target);
@@ -1096,9 +1128,11 @@
       },
       announce,
     );
-    stage.append(tray, bins);
+    stage.append(task, counter, tray, bins);
     return {
       requiredActions: items.length,
+      prompt: deepLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
+      helper: "그림 하나를 고른 뒤 알맞은 바구니를 눌러요.",
       hint: () => {
         const source = sources.find((item) => !item.disabled);
         if (!source) return;
@@ -1247,13 +1281,14 @@
   }
 
   function renderDrag(context) {
-    const { controller, stage, game, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, game, gameKey, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
+    const isSafetyJourney = SAFETY_RELATION_KEYS.has(gameKey);
     const pairCount = roundIndex === 0 ? 2 : Math.min(3, game.rounds.length);
     const selectedRounds = Array.from({ length: pairCount }, (_, offset) =>
       game.rounds[(roundIndex + offset) % game.rounds.length],
     );
     const pairs = selectedRounds.map((item, match) => ({
-      clue: (item.scene || []).map(cleanVisual),
+      clue: isSafetyJourney ? [] : (item.scene || []).map(cleanVisual),
       prompt: item.prompt,
       option: correctOption(item),
       match,
@@ -1261,11 +1296,13 @@
 
     const targetsBoard = document.createElement("div");
     targetsBoard.className = "sequence-slots relation-targets";
-    targetsBoard.style.gridTemplateColumns = "repeat(" + pairCount + ", minmax(0, 1fr))";
+    if (isSafetyJourney) targetsBoard.classList.add("safety-relation-targets");
+    targetsBoard.style.gridTemplateColumns = isSafetyJourney ? "1fr" : "repeat(" + pairCount + ", minmax(0, 1fr))";
     const targets = shuffled(pairs, seed + ":clues").map((pair) => {
       const target = document.createElement("button");
       target.type = "button";
       target.className = "sequence-slot relation-target";
+      if (isSafetyJourney) target.classList.add("safety-relation-target");
       target.dataset.activityDrop = String(pair.match);
       const clue = document.createElement("span");
       clue.className = pair.clue.length ? "relation-clue-visual" : "relation-clue-text";
@@ -1318,6 +1355,8 @@
     stage.append(tray, targetsBoard);
     return {
       requiredActions: pairCount,
+      prompt: isSafetyJourney ? "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?" : "",
+      helper: isSafetyJourney ? pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요." : "",
       hint: () => {
         const source = sources.find((item) => !item.disabled);
         if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
@@ -2609,7 +2648,7 @@
     sort: renderSort,
     sequence: renderSequence,
     memory: renderMemory,
-    pattern: renderLegacyPattern,
+    pattern: renderPattern,
     spot: renderSpot,
     trace: renderTrace,
     order: renderOrder,
@@ -2656,6 +2695,8 @@
       mode,
       label: metaFor(mode, config.gameKey).label,
       instruction: metaFor(mode, config.gameKey).instruction,
+      prompt: activity?.prompt || "",
+      helper: activity?.helper || "",
       hint: activity?.hint || (() => {}),
       replay: activity?.replay || (() => {}),
       destroy() {

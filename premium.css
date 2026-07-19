@@ -572,6 +572,62 @@
   font-weight: 850;
 }
 
+.offline-settings {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 18px 0;
+  padding: 16px;
+  border: 2px solid #c5dff2;
+  border-radius: 22px;
+  background: var(--blue-soft);
+}
+
+.offline-settings > div {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.offline-settings-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 14px;
+  background: white;
+  color: var(--blue-dark);
+  font-size: 22px;
+  font-weight: 950;
+}
+
+.offline-settings strong,
+.offline-settings small {
+  display: block;
+}
+
+.offline-settings small {
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+#install-app {
+  min-width: 112px;
+  min-height: 46px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--blue-dark);
+  color: white;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .growth-report {
   margin: 18px 0;
   padding: 20px;
@@ -658,6 +714,106 @@
   color: var(--ink-soft);
   font-size: 12px;
   text-align: center;
+}
+
+.parent-gate {
+  width: min(100% - 28px, 440px);
+  padding: 0;
+  border: 0;
+  border-radius: 30px;
+  background: transparent;
+}
+
+.parent-gate::backdrop {
+  background: rgba(54, 45, 39, 0.62);
+  backdrop-filter: blur(3px);
+}
+
+.parent-gate-panel {
+  position: relative;
+  padding: 30px 24px 26px;
+  border: 3px solid white;
+  border-radius: 30px;
+  background: var(--paper);
+  box-shadow: 0 12px 0 rgba(45, 34, 28, 0.18);
+  text-align: center;
+}
+
+.parent-gate-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  background: white;
+  color: var(--ink);
+  font-size: 23px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.parent-gate-icon {
+  width: 66px;
+  height: 66px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  border-radius: 22px;
+  background: var(--yellow-soft);
+  font-size: 31px;
+}
+
+.parent-gate h2 {
+  margin: 7px 0 8px;
+  font-size: 25px;
+}
+
+.parent-gate p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.55;
+}
+
+.parent-gate-choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.parent-gate-choices button {
+  min-height: 60px;
+  border: 2px solid #d9cee9;
+  border-radius: 18px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 22px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.parent-gate-choices button:active {
+  transform: translateY(2px);
+}
+
+.parent-gate-choices button.is-wrong {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  color: var(--coral-dark);
+  animation: gentle-shake 360ms ease;
+}
+
+.parent-gate small {
+  min-height: 20px;
+  display: block;
+  margin-top: 13px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .adaptive-note {
@@ -811,6 +967,15 @@
   .child-profile-settings {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .offline-settings {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #install-app {
+    width: 100%;
   }
 
   .child-profile-settings input {

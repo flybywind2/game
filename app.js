@@ -620,6 +620,7 @@
   const musicVolumeValue = document.querySelector("#music-volume-value");
   const confetti = document.querySelector("#confetti");
   const parentDialog = document.querySelector("#parent-dialog");
+  const parentGate = document.querySelector("#parent-gate");
   const toast = document.querySelector("#toast");
 
   let promptElement;
@@ -651,6 +652,8 @@
   let musicEnabled = loadMusicPreference();
   let musicVolume = loadMusicVolume();
   let bgmAudio = null;
+  let deferredInstallPrompt = null;
+  let parentUnlockedUntil = 0;
 
   function todayKey() {
     const now = new Date();
@@ -1311,6 +1314,8 @@
         onProgress: playChime,
         announce: announceActivity,
       });
+      if (activeActivity?.prompt) promptElement.textContent = activeActivity.prompt;
+      if (activeActivity?.helper) promptHelper.textContent = activeActivity.helper;
     }
 
     speakRoundInstruction(round);
@@ -1612,6 +1617,46 @@
     else parentDialog.setAttribute("open", "");
   }
 
+  function closeParentGate() {
+    if (typeof parentGate.close === "function") parentGate.close();
+    else parentGate.removeAttribute("open");
+  }
+
+  function requestParentAccess() {
+    if (Date.now() < parentUnlockedUntil) {
+      openParentDialog();
+      return;
+    }
+    const problems = [[2, 3], [3, 4], [4, 2], [5, 3]];
+    const [left, right] = problems[Math.floor(Math.random() * problems.length)];
+    const answer = left + right;
+    document.querySelector("#parent-gate-question").textContent = `별 ${left}개와 별 ${right}개를 합치면 모두 몇 개일까요?`;
+    document.querySelector("#parent-gate-feedback").textContent = "성장 기록과 설정을 안전하게 보호해요.";
+    const choices = [answer - 1, answer, answer + 1].sort(() => Math.random() - 0.5);
+    const wrap = document.querySelector("#parent-gate-choices");
+    wrap.innerHTML = "";
+    choices.forEach((value) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = String(value);
+      button.addEventListener("click", () => {
+        if (value !== answer) {
+          button.classList.remove("is-wrong");
+          void button.offsetWidth;
+          button.classList.add("is-wrong");
+          document.querySelector("#parent-gate-feedback").textContent = "다시 계산해 주세요.";
+          return;
+        }
+        parentUnlockedUntil = Date.now() + 5 * 60 * 1000;
+        closeParentGate();
+        openParentDialog();
+      });
+      wrap.appendChild(button);
+    });
+    if (typeof parentGate.showModal === "function") parentGate.showModal();
+    else parentGate.setAttribute("open", "");
+  }
+
   function closeParentDialog() {
     if (typeof parentDialog.close === "function") parentDialog.close();
     else parentDialog.removeAttribute("open");
@@ -1622,6 +1667,16 @@
     toast.textContent = message;
     toast.classList.add("show");
     toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2200);
+  }
+
+  function updateOfflineStatus(message) {
+    const status = document.querySelector("#offline-ready-status");
+    if (status) status.textContent = message;
+  }
+
+  function updateConnectionState() {
+    document.body.classList.toggle("is-offline", !navigator.onLine);
+    if (!navigator.onLine) updateOfflineStatus("지금은 오프라인이에요. 준비된 놀이는 그대로 할 수 있어요.");
   }
 
   const CATALOG_PAGE_SIZE = 24;
@@ -1809,12 +1864,47 @@
     });
   });
 
-  document.querySelector("#open-growth-report").addEventListener("click", openParentDialog);
+  document.querySelector("#open-growth-report").addEventListener("click", requestParentAccess);
 
   document.querySelector("#child-nickname").addEventListener("input", (event) => {
     const nickname = event.currentTarget.value.trim().slice(0, 10);
     learnerProfile.nickname = nickname || "꼬마 탐험가";
     saveLearnerProfile();
+  });
+
+  const installButton = document.querySelector("#install-app");
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    installButton.hidden = false;
+    updateOfflineStatus("이 기기의 홈 화면에 몽글 놀이터를 설치할 수 있어요.");
+  });
+
+  installButton.addEventListener("click", async () => {
+    if (!deferredInstallPrompt) {
+      updateOfflineStatus("브라우저 메뉴에서 ‘홈 화면에 추가’를 선택해 주세요.");
+      return;
+    }
+    deferredInstallPrompt.prompt();
+    const choice = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+    updateOfflineStatus(choice.outcome === "accepted" ? "홈 화면에 설치했어요." : "원할 때 다시 설치할 수 있어요.");
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    installButton.hidden = true;
+    updateOfflineStatus("홈 화면 앱으로 설치되어 있어요.");
+  });
+
+  window.addEventListener("online", () => {
+    updateConnectionState();
+    updateOfflineStatus("온라인으로 연결됐어요. 오프라인 자료도 준비되어 있어요.");
+  });
+  window.addEventListener("offline", () => {
+    updateConnectionState();
+    showToast("오프라인에서도 준비된 놀이를 계속할 수 있어요.");
   });
 
   const stretchButton = document.querySelector("#stretch-button");
@@ -1826,8 +1916,12 @@
     showToast(promised ? "두 팔을 쭉! 몸도 마음도 시원해요." : "언제든 다시 기지개를 켤 수 있어요.");
   });
 
-  document.querySelector("#parent-open").addEventListener("click", openParentDialog);
+  document.querySelector("#parent-open").addEventListener("click", requestParentAccess);
   document.querySelector("#parent-close").addEventListener("click", closeParentDialog);
+  document.querySelector("#parent-gate-close").addEventListener("click", closeParentGate);
+  parentGate.addEventListener("click", (event) => {
+    if (event.target === parentGate) closeParentGate();
+  });
   parentDialog.addEventListener("click", (event) => {
     if (event.target === parentDialog) closeParentDialog();
   });
@@ -1867,4 +1961,21 @@
   updateSoundButton();
   updateMusicControls();
   cachePlayElements();
+  updateConnectionState();
+
+  if (window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone) {
+    installButton.hidden = true;
+    updateOfflineStatus("홈 화면 앱으로 설치되어 있어요.");
+  } else if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js")
+        .then(() => navigator.serviceWorker.ready)
+        .then(() => {
+          if (navigator.onLine) updateOfflineStatus("핵심 놀이와 이야기 그림이 오프라인용으로 준비됐어요.");
+        })
+        .catch(() => updateOfflineStatus("오프라인 준비를 완료하지 못했어요. 온라인에서는 정상 이용할 수 있어요."));
+    });
+  } else {
+    updateOfflineStatus("이 브라우저에서는 홈 화면 설치를 지원하지 않아요.");
+  }
 })();

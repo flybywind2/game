@@ -931,6 +931,31 @@ button.pattern-cell {
   font-weight: 850;
 }
 
+.safety-relation-targets {
+  width: min(100%, 680px);
+  gap: 10px;
+}
+
+.safety-relation-target {
+  min-height: 76px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  text-align: left;
+}
+
+.safety-relation-target .relation-clue-text {
+  font-size: 15px;
+  -webkit-line-clamp: 3;
+}
+
+.safety-relation-target small {
+  max-width: 72px;
+  text-align: center;
+}
+
 .pattern-answer-tray .activity-token {
   min-height: 100px;
 }
@@ -1359,6 +1384,15 @@ button.pattern-cell {
 
   .relation-clue-text {
     font-size: 11px;
+  }
+
+  .safety-relation-target {
+    min-height: 72px;
+    padding: 10px 12px;
+  }
+
+  .safety-relation-target .relation-clue-text {
+    font-size: 12px;
   }
 
   .pattern-answer-tray {
