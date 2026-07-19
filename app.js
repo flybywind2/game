@@ -571,6 +571,15 @@
   const MUSIC_VOLUME_KEY = "mongle-music-volume-v1";
   const PLAY_LIMIT_KEY = "mongle-play-limit-v1";
   const USABILITY_KEY = "mongle-usability-observations-v1";
+  const LOCAL_DATA_KEYS = Object.freeze([
+    STORAGE_KEY,
+    PROFILE_KEY,
+    SOUND_KEY,
+    MUSIC_KEY,
+    MUSIC_VOLUME_KEY,
+    PLAY_LIMIT_KEY,
+    USABILITY_KEY,
+  ]);
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const GAME_HASH_PREFIX = "#game/";
@@ -740,6 +749,30 @@
     } catch {
       // Observation mode remains usable when storage is unavailable.
     }
+  }
+
+  function eraseAllLocalData() {
+    const backupWarning = window.confirm(
+      "백업하지 않은 성장 기록은 삭제한 뒤 되돌릴 수 없어요. 모든 기록과 설정 삭제를 계속할까요?",
+    );
+    if (!backupWarning) return;
+    const finalConfirmation = window.confirm(
+      "아이 애칭, 완료·시도 기록, 보호자 관찰, 소리와 놀이 시간 설정을 모두 지울까요?",
+    );
+    if (!finalConfirmation) return;
+    try {
+      LOCAL_DATA_KEYS.forEach((key) => localStorage.removeItem(key));
+      for (let index = sessionStorage.length - 1; index >= 0; index -= 1) {
+        const key = sessionStorage.key(index);
+        if (key?.startsWith("mongle-place-demo-v1:")) sessionStorage.removeItem(key);
+      }
+    } catch {
+      showToast("브라우저 저장 공간을 지우지 못했어요. 브라우저 설정을 확인해 주세요.");
+      return;
+    }
+    stopBgm();
+    stopVoice();
+    window.location.replace(`${window.location.pathname}${window.location.search}`);
   }
 
   function normalizeDailyProgress(saved) {
@@ -3178,6 +3211,7 @@
     updateParentDashboard();
     showToast("오늘의 놀이 기록을 지웠어요.");
   });
+  document.querySelector("#erase-all-data").addEventListener("click", eraseAllLocalData);
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
