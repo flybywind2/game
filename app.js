@@ -565,11 +565,45 @@
   }
 
   const STORAGE_KEY = "mongle-play-progress-v1";
+  const PROFILE_KEY = "mongle-learner-profile-v2";
   const SOUND_KEY = "mongle-sound-v1";
   const MUSIC_KEY = "mongle-music-v1";
   const MUSIC_VOLUME_KEY = "mongle-music-volume-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
+  const CATEGORY_NAMES = Object.freeze({
+    look: "관찰력",
+    number: "수·규칙",
+    word: "말·이해",
+    heart: "마음·생활",
+  });
+  const BASE_GAME_CATEGORIES = Object.freeze({
+    colors: "look",
+    shapes: "look",
+    counting: "number",
+    sounds: "word",
+    words: "word",
+    emotions: "heart",
+    patterns: "look",
+    more: "look",
+    matching: "look",
+    sizes: "number",
+    routines: "heart",
+    body: "word",
+  });
+  const STORY_CHAPTERS = Object.freeze([
+    { key: "colors", title: "아침 열매 찾기", subtitle: "색깔 관찰", intro: "햇살이 비치자 몽글이의 소풍 바구니가 알록달록 빛났어요. 잘 익은 열매를 찾아 아침 준비를 도와줄까요?", mission: "색을 자세히 보고 꼭 맞는 과일을 찾아요." },
+    { key: "shapes", title: "모양 기차 출발", subtitle: "손가락 그리기", intro: "열매를 싣고 떠날 기차의 표지판이 비어 있어요. 동그라미, 세모, 네모 길을 손가락으로 그려 완성해요.", mission: "모양을 찾은 뒤 굵은 길을 끝까지 따라 그려요." },
+    { key: "counting", title: "병아리 다리 건너기", subtitle: "1~5 세기", intro: "기차역 앞에서 병아리들이 차례를 기다려요. 한 마리씩 세어 모두 안전하게 건너게 해 주세요.", mission: "필요한 수만큼 직접 눌러 바구니를 채워요." },
+    { key: "sounds", title: "숲속 소리 편지", subtitle: "기억·집중", intro: "숲에서 멍멍, 음메, 꽥꽥 소리가 들려왔어요. 그림의 자리를 기억해 소리 편지의 주인을 찾아요.", mission: "그림을 기억하고 뒤집힌 카드에서 소리 주인을 찾아요." },
+    { key: "words", title: "소풍 가방 꾸리기", subtitle: "낱말 분류", intro: "소풍 가방에 먹는 것과 타는 것, 입는 것이 뒤섞였어요. 말의 쓰임을 생각해 두 바구니로 나눠요.", mission: "세 그림을 빠짐없이 알맞은 바구니에 나눠요." },
+    { key: "patterns", title: "깃발 규칙 잇기", subtitle: "규칙 완성", intro: "소풍길의 깃발 두 칸이 바람에 날아갔어요. 반복되는 순서를 살펴보고 빠진 깃발을 되돌려 놓아요.", mission: "규칙을 찾아 비어 있는 두 칸을 모두 채워요." },
+    { key: "sizes", title: "동물 친구 줄 세우기", subtitle: "크기 비교", intro: "친구들이 사진을 찍으려고 모였지만 어디에 설지 모르겠대요. 실제 크기를 생각해 차례대로 세워요.", mission: "작은 친구부터 큰 친구까지 순서대로 놓아요." },
+    { key: "body", title: "몸 친구 도움 작전", subtitle: "관계 연결", intro: "보고, 듣고, 걸으며 숲길을 지나야 해요. 눈과 귀와 발이 어떤 일을 하는지 알맞게 이어 주세요.", mission: "질문 그림과 알맞은 몸 부분을 모두 연결해요." },
+    { key: "emotions", title: "친구 마음 안아주기", subtitle: "감정 이해", intro: "소풍 중 친구의 표정이 자꾸 달라져요. 기쁜지, 슬픈지, 놀랐는지 마음을 살펴 따뜻하게 불러 주세요.", mission: "표정을 기억하고 알맞은 마음 이름을 찾아요." },
+    { key: "routines", title: "포근한 하루 마무리", subtitle: "생활 습관", intro: "신나게 논 뒤에는 손을 씻고 이를 닦고 잠자리를 준비해요. 몽글이와 하루를 포근하게 마무리해요.", mission: "생활 그림을 살펴 알맞은 곳에 모두 나눠요." },
+  ]);
+  const STORY_BY_KEY = Object.freeze(Object.fromEntries(STORY_CHAPTERS.map((chapter, index) => [chapter.key, { ...chapter, index }])));
   const playTemplate = document.querySelector("#play-main").innerHTML;
 
   const shell = document.querySelector("#game-shell");
@@ -601,12 +635,14 @@
   let returnFocusElement = null;
   let roundInstructionToken = 0;
   let activeGameKey = null;
+  let activeStoryMode = false;
   let roundIndex = 0;
   let wrongAttempts = 0;
   let advanceTimer = null;
   let toastTimer = null;
   let soundEnabled = loadSoundPreference();
   let dailyProgress = loadProgress();
+  let learnerProfile = loadLearnerProfile();
   let audioContext = null;
   let activeUtterance = null;
   let activeVoiceAudio = null;
@@ -655,6 +691,83 @@
       // The games still work when storage is unavailable.
     }
     updateTodayCard();
+  }
+
+  function blankLearnerProfile() {
+    return {
+      version: 2,
+      nickname: "꼬마 탐험가",
+      xp: 0,
+      completed: {},
+      stickers: [],
+      totalAttempts: 0,
+      totalCorrect: 0,
+      gameStats: {},
+    };
+  }
+
+  function loadLearnerProfile() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PROFILE_KEY));
+      if (!saved || saved.version !== 2) return blankLearnerProfile();
+      return {
+        ...blankLearnerProfile(),
+        ...saved,
+        completed: saved.completed || {},
+        stickers: Array.isArray(saved.stickers) ? saved.stickers.filter((key) => GAMES[key]) : [],
+        gameStats: saved.gameStats || {},
+      };
+    } catch {
+      return blankLearnerProfile();
+    }
+  }
+
+  function saveLearnerProfile() {
+    try {
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(learnerProfile));
+    } catch {
+      // Long-term progress is optional when storage is unavailable.
+    }
+    updatePremiumDashboard();
+  }
+
+  function gameStat(key) {
+    if (!learnerProfile.gameStats[key]) {
+      learnerProfile.gameStats[key] = { attempts: 0, correct: 0, recent: [] };
+    }
+    return learnerProfile.gameStats[key];
+  }
+
+  function adaptiveLevelForGame(key) {
+    const recent = (learnerProfile.gameStats[key]?.recent || []).slice(-6);
+    if (recent.length < 4) return "standard";
+    const accuracy = recent.filter(Boolean).length / recent.length;
+    if (accuracy >= 0.84) return "challenge";
+    if (accuracy <= 0.55) return "support";
+    return "standard";
+  }
+
+  function profileLevel() {
+    return Math.floor(Math.max(0, learnerProfile.xp) / 300) + 1;
+  }
+
+  function gameCategory(key) {
+    return GAMES[key]?.category || BASE_GAME_CATEGORIES[key] || "look";
+  }
+
+  function categoryProgress(category) {
+    const keys = Object.keys(GAMES).filter((key) => gameCategory(key) === category);
+    const completed = keys.filter((key) => learnerProfile.completed[key]).length;
+    return { completed, total: keys.length, percent: keys.length ? Math.round((completed / keys.length) * 100) : 0 };
+  }
+
+  function categoryAccuracy(category) {
+    const stats = Object.entries(learnerProfile.gameStats)
+      .filter(([key]) => GAMES[key] && gameCategory(key) === category)
+      .map(([, stat]) => stat);
+    const attempts = stats.reduce((sum, stat) => sum + (Number(stat.attempts) || 0), 0);
+    const correct = stats.reduce((sum, stat) => sum + (Number(stat.correct) || 0), 0);
+    return { attempts, correct, percent: attempts ? Math.round((correct / attempts) * 100) : 0 };
   }
 
   function loadSoundPreference() {
@@ -741,6 +854,77 @@
     if (count === 0) status.textContent = "아직 시작 전이에요";
     else if (count < 3) status.textContent = `${count}개 완료했어요`;
     else status.textContent = "오늘 목표 완료!";
+  }
+
+  function updatePremiumDashboard() {
+    const name = document.querySelector("#explorer-name");
+    if (!name) return;
+    name.textContent = learnerProfile.nickname || "꼬마 탐험가";
+    const level = profileLevel();
+    const levelXp = learnerProfile.xp % 300;
+    document.querySelector("#explorer-level").textContent = String(level);
+    document.querySelector("#explorer-xp").textContent = String(learnerProfile.xp);
+    document.querySelector("#explorer-xp-next").textContent = String(levelXp === 0 && learnerProfile.xp > 0 ? 300 : 300 - levelXp);
+    document.querySelector("#explorer-xp-bar").style.width = `${Math.round((levelXp / 300) * 100)}%`;
+
+    document.querySelectorAll("[data-world]").forEach((card) => {
+      const progress = categoryProgress(card.dataset.world);
+      card.querySelector(".world-progress i").style.width = `${progress.percent}%`;
+      card.querySelector(".world-progress b").textContent = `${progress.completed}/${progress.total}`;
+      card.setAttribute("aria-label", `${CATEGORY_NAMES[card.dataset.world]}, ${progress.total}개 중 ${progress.completed}개 완료`);
+    });
+
+    document.querySelector("#sticker-count").textContent = String(learnerProfile.stickers.length);
+    const stickerMessage = document.querySelector("#sticker-message");
+    if (!learnerProfile.stickers.length) stickerMessage.textContent = "첫 놀이를 끝내고 몽글 스티커를 받아요!";
+    else if (learnerProfile.stickers.length < 10) stickerMessage.textContent = "새로운 놀이마다 고유 스티커가 찾아와요.";
+    else stickerMessage.textContent = `${learnerProfile.nickname || "꼬마 탐험가"}만의 멋진 모음이 자라고 있어요.`;
+
+    const preview = document.querySelector("#sticker-preview");
+    preview.innerHTML = "";
+    learnerProfile.stickers.slice(-5).reverse().forEach((key) => {
+      const sticker = document.createElement("span");
+      sticker.textContent = GAMES[key]?.icon || "★";
+      sticker.title = GAMES[key]?.title || "몽글 스티커";
+      sticker.setAttribute("aria-label", `${GAMES[key]?.title || "몽글"} 스티커`);
+      preview.appendChild(sticker);
+    });
+    while (preview.children.length < 5) {
+      const empty = document.createElement("span");
+      empty.className = "empty-sticker";
+      empty.textContent = "?";
+      empty.setAttribute("aria-hidden", "true");
+      preview.appendChild(empty);
+    }
+    renderStoryJourney();
+  }
+
+  function renderStoryJourney() {
+    const path = document.querySelector("#story-path");
+    if (!path) return;
+    const completed = STORY_CHAPTERS.filter((chapter) => learnerProfile.completed[chapter.key]).length;
+    const nextIndex = STORY_CHAPTERS.findIndex((chapter) => !learnerProfile.completed[chapter.key]);
+    const activeIndex = nextIndex < 0 ? 0 : nextIndex;
+    document.querySelector("#story-completed-count").textContent = String(completed);
+    path.innerHTML = "";
+    STORY_CHAPTERS.forEach((chapter, index) => {
+      const done = Boolean(learnerProfile.completed[chapter.key]);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `story-node${done ? " is-complete" : ""}${index === activeIndex ? " is-next" : ""}`;
+      button.innerHTML = `
+        <span class="story-node-number">${done ? "✓" : index + 1}</span>
+        <span><strong>${chapter.title}</strong><small>${chapter.subtitle}</small></span>`;
+      button.setAttribute("aria-label", `${index + 1}장 ${chapter.title}, ${done ? "완료" : index === activeIndex ? "다음 이야기" : "시작 가능"}`);
+      button.addEventListener("click", () => startGame(chapter.key, { story: true }));
+      path.appendChild(button);
+    });
+    const continueButton = document.querySelector("#story-continue");
+    const nextChapter = STORY_CHAPTERS[activeIndex];
+    continueButton.querySelector("span").textContent = completed
+      ? completed === STORY_CHAPTERS.length ? "이야기 다시 만나기" : `${activeIndex + 1}장 이어 하기`
+      : "첫 이야기 시작";
+    continueButton.onclick = () => startGame(nextChapter.key, { story: true });
   }
 
   function updateSoundButton() {
@@ -937,7 +1121,43 @@
     window.history.replaceState(null, "", url);
   }
 
-  function startGame(key, { updateUrl = true } = {}) {
+  function renderStoryIntro(key) {
+    const chapter = STORY_BY_KEY[key];
+    if (!chapter) {
+      renderRound();
+      return;
+    }
+    activeActivity?.destroy();
+    activeActivity = null;
+    gameName.textContent = `${chapter.index + 1}장 · ${chapter.title}`;
+    progressBar.innerHTML = "";
+    replayButton.disabled = true;
+    const art = CATEGORY_ART[gameCategory(key)];
+    playMain.innerHTML = `
+      <div class="story-intro-card">
+        <img src="${art}" alt="${chapter.title} 이야기 장면" width="512" height="512" />
+        <div class="story-intro-copy">
+          <span class="section-kicker">몽글이의 반짝이는 하루 · ${chapter.index + 1}장</span>
+          <h2 tabindex="-1">${chapter.title}</h2>
+          <p>${chapter.intro}</p>
+          <div class="story-mission"><strong>오늘의 미션</strong><br>${chapter.mission}</div>
+          <div class="story-intro-actions">
+            <button class="story-begin" type="button">이야기 시작!</button>
+            <button class="story-catalog" type="button">다른 놀이 보기</button>
+          </div>
+        </div>
+      </div>`;
+    const begin = playMain.querySelector(".story-begin");
+    begin.addEventListener("click", () => {
+      restorePlayTemplate();
+      replayButton.disabled = false;
+      renderRound();
+    });
+    playMain.querySelector(".story-catalog").addEventListener("click", closeGame);
+    window.setTimeout(() => playMain.querySelector(".story-intro-copy h2")?.focus({ preventScroll: true }), 80);
+  }
+
+  function startGame(key, { updateUrl = true, story = false } = {}) {
     if (!GAMES[key]) return;
     if (updateUrl && gameKeyFromLocation() !== key) {
       window.history.pushState({ mongleGame: key, returnToCatalog: true }, "", gameUrl(key));
@@ -949,6 +1169,7 @@
     playChime("start");
     clearTimeout(advanceTimer);
     activeGameKey = key;
+    activeStoryMode = Boolean(story && STORY_BY_KEY[key]);
     roundIndex = 0;
     wrongAttempts = 0;
     roundSettled = false;
@@ -959,7 +1180,8 @@
     shell.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
     document.title = GAMES[key].title + " | 몽글몽글 배움 놀이터";
-    renderRound();
+    if (activeStoryMode) renderStoryIntro(key);
+    else renderRound();
     document.querySelector("#game-close").focus({ preventScroll: true });
   }
 
@@ -985,6 +1207,7 @@
       shell.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       activeGameKey = null;
+      activeStoryMode = false;
       document.title = DEFAULT_TITLE;
       if (focusTarget?.isConnected && !focusTarget.hidden) {
         focusTarget.focus({ preventScroll: true });
@@ -1080,6 +1303,7 @@
         round,
         gameKey: activeGameKey,
         roundIndex,
+        difficulty: adaptiveLevelForGame(activeGameKey),
         onAttempt: recordAttempt,
         onComplete: completeCurrentRound,
         onMistake: reportRoundMistake,
@@ -1151,16 +1375,23 @@
     });
   }
 
-  function recordAttempt() {
+  function recordAttempt(correct = false) {
     dailyProgress.attempts += 1;
     dailyProgress.lastPlayed = activeGameKey;
+    learnerProfile.totalAttempts += 1;
+    if (correct) learnerProfile.totalCorrect += 1;
+    const stats = gameStat(activeGameKey);
+    stats.attempts += 1;
+    if (correct) stats.correct += 1;
+    stats.recent = [...stats.recent, Boolean(correct)].slice(-8);
     saveProgress();
+    saveLearnerProfile();
   }
 
   function completeCurrentRound(source, { record = true } = {}) {
     const round = currentRound();
     if (!round || roundSettled) return;
-    if (record) recordAttempt();
+    if (record) recordAttempt(true);
     roundSettled = true;
     roundInstructionToken += 1;
     answersElement.classList.add("is-resolved");
@@ -1195,7 +1426,7 @@
 
   function reportRoundMistake(source, hintTargets) {
     if (roundSettled) return;
-    recordAttempt();
+    recordAttempt(false);
     wrongAttempts += 1;
     source?.classList.remove("try-again");
     if (source) void source.offsetWidth;
@@ -1236,9 +1467,17 @@
     activeActivity?.destroy();
     activeActivity = null;
     const game = GAMES[activeGameKey];
+    const storyMode = activeStoryMode;
+    const storyChapter = storyMode ? STORY_BY_KEY[activeGameKey] : null;
+    const nextChapter = storyChapter ? STORY_CHAPTERS[storyChapter.index + 1] : null;
+    const isNewSticker = !learnerProfile.stickers.includes(activeGameKey);
+    learnerProfile.completed[activeGameKey] = (learnerProfile.completed[activeGameKey] || 0) + 1;
+    learnerProfile.xp += isNewSticker ? 100 : 30;
+    if (isNewSticker) learnerProfile.stickers.push(activeGameKey);
     dailyProgress.completed[activeGameKey] = (dailyProgress.completed[activeGameKey] || 0) + 1;
     dailyProgress.lastPlayed = activeGameKey;
     saveProgress();
+    saveLearnerProfile();
     replayButton.disabled = true;
     renderProgress(game.rounds.length, game.rounds.length);
     progressBar.querySelectorAll(".progress-dot").forEach((dot) => {
@@ -1248,18 +1487,21 @@
 
     playMain.innerHTML = `
       <div class="completion-card">
-        <div class="completion-sticker" aria-hidden="true">★</div>
-        <p class="completion-label">오늘의 별 스티커</p>
+        <div class="completion-sticker ${isNewSticker ? "is-new-sticker" : ""}" aria-hidden="true">${isNewSticker ? game.icon : "★"}</div>
+        <p class="completion-label">${isNewSticker ? "새 스티커를 찾았어요!" : "다시 만나 더 단단해졌어요!"}</p>
         <h2>우와, 다 해냈어!</h2>
+        <span class="completion-reward">+${isNewSticker ? 100 : 30} XP · LEVEL ${profileLevel()}</span>
         <p>${game.title} 놀이를 끝까지 즐겼어요.<br>이제 잠깐 쉬어도 좋아요.</p>
         <div class="completion-actions">
           <button class="completion-home" type="button">다른 놀이 만나기</button>
+          ${nextChapter ? `<button class="completion-next" type="button">다음 이야기</button>` : ""}
           <button class="completion-again" type="button">한 번 더</button>
         </div>
       </div>`;
 
     playMain.querySelector(".completion-home").addEventListener("click", closeGame);
-    playMain.querySelector(".completion-again").addEventListener("click", () => startGame(activeGameKey));
+    playMain.querySelector(".completion-again").addEventListener("click", () => startGame(activeGameKey, { story: storyMode }));
+    playMain.querySelector(".completion-next")?.addEventListener("click", () => startGame(nextChapter.key, { story: true }));
     launchConfetti();
     speak(`우와, 다 해냈어! ${game.title} 놀이 끝!`);
   }
@@ -1283,7 +1525,12 @@
   }
 
   function recommendedGame() {
-    return Object.keys(GAMES).find((key) => !dailyProgress.completed[key]) || "colors";
+    const category = Object.keys(CATEGORY_NAMES)
+      .map((key) => ({ key, ...categoryProgress(key) }))
+      .sort((a, b) => a.percent - b.percent || a.completed - b.completed)[0]?.key;
+    return Object.keys(GAMES).find((key) => gameCategory(key) === category && !learnerProfile.completed[key])
+      || Object.keys(GAMES).sort((a, b) => (learnerProfile.completed[a] || 0) - (learnerProfile.completed[b] || 0))[0]
+      || "colors";
   }
 
   function updateParentDashboard() {
@@ -1296,6 +1543,33 @@
     else if (count < 3) message.textContent = "짧고 즐거운 시도를 이어가고 있어요.";
     else message.textContent = "오늘의 작은 목표를 충분히 만났어요.";
 
+    const nicknameInput = document.querySelector("#child-nickname");
+    nicknameInput.value = learnerProfile.nickname || "꼬마 탐험가";
+    document.querySelector("#parent-level").textContent = String(profileLevel());
+
+    const growthList = document.querySelector("#growth-skill-list");
+    growthList.innerHTML = "";
+    Object.entries(CATEGORY_NAMES).forEach(([category, label]) => {
+      const accuracy = categoryAccuracy(category);
+      const progress = categoryProgress(category);
+      const skill = document.createElement("div");
+      skill.className = "growth-skill";
+      skill.innerHTML = `
+        <span><strong>${label}</strong><b>${accuracy.attempts ? `${accuracy.percent}%` : "관찰 전"}</b></span>
+        <div class="growth-skill-track" aria-label="${label} 정답 경험 ${accuracy.percent}%"><i style="width:${accuracy.percent}%"></i></div>
+        <small>${progress.completed}/${progress.total}개 놀이 · ${accuracy.attempts}번 시도</small>`;
+      growthList.appendChild(skill);
+    });
+
+    const levels = Object.keys(learnerProfile.gameStats).map(adaptiveLevelForGame);
+    const challengeCount = levels.filter((level) => level === "challenge").length;
+    const supportCount = levels.filter((level) => level === "support").length;
+    const adaptiveSummary = document.querySelector("#adaptive-summary");
+    if (!levels.length) adaptiveSummary.textContent = "아이의 최근 시도를 모은 뒤 알맞은 단계를 추천해요.";
+    else if (supportCount > challengeCount) adaptiveSummary.textContent = "천천히 성공을 쌓도록 그림 수와 단서를 부드럽게 조절하고 있어요.";
+    else if (challengeCount) adaptiveSummary.textContent = "익숙한 놀이에는 그림과 기억 카드를 늘려 한 단계 더 도전하고 있어요.";
+    else adaptiveSummary.textContent = "현재 기본 단계가 잘 맞아요. 성공과 어려움을 계속 살펴볼게요.";
+
     const insight = dailyProgress.lastPlayed ? GAMES[dailyProgress.lastPlayed] : null;
     document.querySelector("#parent-insight-text").textContent = insight
       ? insight.insight
@@ -1303,16 +1577,28 @@
 
     const list = document.querySelector("#parent-game-list");
     list.innerHTML = "";
-    Object.entries(GAMES).forEach(([key, game]) => {
-      const complete = Boolean(dailyProgress.completed[key]);
+    const playedGames = Object.entries(learnerProfile.gameStats)
+      .filter(([key, stats]) => GAMES[key] && stats.attempts)
+      .sort((a, b) => (b[1].attempts || 0) - (a[1].attempts || 0))
+      .slice(0, 12);
+    playedGames.forEach(([key, stats]) => {
+      const game = GAMES[key];
+      const complete = Boolean(learnerProfile.completed[key]);
+      const accuracy = stats.attempts ? Math.round((stats.correct / stats.attempts) * 100) : 0;
       const item = document.createElement("div");
       item.className = "parent-game-item";
       item.innerHTML = `
         <span class="parent-game-icon" aria-hidden="true">${game.icon}</span>
         <span><strong>${game.title}</strong><small>${game.skill}</small></span>
-        <span class="game-state ${complete ? "complete" : ""}">${complete ? "만났어요" : "아직이에요"}</span>`;
+        <span class="game-state ${complete ? "complete" : ""}">${complete ? `${accuracy}% · 완료` : `${stats.attempts}번 시도`}</span>`;
       list.appendChild(item);
     });
+    if (!playedGames.length) {
+      const empty = document.createElement("p");
+      empty.className = "parent-list-empty";
+      empty.textContent = "첫 놀이를 시작하면 이곳에 자세한 기록이 보여요.";
+      list.appendChild(empty);
+    }
 
     const offline = insight?.offline || GAMES.colors.offline;
     document.querySelector("#offline-tip-title").textContent = offline.title;
@@ -1514,6 +1800,22 @@
     applyCatalogView();
   });
 
+  document.querySelectorAll("[data-world]").forEach((world) => {
+    world.addEventListener("click", () => {
+      const filter = document.querySelector(`.filter-chip[data-filter="${world.dataset.world}"]`);
+      filter?.click();
+      document.querySelector("#games")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+
+  document.querySelector("#open-growth-report").addEventListener("click", openParentDialog);
+
+  document.querySelector("#child-nickname").addEventListener("input", (event) => {
+    const nickname = event.currentTarget.value.trim().slice(0, 10);
+    learnerProfile.nickname = nickname || "꼬마 탐험가";
+    saveLearnerProfile();
+  });
+
   const stretchButton = document.querySelector("#stretch-button");
   stretchButton.addEventListener("click", () => {
     const promised = stretchButton.classList.toggle("promised");
@@ -1560,6 +1862,7 @@
   }, { passive: true });
 
   updateTodayCard();
+  updatePremiumDashboard();
   updateSoundButton();
   updateMusicControls();
   cachePlayElements();

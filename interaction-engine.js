@@ -481,9 +481,10 @@
   }
 
   function renderSpot(context) {
-    const { controller, stage, game, round, roundIndex, seed, onComplete, onMistake, announce } = context;
+    const { controller, stage, game, round, roundIndex, difficulty, seed, onComplete, onMistake, announce } = context;
     const correct = correctOption(round);
-    const desiredCount = [4, 5, 6][Math.min(2, roundIndex || 0)];
+    const baseCount = [4, 5, 6][Math.min(2, roundIndex || 0)];
+    const desiredCount = Math.max(3, Math.min(6, baseCount + (difficulty === "challenge" ? 1 : difficulty === "support" ? -1 : 0)));
     const optionVisuals = new Set(round.options.map((option) => cleanVisual(option.visual)));
     const sceneDistractors = (round.scene || [])
       .map(cleanVisual)
@@ -739,9 +740,10 @@
   }
 
   function renderMemory(context) {
-    const { controller, stage, round, roundIndex, seed, onAttempt, onComplete, onMistake, announce } = context;
+    const { controller, stage, round, roundIndex, difficulty, seed, onAttempt, onComplete, onMistake, announce } = context;
     const requested = correctOption(round);
-    const desiredCount = [3, 4, 6][Math.min(2, roundIndex || 0)];
+    const baseCount = [3, 4, 6][Math.min(2, roundIndex || 0)];
+    const desiredCount = Math.max(3, Math.min(6, baseCount + (difficulty === "challenge" ? 1 : difficulty === "support" ? -1 : 0)));
     const indexedOptions = round.options.map((option, optionIndex) => ({ option, optionIndex }));
     const wrongCards = indexedOptions.filter((card) => card.option !== requested);
     const cardPool = [...indexedOptions];
@@ -781,8 +783,8 @@
         if (locked || button.disabled) return;
         button.classList.add("is-open");
         button.setAttribute("aria-label", optionName(card.option));
-        onAttempt();
         if (card.option === requested) {
+          onAttempt(true);
           locked = true;
           button.disabled = true;
           button.classList.add("is-matched");

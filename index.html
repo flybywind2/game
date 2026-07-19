@@ -14,7 +14,8 @@
     <link rel="stylesheet" href="./styles.css?v=5" />
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
-    <link rel="stylesheet" href="./interactions.css?v=14" />
+    <link rel="stylesheet" href="./interactions.css?v=15" />
+    <link rel="stylesheet" href="./premium.css?v=1" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -96,6 +97,71 @@
           <span class="stamp" data-stamp="2">★</span>
         </div>
         <p class="today-status" id="today-status" aria-live="polite">아직 시작 전이에요</p>
+      </section>
+
+      <section class="adventure-hub container" aria-labelledby="adventure-title">
+        <header class="adventure-heading">
+          <div class="explorer-profile">
+            <span class="explorer-avatar" aria-hidden="true"><img src="./assets/generated/favicon.png" alt="" width="96" height="96" /></span>
+            <div>
+              <span class="section-kicker">나의 몽글 마을</span>
+              <h2 id="adventure-title"><span id="explorer-name">꼬마 탐험가</span>의 모험 지도</h2>
+            </div>
+          </div>
+          <div class="level-card" aria-label="탐험 레벨과 경험치">
+            <span>LEVEL <strong id="explorer-level">1</strong></span>
+            <div class="xp-track" aria-hidden="true"><span id="explorer-xp-bar"></span></div>
+            <small><span id="explorer-xp">0</span> XP · 다음 레벨까지 <span id="explorer-xp-next">300</span></small>
+          </div>
+        </header>
+
+        <div class="world-map" id="world-map" aria-label="영역별 모험 진행도">
+          <button class="world-card world-look" type="button" data-world="look">
+            <img src="./assets/generated/game-look.webp" alt="색깔과 모양 숲" width="512" height="512" loading="lazy" />
+            <span><strong>반짝 관찰 숲</strong><small>보고 찾고 비교해요</small></span>
+            <span class="world-progress"><i></i><b>0%</b></span>
+          </button>
+          <button class="world-card world-number" type="button" data-world="number">
+            <img src="./assets/generated/game-number.webp" alt="수와 규칙 언덕" width="512" height="512" loading="lazy" />
+            <span><strong>차곡차곡 수 언덕</strong><small>세고 규칙을 만들어요</small></span>
+            <span class="world-progress"><i></i><b>0%</b></span>
+          </button>
+          <button class="world-card world-word" type="button" data-world="word">
+            <img src="./assets/generated/game-word.webp" alt="말과 소리 마을" width="512" height="512" loading="lazy" />
+            <span><strong>재잘재잘 말 마을</strong><small>듣고 말하고 연결해요</small></span>
+            <span class="world-progress"><i></i><b>0%</b></span>
+          </button>
+          <button class="world-card world-heart" type="button" data-world="heart">
+            <img src="./assets/generated/game-heart.webp" alt="마음과 생활 정원" width="512" height="512" loading="lazy" />
+            <span><strong>포근포근 마음 정원</strong><small>마음과 생활을 익혀요</small></span>
+            <span class="world-progress"><i></i><b>0%</b></span>
+          </button>
+        </div>
+
+        <div class="sticker-shelf">
+          <div>
+            <span class="sticker-label">모은 스티커</span>
+            <strong><span id="sticker-count">0</span> / 101</strong>
+            <p id="sticker-message">첫 놀이를 끝내고 몽글 스티커를 받아요!</p>
+          </div>
+          <div class="sticker-preview" id="sticker-preview" aria-label="최근에 모은 스티커">
+            <span class="empty-sticker">?</span><span class="empty-sticker">?</span><span class="empty-sticker">?</span><span class="empty-sticker">?</span><span class="empty-sticker">?</span>
+          </div>
+          <button class="report-shortcut" id="open-growth-report" type="button">성장 리포트 보기 <span aria-hidden="true">→</span></button>
+        </div>
+      </section>
+
+      <section class="story-journey container" aria-labelledby="story-journey-title">
+        <header class="story-journey-heading">
+          <div>
+            <span class="section-kicker">프리미엄 이야기 코스</span>
+            <h2 id="story-journey-title">몽글이의 반짝이는 하루</h2>
+            <p>열 가지 놀이가 한 편의 모험처럼 이어져요.</p>
+          </div>
+          <div class="story-progress-summary"><strong id="story-completed-count">0</strong><span>/ 10 이야기</span></div>
+        </header>
+        <div class="story-path" id="story-path" aria-label="열 가지 이야기 모험"></div>
+        <button class="story-continue" id="story-continue" type="button"><span>첫 이야기 시작</span><b aria-hidden="true">→</b></button>
       </section>
 
       <section class="games-section" id="games" aria-labelledby="games-title">
@@ -401,6 +467,26 @@
           </div>
         </div>
 
+        <section class="child-profile-settings" aria-labelledby="child-profile-title">
+          <div>
+            <span class="profile-settings-icon" aria-hidden="true">☺</span>
+            <span><strong id="child-profile-title">아이 애칭</strong><small>이 기기에만 저장되며 언제든 바꿀 수 있어요.</small></span>
+          </div>
+          <label><span class="sr-only">아이 애칭</span><input id="child-nickname" type="text" maxlength="10" autocomplete="off" value="꼬마 탐험가" /></label>
+        </section>
+
+        <section class="growth-report" aria-labelledby="growth-report-title">
+          <div class="growth-report-heading">
+            <div><span class="section-kicker">누적 성장 리포트</span><h3 id="growth-report-title">네 가지 힘이 자라고 있어요</h3></div>
+            <span class="growth-level">LEVEL <strong id="parent-level">1</strong></span>
+          </div>
+          <div class="growth-skill-list" id="growth-skill-list"></div>
+          <div class="adaptive-note">
+            <span aria-hidden="true">✦</span>
+            <p><strong>맞춤 난이도</strong><span id="adaptive-summary">아이의 최근 시도를 모은 뒤 알맞은 단계를 추천해요.</span></p>
+          </div>
+        </section>
+
         <section class="audio-settings" aria-labelledby="music-settings-title">
           <div class="audio-settings-heading">
             <div>
@@ -441,7 +527,7 @@
 
         <div class="parent-note">
           <p><strong>안심하세요.</strong> 이름·사진·음성은 수집하지 않으며, 놀이 기록은 이 기기에만 저장됩니다. 음성 안내는 Supertonic 3 F1로 생성된 AI 음성입니다.</p>
-          <button id="reset-progress" type="button">기록 지우기</button>
+          <button id="reset-progress" type="button">오늘 기록 지우기</button>
         </div>
       </div>
     </dialog>
@@ -450,7 +536,7 @@
 
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
-    <script src="./interaction-engine.js?v=14"></script>
-    <script src="./app.js?v=15"></script>
+    <script src="./interaction-engine.js?v=15"></script>
+    <script src="./app.js?v=17"></script>
   </body>
 </html>
