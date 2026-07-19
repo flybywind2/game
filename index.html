@@ -19,8 +19,8 @@
     <link rel="stylesheet" href="./styles.css?v=8" />
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
-    <link rel="stylesheet" href="./interactions.css?v=21" />
-    <link rel="stylesheet" href="./premium.css?v=16" />
+    <link rel="stylesheet" href="./interactions.css?v=22" />
+    <link rel="stylesheet" href="./premium.css?v=18" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -626,17 +626,25 @@
         </section>
 
         <section class="offline-settings" aria-labelledby="offline-settings-title">
-          <div>
+          <div class="offline-settings-heading">
             <span class="offline-settings-icon" aria-hidden="true">⌂</span>
             <span><strong id="offline-settings-title">홈 화면 앱 · 오프라인 놀이</strong><small id="offline-ready-status">오프라인 준비 상태를 확인하고 있어요.</small></span>
           </div>
           <button id="install-app" type="button" hidden>앱으로 설치</button>
+          <div class="offline-voice-pack">
+            <span><strong>F1 오프라인 음성팩</strong><small id="offline-voice-status" role="status">음성 저장 상태를 확인하고 있어요.</small></span>
+            <progress id="offline-voice-progress" value="0" max="703" aria-label="오프라인 음성팩 준비 진행" hidden></progress>
+            <div class="offline-voice-actions">
+              <button id="download-offline-voice" type="button" hidden>오프라인 음성팩 받기</button>
+              <button id="remove-offline-voice" type="button" hidden>음성팩 지우기</button>
+            </div>
+          </div>
         </section>
 
         <section class="support-settings" aria-labelledby="support-settings-title">
           <div class="support-settings-heading">
             <span class="support-settings-icon" aria-hidden="true">?</span>
-            <span><strong id="support-settings-title">도움말 · 기기 점검</strong><small>몽글 놀이터 1.0.0 · 빌드 2026.07.19.2</small></span>
+            <span><strong id="support-settings-title">도움말 · 기기 점검</strong><small>몽글 놀이터 1.0.0 · 빌드 2026.07.19.5</small></span>
           </div>
           <p id="support-status" role="status">소리를 직접 확인하거나 개인정보 없는 문제 해결 정보를 복사할 수 있어요.</p>
           <div class="support-actions">
@@ -719,7 +727,7 @@
 
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
-    <script src="./interaction-engine.js?v=29"></script>
-    <script src="./app.js?v=47"></script>
+    <script src="./interaction-engine.js?v=30"></script>
+    <script src="./app.js?v=49"></script>
   </body>
 </html>

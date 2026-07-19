@@ -1,4 +1,5 @@
-const CACHE_VERSION = "mongle-premium-v44";
+const CACHE_VERSION = "mongle-premium-v47";
+const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,12 +7,12 @@ const APP_SHELL = [
   "./styles.css?v=8",
   "./enhancements.css?v=1",
   "./catalog.css?v=1",
-  "./interactions.css?v=21",
-  "./premium.css?v=16",
+  "./interactions.css?v=22",
+  "./premium.css?v=18",
   "./extra-games.js?v=5",
   "./tts-manifest.js?v=4",
-  "./interaction-engine.js?v=29",
-  "./app.js?v=47",
+  "./interaction-engine.js?v=30",
+  "./app.js?v=49",
   "./assets/generated/favicon.png",
   "./assets/generated/app-icon-192.png",
   "./assets/generated/app-icon-512.png",
@@ -30,7 +31,8 @@ const APP_SHELL = [
   "./assets/generated/story/chapter-08-body-mission.webp",
   "./assets/generated/story/chapter-09-feelings.webp",
   "./assets/generated/story/chapter-10-bedtime.webp",
-  "./audio/music/mongle-meadow.mp3?v=2"
+  "./audio/music/mongle-meadow.mp3?v=2",
+  "./audio/tts/475d88a95a439ca6.mp3"
 ];
 
 self.addEventListener("install", (event) => {
@@ -44,7 +46,9 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key))))
+      .then((keys) => Promise.all(keys
+        .filter((key) => key !== CACHE_VERSION && key !== VOICE_PACK_CACHE)
+        .map((key) => caches.delete(key))))
       .then(() => self.clients.claim()),
   );
 });

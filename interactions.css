@@ -481,6 +481,7 @@ body.is-keyboard-nav .count-piece:focus {
 .memory-preview-note {
   margin: 0;
   padding: 10px 16px;
+  border: 2px solid #efd270;
   border-radius: 999px;
   background: #fff2b8;
   color: #76561d;
@@ -572,7 +573,17 @@ body.is-keyboard-nav .count-piece:focus {
 }
 
 .memory-start {
-  min-width: min(100%, 220px);
+  width: min(100%, 360px);
+  min-height: 62px;
+  padding-inline: 18px;
+  line-height: 1.25;
+}
+
+.mode-memory[data-phase="preview"] .memory-board {
+  padding: 8px;
+  border: 3px dashed rgba(239, 184, 78, 0.65);
+  border-radius: 30px;
+  background: rgba(255, 249, 226, 0.72);
 }
 
 .memory-card.is-matched {

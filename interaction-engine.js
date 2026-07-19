@@ -885,7 +885,7 @@
     const previewNote = document.createElement("p");
     previewNote.className = "memory-preview-note";
     previewNote.setAttribute("aria-live", "polite");
-    previewNote.textContent = "먼저 그림을 보여줄게요. 어디에 있는지 기억해요!";
+    previewNote.textContent = "시작 전 한 번 보기 · 그림과 자리를 천천히 기억해요!";
     const board = document.createElement("div");
     board.className = "memory-board memory-pair-board";
     board.dataset.cardCount = String(cards.length);
@@ -897,8 +897,9 @@
     const startButton = document.createElement("button");
     startButton.type = "button";
     startButton.className = "activity-confirm memory-start";
-    startButton.textContent = "다 봤어요! 시작";
-    startButton.setAttribute("aria-label", "그림을 모두 기억했어요. 카드 짝맞추기 시작");
+    startButton.textContent = "그림을 다 봤어요! 카드 덮고 시작";
+    startButton.setAttribute("aria-label", "그림과 자리를 모두 기억했어요. 카드를 덮고 짝맞추기 시작");
+    stage.dataset.phase = "preview";
 
     cards.forEach((card, index) => {
       const button = document.createElement("button");
@@ -972,6 +973,7 @@
         button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
       });
       locked = false;
+      stage.dataset.phase = "play";
       previewNote.textContent = "이제 카드를 두 장씩 뒤집어 같은 그림을 찾아요.";
       announce("그림을 모두 덮었어요. 같은 그림 두 장을 찾아요.");
     };
@@ -987,6 +989,7 @@
     const previewCards = () => {
       if (locked) return;
       locked = true;
+      stage.dataset.phase = "preview";
       first = null;
       cardButtons.forEach((button) => {
         if (button.classList.contains("is-matched")) return;
@@ -1004,9 +1007,9 @@
     return {
       requiredActions: pairOptions.length * 2,
       completion: "같은 그림 " + pairOptions.length + "쌍을 모두 찾았어!",
-      prompt: "같은 그림 두 장을 찾아 짝을 모두 맞춰 볼까?",
-      helper: "한 번에 두 장씩 뒤집고 자리를 기억해요.",
-      speech: "먼저 그림 위치를 보여줄게요. 어디에 있는지 기억한 뒤 같은 그림 두 장씩 찾아 보자.",
+      prompt: "먼저 보이는 그림과 자리를 기억해요!",
+      helper: "시작하기 전에 모든 카드를 앞면으로 한 번 보여줘요.",
+      speech: "시작하기 전에 모든 그림을 한 번 보여줄게요. 어디에 있는지 천천히 기억한 뒤 카드 덮고 시작 버튼을 눌러요.",
       hint: () => {
         const source = first || cardButtons.find((item) => !item.disabled);
         const match = source && cardButtons.find((item) => item !== source && !item.disabled && item.dataset.pair === source.dataset.pair);

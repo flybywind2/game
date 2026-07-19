@@ -583,7 +583,8 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.19.2";
+  const APP_BUILD = "2026.07.19.5";
+  const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
   const CATEGORY_NAMES = Object.freeze({
@@ -682,6 +683,8 @@
   let playExtensionMinutes = 0;
   let playAccumulatedMs = 0;
   let playActiveSince = 0;
+  let voicePackCachedCount = 0;
+  let voicePackTotal = new Set(Object.values(window.MONGLE_TTS_AUDIO || {})).size;
 
   function todayKey() {
     const now = new Date();
@@ -796,6 +799,7 @@
       `접속 상태: ${navigator.onLine ? "온라인" : "오프라인"}`,
       `실행 방식: ${standalone ? "홈 화면 앱" : "브라우저"}`,
       `오프라인 상태: ${serviceWorker}`,
+      `오프라인 음성팩: ${voicePackCachedCount}/${voicePackTotal}`,
       `콘텐츠: ${Object.keys(GAMES).length}개 놀이`,
       `화면: ${window.innerWidth} × ${window.innerHeight}`,
       `말소리: ${soundEnabled ? "켬" : "끔"}`,
@@ -803,6 +807,123 @@
       `로컬 저장: ${storage}`,
       "개인정보: 애칭·진도·관찰 기록 미포함",
     ].join("\n");
+  }
+
+  function voicePackSources() {
+    return [...new Set(Object.values(window.MONGLE_TTS_AUDIO || {}))]
+      .map((source) => new URL(source, document.baseURI).href);
+  }
+
+  async function renderVoicePackState() {
+    const status = document.querySelector("#offline-voice-status");
+    const progress = document.querySelector("#offline-voice-progress");
+    const download = document.querySelector("#download-offline-voice");
+    const remove = document.querySelector("#remove-offline-voice");
+    voicePackTotal = voicePackSources().length;
+    if (!("caches" in window)) {
+      status.textContent = "이 브라우저에서는 오프라인 음성팩을 저장할 수 없어요.";
+      download.hidden = true;
+      remove.hidden = true;
+      progress.hidden = true;
+      return;
+    }
+    try {
+      const cache = await caches.open(VOICE_PACK_CACHE);
+      const requests = await cache.keys();
+      const allowed = new Set(voicePackSources());
+      voicePackCachedCount = requests.filter((request) => allowed.has(request.url)).length;
+    } catch {
+      voicePackCachedCount = 0;
+    }
+    progress.max = Math.max(1, voicePackTotal);
+    progress.value = voicePackCachedCount;
+    progress.hidden = false;
+    download.hidden = false;
+    remove.hidden = voicePackCachedCount === 0;
+    const ready = voicePackCachedCount >= voicePackTotal && voicePackTotal > 0;
+    document.querySelector(".offline-voice-pack").classList.toggle("is-ready", ready);
+    if (ready) {
+      status.textContent = `F1 음성 ${voicePackTotal}개가 모두 준비됐어요. 인터넷 없이도 같은 목소리로 들을 수 있어요.`;
+      download.textContent = "음성팩 준비 완료";
+      download.hidden = true;
+      download.disabled = true;
+    } else {
+      status.textContent = voicePackCachedCount
+        ? `${voicePackCachedCount}/${voicePackTotal}개 준비됨 · 다시 누르면 이어받아요.`
+        : `전체 F1 음성 ${voicePackTotal}개 · 약 38MB · Wi-Fi에서 선택해 받아요.`;
+      download.textContent = voicePackCachedCount ? "음성팩 이어받기" : "오프라인 음성팩 받기";
+      download.disabled = false;
+    }
+  }
+
+  async function downloadOfflineVoicePack() {
+    const button = document.querySelector("#download-offline-voice");
+    const status = document.querySelector("#offline-voice-status");
+    const progress = document.querySelector("#offline-voice-progress");
+    if (!navigator.onLine) {
+      status.textContent = "음성팩을 받으려면 인터넷에 연결해 주세요.";
+      return;
+    }
+    if (!window.confirm("F1 음성 703개를 오프라인용으로 받을까요? 약 38MB의 저장 공간을 사용합니다.")) return;
+    try {
+      const estimate = await navigator.storage?.estimate?.();
+      if (estimate?.quota && estimate?.usage && estimate.quota - estimate.usage < 45 * 1024 * 1024) {
+        status.textContent = "저장 공간이 부족해요. 약 45MB를 비운 뒤 다시 시도해 주세요.";
+        return;
+      }
+      const sources = voicePackSources();
+      const cache = await caches.open(VOICE_PACK_CACHE);
+      const cached = new Set((await cache.keys()).map((request) => request.url));
+      const queue = sources.filter((source) => !cached.has(source));
+      let completed = sources.length - queue.length;
+      let failed = 0;
+      button.disabled = true;
+      progress.max = Math.max(1, sources.length);
+      progress.value = completed;
+      status.textContent = `${completed}/${sources.length}개 준비 중… 화면을 닫지 말아 주세요.`;
+      const updateProgress = () => {
+        voicePackCachedCount = completed;
+        voicePackTotal = sources.length;
+        progress.value = completed;
+        status.textContent = `${completed}/${sources.length}개 준비 중…${failed ? ` ${failed}개 다시 시도 필요` : ""}`;
+      };
+      let cursor = 0;
+      const worker = async () => {
+        while (cursor < queue.length) {
+          const source = queue[cursor];
+          cursor += 1;
+          try {
+            const response = await fetch(source);
+            if (!response.ok) throw new Error("voice download failed");
+            await cache.put(source, response.clone());
+            completed += 1;
+          } catch {
+            failed += 1;
+          }
+          if ((completed + failed) % 5 === 0 || completed + failed === sources.length) updateProgress();
+        }
+      };
+      await Promise.all(Array.from({ length: Math.min(6, Math.max(1, queue.length)) }, worker));
+      await renderVoicePackState();
+      if (failed) status.textContent = `${completed}/${sources.length}개를 준비했어요. 다시 누르면 남은 음성을 이어받아요.`;
+      else showToast("오프라인 F1 음성팩 준비를 마쳤어요.");
+    } catch {
+      status.textContent = "음성팩을 준비하지 못했어요. 연결과 저장 공간을 확인한 뒤 다시 시도해 주세요.";
+    } finally {
+      button.disabled = voicePackTotal > 0 && voicePackCachedCount >= voicePackTotal;
+    }
+  }
+
+  async function removeOfflineVoicePack() {
+    if (!window.confirm("저장된 오프라인 F1 음성팩을 지울까요? 온라인에서는 계속 음성을 들을 수 있어요.")) return;
+    try {
+      await caches.delete(VOICE_PACK_CACHE);
+      voicePackCachedCount = 0;
+      await renderVoicePackState();
+      showToast("오프라인 음성팩을 지웠어요.");
+    } catch {
+      document.querySelector("#offline-voice-status").textContent = "음성팩을 지우지 못했어요. 브라우저 저장 공간을 확인해 주세요.";
+    }
   }
 
   async function copySupportDiagnostics() {
@@ -3280,6 +3401,8 @@
   document.querySelector("#erase-all-data").addEventListener("click", eraseAllLocalData);
   document.querySelector("#test-parent-audio").addEventListener("click", runAudioCheck);
   document.querySelector("#copy-support-diagnostics").addEventListener("click", copySupportDiagnostics);
+  document.querySelector("#download-offline-voice").addEventListener("click", downloadOfflineVoicePack);
+  document.querySelector("#remove-offline-voice").addEventListener("click", removeOfflineVoicePack);
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
@@ -3313,6 +3436,7 @@
   updateSoundButton();
   updateMusicControls();
   renderPlayLimitSettings();
+  renderVoicePackState();
   cachePlayElements();
   updateConnectionState();
 
