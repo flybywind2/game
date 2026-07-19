@@ -1,4 +1,4 @@
-/* Mongle v5: varied, touch-friendly activities for all 100 games. */
+/* Mongle v5: varied, touch-friendly activities for all 105 games. */
 (() => {
   "use strict";
 
@@ -14,6 +14,14 @@
     quantity: {
       label: "묶음 세어 고르기",
       instruction: "그림을 하나씩 눌러 세고 질문에 맞는 묶음이나 숫자를 골라요.",
+    },
+    add: {
+      label: "한 바구니로 더하기",
+      instruction: "양쪽 그림을 하나씩 눌러 가운데에 모두 모아요.",
+    },
+    subtract: {
+      label: "쏙 빼고 남기기",
+      instruction: "빼낼 그림만큼 하나씩 눌러 옮기고 남은 그림을 세어요.",
     },
     compare: {
       label: "두 무리 비교",
@@ -70,6 +78,8 @@
       "counting",
     ]),
     quantity: new Set(["extra016", "extra017", "extra018", "extra019", "extra020"]),
+    add: new Set(["extra090", "extra091"]),
+    subtract: new Set(["extra092", "extra093"]),
     countCompare: new Set(["extra021", "extra022"]),
     connect: new Set([
       "sounds",
@@ -922,6 +932,182 @@
         pulse(uncounted ? [uncounted, target.group] : [target?.select]);
       },
       replay: () => pulse(targets.map((target) => target.group), "is-replay"),
+    };
+  }
+
+  function mathFormula(left, operator, right) {
+    const formula = document.createElement("div");
+    formula.className = "math-formula";
+    formula.setAttribute("aria-label", `${left} ${operator === "+" ? "더하기" : "빼기"} ${right}는 무엇일까요?`);
+    [left, operator, right, "=", "?"].forEach((value, index) => {
+      const cell = document.createElement("span");
+      cell.textContent = String(value);
+      if (index === 4) cell.dataset.mathResult = "true";
+      formula.appendChild(cell);
+    });
+    return formula;
+  }
+
+  function renderAdd(context) {
+    const { controller, stage, round, onComplete, onProgress, announce } = context;
+    const operation = round.operation || {};
+    const left = Math.max(1, Math.min(4, Number(operation.left) || 1));
+    const right = Math.max(1, Math.min(5 - left, Number(operation.right) || 1));
+    const total = left + right;
+    const item = cleanVisual(operation.item || "⭐");
+    const formula = mathFormula(left, "+", right);
+    const workspace = document.createElement("div");
+    workspace.className = "math-workspace add-workspace";
+    const basket = document.createElement("section");
+    basket.className = "math-result-basket";
+    basket.innerHTML = '<strong>모두 모으는 바구니</strong><div class="math-result-items" aria-hidden="true"></div><span class="math-live-count">0개</span>';
+    basket.setAttribute("aria-label", "현재 가운데 바구니에 0개");
+    const resultItems = basket.querySelector(".math-result-items");
+    const liveCount = basket.querySelector(".math-live-count");
+    const pieceButtons = [];
+    let moved = 0;
+
+    const makeGroup = (count, label) => {
+      const group = document.createElement("section");
+      group.className = "math-add-group";
+      const heading = document.createElement("strong");
+      heading.textContent = `${label} ${count}개`;
+      const pieces = document.createElement("div");
+      pieces.className = "math-pieces";
+      Array.from({ length: count }, (_, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "math-piece";
+        button.textContent = item;
+        button.setAttribute("aria-label", `${label}의 ${index + 1}번째 그림을 가운데로 옮기기`);
+        controller.on(button, "click", () => {
+          if (button.disabled) return;
+          button.disabled = true;
+          button.classList.add("is-moved");
+          const movedItem = document.createElement("span");
+          movedItem.textContent = item;
+          resultItems.appendChild(movedItem);
+          moved += 1;
+          liveCount.textContent = `${moved}개`;
+          basket.setAttribute("aria-label", `현재 가운데 바구니에 ${moved}개`);
+          onProgress("prompt");
+          announce(`${moved}개를 모았어요.`);
+          if (moved === total) {
+            confirm.disabled = false;
+            confirm.textContent = `${total}개, 모두 모았어요!`;
+            basket.classList.add("is-ready");
+          }
+        });
+        pieces.appendChild(button);
+        pieceButtons.push(button);
+      });
+      group.append(heading, pieces);
+      return group;
+    };
+
+    const leftGroup = makeGroup(left, "첫 무리");
+    const rightGroup = makeGroup(right, "둘째 무리");
+    const plus = document.createElement("span");
+    plus.className = "math-workspace-sign";
+    plus.textContent = "+";
+    workspace.append(leftGroup, plus, rightGroup, basket);
+    const confirm = document.createElement("button");
+    confirm.type = "button";
+    confirm.className = "activity-confirm math-confirm";
+    confirm.textContent = "그림을 모두 모아 봐요";
+    confirm.disabled = true;
+    controller.on(confirm, "click", () => {
+      if (confirm.disabled) return;
+      formula.querySelector("[data-math-result]").textContent = String(total);
+      formula.classList.add("is-solved");
+      announce(`${left} 더하기 ${right}은 ${total}이에요.`);
+      onComplete(confirm);
+    });
+    stage.append(formula, workspace, confirm);
+    return {
+      requiredActions: total + 1,
+      completion: round.success,
+      hint: () => pulse(pieceButtons.find((button) => !button.disabled) || confirm),
+      replay: () => pulse([leftGroup, rightGroup, basket], "is-replay"),
+    };
+  }
+
+  function renderSubtract(context) {
+    const { controller, stage, round, onComplete, onProgress, announce } = context;
+    const operation = round.operation || {};
+    const start = Math.max(1, Math.min(5, Number(operation.start) || 2));
+    const take = Math.max(1, Math.min(start, Number(operation.take) || 1));
+    const remaining = start - take;
+    const item = cleanVisual(operation.item || "⭐");
+    const formula = mathFormula(start, "−", take);
+    const workspace = document.createElement("div");
+    workspace.className = "math-workspace subtract-workspace";
+    const startGroup = document.createElement("section");
+    startGroup.className = "math-subtract-group";
+    const heading = document.createElement("strong");
+    heading.textContent = `처음에는 ${start}개`;
+    const pieces = document.createElement("div");
+    pieces.className = "math-pieces subtract-pieces";
+    const takeBox = document.createElement("section");
+    takeBox.className = "math-take-box";
+    takeBox.innerHTML = `<strong>${take}개를 이쪽으로 빼요</strong><div class="math-taken-items" aria-hidden="true"></div><span class="math-live-count">0 / ${take}</span>`;
+    const takenItems = takeBox.querySelector(".math-taken-items");
+    const liveCount = takeBox.querySelector(".math-live-count");
+    const pieceButtons = [];
+    let removed = 0;
+
+    Array.from({ length: start }, (_, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "math-piece";
+      button.textContent = item;
+      button.setAttribute("aria-label", `${index + 1}번째 그림 빼내기`);
+      controller.on(button, "click", () => {
+        if (button.disabled || removed >= take) return;
+        button.disabled = true;
+        button.classList.add("is-removed");
+        const movedItem = document.createElement("span");
+        movedItem.textContent = item;
+        takenItems.appendChild(movedItem);
+        removed += 1;
+        liveCount.textContent = `${removed} / ${take}`;
+        onProgress("prompt");
+        announce(`${removed}개를 뺐어요.`);
+        if (removed === take) {
+          pieceButtons.filter((piece) => !piece.disabled).forEach((piece) => piece.classList.add("is-remaining"));
+          confirm.disabled = false;
+          confirm.textContent = "남은 그림을 다 셌어요!";
+          takeBox.classList.add("is-ready");
+          announce(`${take}개를 모두 뺐어요. 남은 그림을 세어 봐요.`);
+        }
+      });
+      pieces.appendChild(button);
+      pieceButtons.push(button);
+    });
+    startGroup.append(heading, pieces);
+    const arrow = document.createElement("span");
+    arrow.className = "math-workspace-sign";
+    arrow.textContent = "→";
+    workspace.append(startGroup, arrow, takeBox);
+    const confirm = document.createElement("button");
+    confirm.type = "button";
+    confirm.className = "activity-confirm math-confirm";
+    confirm.textContent = `${take}개를 하나씩 빼 봐요`;
+    confirm.disabled = true;
+    controller.on(confirm, "click", () => {
+      if (confirm.disabled) return;
+      formula.querySelector("[data-math-result]").textContent = String(remaining);
+      formula.classList.add("is-solved");
+      startGroup.classList.add("is-counted-result");
+      announce(`${start} 빼기 ${take}는 ${remaining}이에요.`);
+      onComplete(confirm);
+    });
+    stage.append(formula, workspace, confirm);
+    return {
+      requiredActions: take + 1,
+      completion: round.success,
+      hint: () => pulse(pieceButtons.find((button) => !button.disabled) || confirm),
+      replay: () => pulse([startGroup, takeBox], "is-replay"),
     };
   }
 
@@ -3388,6 +3574,8 @@
   const RENDERERS = Object.freeze({
     count: renderCount,
     quantity: renderQuantity,
+    add: renderAdd,
+    subtract: renderSubtract,
     countCompare: renderCountCompare,
     compare: renderCompare,
     connect: renderConnect,
@@ -3427,6 +3615,8 @@
     const minimumActions = {
       count: 2,
       quantity: 2,
+      add: 3,
+      subtract: 2,
       countCompare: 4,
       compare: 3,
       connect: 4,

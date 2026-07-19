@@ -1,4 +1,4 @@
-const CACHE_VERSION = "mongle-premium-v54";
+const CACHE_VERSION = "mongle-premium-v58";
 const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
 const APP_SHELL = [
   "./",
@@ -7,12 +7,12 @@ const APP_SHELL = [
   "./styles.css?v=8",
   "./enhancements.css?v=1",
   "./catalog.css?v=1",
-  "./interactions.css?v=25",
+  "./interactions.css?v=28",
   "./premium.css?v=22",
-  "./extra-games.js?v=6",
-  "./tts-manifest.js?v=4",
-  "./interaction-engine.js?v=33",
-  "./app.js?v=55",
+  "./extra-games.js?v=7",
+  "./tts-manifest.js?v=5",
+  "./interaction-engine.js?v=34",
+  "./app.js?v=56",
   "./assets/generated/favicon.png",
   "./assets/generated/app-icon-192.png",
   "./assets/generated/app-icon-512.png",
@@ -82,12 +82,33 @@ async function cachedAssetResponse(request) {
   }
 }
 
+async function voiceAssetResponse(request) {
+  const voiceCache = await caches.open(VOICE_PACK_CACHE);
+  const downloaded = await voiceCache.match(request);
+  if (downloaded) return downloaded;
+  const shellCache = await caches.open(CACHE_VERSION);
+  const bundledCheckVoice = await shellCache.match(request);
+  if (bundledCheckVoice) return bundledCheckVoice;
+  try {
+    return await fetch(request);
+  } catch {
+    return new Response("오프라인 음성팩에 아직 저장되지 않은 문장이에요.", {
+      status: 503,
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
+  }
+}
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
   if (event.request.mode === "navigate") {
     event.respondWith(navigationResponse(event.request));
+    return;
+  }
+  if (url.pathname.includes("/audio/tts/")) {
+    event.respondWith(voiceAssetResponse(event.request));
     return;
   }
   event.respondWith(cachedAssetResponse(event.request));

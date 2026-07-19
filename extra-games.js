@@ -8442,7 +8442,415 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
         ]
       }
     ]
+  },
+  "extra090": {
+    "title": "하나 더 모아봐",
+    "icon": "➕",
+    "category": "number",
+    "cardColor": "coral",
+    "description": "두 작은 무리를 손으로 옮겨 한 바구니에 합쳐요.",
+    "duration": "3분",
+    "preview": [
+      "🍎",
+      "+",
+      "🍎"
+    ],
+    "skill": "합이 3 이하인 덧셈",
+    "insight": "식을 외우기보다 두 무리를 직접 한곳에 모으며 ‘모두 몇 개’를 경험해요.",
+    "offline": {
+      "title": "간식 두 접시 합치기",
+      "text": "두 접시의 작은 간식 무리를 빈 그릇 하나로 옮기며 모두 몇 개인지 세어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "양쪽 사과를 하나씩 눌러 가운데 바구니로 모아요.",
+        "prompt": "사과 한 개와 한 개를 모으면 모두 몇 개일까?",
+        "speech": "사과 한 개 더하기 한 개를 가운데로 모아 보자.",
+        "success": "하나 더하기 하나는 둘! 사과가 모두 두 개야!",
+        "operation": {
+          "type": "add",
+          "left": 1,
+          "right": 1,
+          "item": "🍎"
+        },
+        "options": [
+          {
+            "label": "숫자 1",
+            "visual": "1"
+          },
+          {
+            "label": "숫자 2",
+            "visual": "2",
+            "correct": true
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          }
+        ]
+      },
+      {
+        "helper": "왼쪽 딸기 둘과 오른쪽 딸기 하나를 모두 옮겨요.",
+        "prompt": "딸기 두 개에 한 개를 더하면 모두 몇 개일까?",
+        "speech": "딸기 두 개 더하기 한 개를 한곳에 모아 보자.",
+        "success": "둘 더하기 하나는 셋! 딸기가 모두 세 개야!",
+        "operation": {
+          "type": "add",
+          "left": 2,
+          "right": 1,
+          "item": "🍓"
+        },
+        "options": [
+          {
+            "label": "숫자 2",
+            "visual": "2"
+          },
+          {
+            "label": "숫자 4",
+            "visual": "4"
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "helper": "별 한 개와 별 두 개를 가운데로 차례로 옮겨요.",
+        "prompt": "별 한 개와 두 개를 모으면 모두 몇 개일까?",
+        "speech": "별 한 개 더하기 두 개를 모두 모아 보자.",
+        "success": "하나 더하기 둘도 셋! 별이 세 개가 되었어!",
+        "operation": {
+          "type": "add",
+          "left": 1,
+          "right": 2,
+          "item": "⭐"
+        },
+        "options": [
+          {
+            "label": "숫자 4",
+            "visual": "4"
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3",
+            "correct": true
+          },
+          {
+            "label": "숫자 2",
+            "visual": "2"
+          }
+        ]
+      }
+    ]
+  },
+  "extra091": {
+    "title": "다섯까지 합체",
+    "icon": "🧺",
+    "category": "number",
+    "cardColor": "yellow",
+    "description": "두 무리를 합쳐 네 개와 다섯 개를 만들어요.",
+    "duration": "3분",
+    "preview": [
+      "🐤🐤",
+      "+",
+      "🐤🐤"
+    ],
+    "skill": "합이 5 이하인 덧셈",
+    "insight": "각 무리를 따로 세고 다시 합친 전체를 세며 덧셈의 뜻을 익혀요.",
+    "offline": {
+      "title": "블록 합체 바구니",
+      "text": "블록 두 무리를 따로 놓은 뒤 한 바구니에 합쳐 다섯까지 세어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "병아리 두 마리씩 두 무리를 한 둥지로 모아요.",
+        "prompt": "병아리 두 마리와 두 마리가 만나면 모두 몇 마리일까?",
+        "speech": "병아리 둘 더하기 둘을 한 둥지로 모아 보자.",
+        "success": "둘 더하기 둘은 넷! 병아리가 네 마리야!",
+        "operation": {
+          "type": "add",
+          "left": 2,
+          "right": 2,
+          "item": "🐤"
+        },
+        "options": [
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          },
+          {
+            "label": "숫자 4",
+            "visual": "4",
+            "correct": true
+          },
+          {
+            "label": "숫자 5",
+            "visual": "5"
+          }
+        ]
+      },
+      {
+        "helper": "공 세 개와 공 한 개를 모두 운동장으로 옮겨요.",
+        "prompt": "공 세 개에 한 개가 더 오면 모두 몇 개일까?",
+        "speech": "공 세 개 더하기 한 개를 모두 모아 보자.",
+        "success": "셋 더하기 하나는 넷! 공이 네 개야!",
+        "operation": {
+          "type": "add",
+          "left": 3,
+          "right": 1,
+          "item": "⚽"
+        },
+        "options": [
+          {
+            "label": "숫자 5",
+            "visual": "5"
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          },
+          {
+            "label": "숫자 4",
+            "visual": "4",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "helper": "물고기 두 마리와 세 마리를 한 바다로 모아요.",
+        "prompt": "물고기 두 마리와 세 마리를 모으면 모두 몇 마리일까?",
+        "speech": "물고기 둘 더하기 셋을 한 바다로 모아 보자.",
+        "success": "둘 더하기 셋은 다섯! 물고기가 모두 다섯 마리야!",
+        "operation": {
+          "type": "add",
+          "left": 2,
+          "right": 3,
+          "item": "🐟"
+        },
+        "options": [
+          {
+            "label": "숫자 4",
+            "visual": "4"
+          },
+          {
+            "label": "숫자 5",
+            "visual": "5",
+            "correct": true
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          }
+        ]
+      }
+    ]
+  },
+  "extra092": {
+    "title": "하나 쏙 빼기",
+    "icon": "➖",
+    "category": "number",
+    "cardColor": "mint",
+    "description": "그림 하나를 직접 빼내고 남은 수를 세어요.",
+    "duration": "3분",
+    "preview": [
+      "🍪🍪",
+      "➖",
+      "🍪"
+    ],
+    "skill": "1을 빼는 뺄셈",
+    "insight": "‘없어졌다’보다 눈앞의 무리에서 하나를 옮기고 남은 수를 다시 세게 해 주세요.",
+    "offline": {
+      "title": "하나 배달하고 남기기",
+      "text": "블록 두세 개에서 하나를 다른 사람에게 건네고 몇 개 남았는지 세어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "쿠키 두 개 중 한 개를 간식 상자로 옮겨요.",
+        "prompt": "쿠키 두 개에서 한 개를 빼면 몇 개가 남을까?",
+        "speech": "쿠키 두 개에서 한 개를 쏙 빼 보자.",
+        "success": "둘 빼기 하나는 하나! 쿠키가 한 개 남았어!",
+        "operation": {
+          "type": "subtract",
+          "start": 2,
+          "take": 1,
+          "item": "🍪"
+        },
+        "options": [
+          {
+            "label": "숫자 2",
+            "visual": "2"
+          },
+          {
+            "label": "숫자 1",
+            "visual": "1",
+            "correct": true
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          }
+        ]
+      },
+      {
+        "helper": "자동차 세 대 중 한 대를 차고로 보내요.",
+        "prompt": "자동차 세 대에서 한 대가 가면 몇 대가 남을까?",
+        "speech": "자동차 세 대에서 한 대를 차고로 보내 보자.",
+        "success": "셋 빼기 하나는 둘! 자동차가 두 대 남았어!",
+        "operation": {
+          "type": "subtract",
+          "start": 3,
+          "take": 1,
+          "item": "🚗"
+        },
+        "options": [
+          {
+            "label": "숫자 1",
+            "visual": "1"
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          },
+          {
+            "label": "숫자 2",
+            "visual": "2",
+            "correct": true
+          }
+        ]
+      },
+      {
+        "helper": "꽃 네 송이 중 한 송이를 꽃병으로 옮겨요.",
+        "prompt": "꽃 네 송이에서 한 송이를 빼면 몇 송이가 남을까?",
+        "speech": "꽃 네 송이에서 한 송이를 옮겨 보자.",
+        "success": "넷 빼기 하나는 셋! 꽃이 세 송이 남았어!",
+        "operation": {
+          "type": "subtract",
+          "start": 4,
+          "take": 1,
+          "item": "🌼"
+        },
+        "options": [
+          {
+            "label": "숫자 4",
+            "visual": "4"
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3",
+            "correct": true
+          },
+          {
+            "label": "숫자 2",
+            "visual": "2"
+          }
+        ]
+      }
+    ]
+  },
+  "extra093": {
+    "title": "두 개 쏙 빼기",
+    "icon": "📤",
+    "category": "number",
+    "cardColor": "blue",
+    "description": "작은 무리에서 두 개를 빼내고 남은 수를 확인해요.",
+    "duration": "3분",
+    "preview": [
+      "⭐⭐⭐",
+      "➖",
+      "⭐⭐"
+    ],
+    "skill": "2를 빼는 뺄셈",
+    "insight": "빼낼 수만큼만 손으로 옮긴 뒤 남은 그림을 다시 짚어 세어요.",
+    "offline": {
+      "title": "두 개 다른 상자로",
+      "text": "장난감 세 개에서 두 개를 다른 상자로 옮기고 남은 장난감을 세어 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "별 세 개 중 두 개를 밤하늘 상자로 옮겨요.",
+        "prompt": "별 세 개에서 두 개를 빼면 몇 개가 남을까?",
+        "speech": "별 세 개에서 두 개를 하나씩 빼 보자.",
+        "success": "셋 빼기 둘은 하나! 별이 한 개 남았어!",
+        "operation": {
+          "type": "subtract",
+          "start": 3,
+          "take": 2,
+          "item": "⭐"
+        },
+        "options": [
+          {
+            "label": "숫자 2",
+            "visual": "2"
+          },
+          {
+            "label": "숫자 1",
+            "visual": "1",
+            "correct": true
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          }
+        ]
+      },
+      {
+        "helper": "사과 네 개 중 두 개를 장바구니로 옮겨요.",
+        "prompt": "사과 네 개에서 두 개를 빼면 몇 개가 남을까?",
+        "speech": "사과 네 개에서 두 개를 장바구니로 옮겨 보자.",
+        "success": "넷 빼기 둘은 둘! 사과가 두 개 남았어!",
+        "operation": {
+          "type": "subtract",
+          "start": 4,
+          "take": 2,
+          "item": "🍎"
+        },
+        "options": [
+          {
+            "label": "숫자 3",
+            "visual": "3"
+          },
+          {
+            "label": "숫자 2",
+            "visual": "2",
+            "correct": true
+          },
+          {
+            "label": "숫자 1",
+            "visual": "1"
+          }
+        ]
+      },
+      {
+        "helper": "블록 다섯 개 중 두 개를 정리 상자로 옮겨요.",
+        "prompt": "블록 다섯 개에서 두 개를 빼면 몇 개가 남을까?",
+        "speech": "블록 다섯 개에서 두 개를 정리 상자로 옮겨 보자.",
+        "success": "다섯 빼기 둘은 셋! 블록이 세 개 남았어!",
+        "operation": {
+          "type": "subtract",
+          "start": 5,
+          "take": 2,
+          "item": "🧱"
+        },
+        "options": [
+          {
+            "label": "숫자 2",
+            "visual": "2"
+          },
+          {
+            "label": "숫자 4",
+            "visual": "4"
+          },
+          {
+            "label": "숫자 3",
+            "visual": "3",
+            "correct": true
+          }
+        ]
+      }
+    ]
   }
 }
 );
-window.MONGLE_EXTRA_META = Object.freeze({ gameCount: 89, roundCount: 267 });
+window.MONGLE_EXTRA_META = Object.freeze({ gameCount: 93, roundCount: 279 });

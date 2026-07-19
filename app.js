@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.19.11";
+  const APP_BUILD = "2026.07.19.13";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -889,7 +889,7 @@
     } else {
       status.textContent = voicePackCachedCount
         ? `${voicePackCachedCount}/${voicePackTotal}개 준비됨 · 다시 누르면 이어받아요.`
-        : `전체 F1 음성 ${voicePackTotal}개 · 약 38MB · Wi-Fi에서 선택해 받아요.`;
+        : `전체 F1 음성 ${voicePackTotal}개 · 약 40MB · Wi-Fi에서 선택해 받아요.`;
       download.textContent = voicePackCachedCount ? "음성팩 이어받기" : "오프라인 음성팩 받기";
       download.disabled = false;
     }
@@ -903,11 +903,11 @@
       status.textContent = "음성팩을 받으려면 인터넷에 연결해 주세요.";
       return;
     }
-    if (!window.confirm("F1 음성 703개를 오프라인용으로 받을까요? 약 38MB의 저장 공간을 사용합니다.")) return;
+    if (!window.confirm(`F1 음성 ${voicePackTotal}개를 오프라인용으로 받을까요? 약 40MB의 저장 공간을 사용합니다.`)) return;
     try {
       const estimate = await navigator.storage?.estimate?.();
-      if (estimate?.quota && estimate?.usage && estimate.quota - estimate.usage < 45 * 1024 * 1024) {
-        status.textContent = "저장 공간이 부족해요. 약 45MB를 비운 뒤 다시 시도해 주세요.";
+      if (estimate?.quota && estimate?.usage && estimate.quota - estimate.usage < 50 * 1024 * 1024) {
+        status.textContent = "저장 공간이 부족해요. 약 50MB를 비운 뒤 다시 시도해 주세요.";
         return;
       }
       const sources = voicePackSources();
@@ -1106,7 +1106,7 @@
       nickname: nickname || "꼬마 탐험가",
       xp: safeWholeNumber(saved.xp, 9999999),
       completed,
-      stickers: Array.isArray(saved.stickers) ? [...new Set(saved.stickers.filter((key) => GAMES[key]))].slice(0, 101) : [],
+      stickers: Array.isArray(saved.stickers) ? [...new Set(saved.stickers.filter((key) => GAMES[key]))].slice(0, Object.keys(GAMES).length) : [],
       totalAttempts,
       totalCorrect: Math.min(totalAttempts, safeWholeNumber(saved.totalCorrect)),
       totalHints: safeWholeNumber(saved.totalHints),
@@ -1926,6 +1926,8 @@
     return {
       count: "●●●",
       quantity: "●123",
+      add: "1+1",
+      subtract: "3−1",
       compare: "⚖",
       countCompare: "●⚖●",
       connect: "↗",
@@ -1971,7 +1973,7 @@
     const modeMeta = engine?.metaFor(mode, activeGameKey) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
     interactionHintElement.textContent = modeMeta.label + " · " + modeMeta.instruction;
     interactionHintElement.dataset.icon = interactionIcon(mode);
-    const ownsScene = ["count", "quantity", "countCompare", "compare", "connect", "memory", "pattern", "spot", "trace", "order", "sequence", "draw"].includes(mode);
+    const ownsScene = ["count", "quantity", "add", "subtract", "countCompare", "compare", "connect", "memory", "pattern", "spot", "trace", "order", "sequence", "draw"].includes(mode);
     renderScene(ownsScene ? [] : round.scene);
 
     if (!engine || mode === "choice") {

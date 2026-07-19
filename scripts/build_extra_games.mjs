@@ -17,12 +17,12 @@ const chunks = chunkNames.map((name) => {
 const games = Object.assign({}, ...chunks);
 const keys = Object.keys(games);
 const expectedKeys = Array.from(
-  { length: 89 },
+  { length: 93 },
   (_, index) => `extra${String(index + 1).padStart(3, "0")}`,
 );
 
 if (JSON.stringify(keys) !== JSON.stringify(expectedKeys)) {
-  throw new Error("Expected continuous extra001-extra089 game keys");
+  throw new Error("Expected continuous extra001-extra093 game keys");
 }
 
 let roundCount = 0;

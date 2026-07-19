@@ -626,6 +626,169 @@ body.is-keyboard-nav .count-piece:focus {
   box-shadow: 0 6px 0 #a8decc;
 }
 
+.math-formula {
+  width: min(100%, 480px);
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: center;
+  gap: 7px;
+  padding: 10px;
+  border: 3px solid #d9cdea;
+  border-radius: 24px;
+  background: #faf7ff;
+}
+
+.math-formula span {
+  min-height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: white;
+  color: var(--purple-dark);
+  font-size: clamp(27px, 7vw, 42px);
+  font-weight: 950;
+}
+
+.math-formula [data-math-result] {
+  border: 3px dashed var(--coral);
+  background: var(--coral-soft);
+  color: var(--coral-dark);
+}
+
+.math-formula.is-solved [data-math-result] {
+  border-style: solid;
+  border-color: var(--mint);
+  background: var(--mint-soft);
+  color: var(--mint-dark);
+  animation: activity-pop 360ms ease both;
+}
+
+.math-workspace {
+  width: min(100%, 680px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+
+.math-add-group,
+.math-subtract-group,
+.math-result-basket,
+.math-take-box {
+  min-width: 0;
+  min-height: 126px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 9px;
+  padding: 12px;
+  border: 3px dashed #e3c79f;
+  border-radius: 25px;
+  background: #fff9e9;
+}
+
+.math-add-group > strong,
+.math-subtract-group > strong,
+.math-result-basket > strong,
+.math-take-box > strong {
+  color: #775d38;
+  font-size: 13px;
+  font-weight: 950;
+  text-align: center;
+}
+
+.math-workspace-sign {
+  color: var(--coral-dark);
+  font-size: 35px;
+  font-weight: 950;
+}
+
+.math-pieces,
+.math-result-items,
+.math-taken-items {
+  display: flex;
+  min-height: 61px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.math-piece {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid #e4d5c1;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 5px 0 #e4d5c1;
+  font-size: 36px;
+  cursor: pointer;
+  transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.math-piece.is-moved,
+.math-piece.is-removed {
+  opacity: 0.16;
+  transform: scale(0.78);
+}
+
+.math-piece.is-remaining {
+  border-color: var(--mint);
+  background: var(--mint-soft);
+  box-shadow: 0 5px 0 #a8decc;
+}
+
+.math-result-basket {
+  grid-column: 1 / -1;
+  min-height: 112px;
+  border-style: solid;
+  border-top-width: 9px;
+  border-color: #cfa874;
+  border-radius: 22px 22px 36px 36px;
+  background: #fff3d6;
+}
+
+.math-result-basket.is-ready,
+.math-take-box.is-ready {
+  border-color: var(--mint);
+  background: var(--mint-soft);
+}
+
+.math-result-items span,
+.math-taken-items span {
+  font-size: 39px;
+  line-height: 1;
+  animation: scene-pop 240ms ease both;
+}
+
+.math-live-count {
+  min-width: 54px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: white;
+  color: var(--coral-dark);
+  font-size: 15px;
+  font-weight: 950;
+  text-align: center;
+}
+
+.subtract-workspace {
+  grid-template-columns: minmax(0, 1.15fr) auto minmax(0, 0.85fr);
+}
+
+.math-take-box {
+  border-color: #d7c9eb;
+  background: #f8f3ff;
+}
+
+.math-confirm:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
 @media (max-width: 520px) {
   .quantity-board {
     gap: 7px;
@@ -655,6 +818,156 @@ body.is-keyboard-nav .count-piece:focus {
 
   .quantity-number-card {
     min-height: 118px;
+  }
+
+  .math-formula {
+    gap: 4px;
+    padding: 7px;
+  }
+
+  .math-formula span {
+    min-height: 47px;
+    border-radius: 12px;
+    font-size: 27px;
+  }
+
+  .math-workspace {
+    gap: 6px;
+  }
+
+  .math-add-group,
+  .math-subtract-group,
+  .math-result-basket,
+  .math-take-box {
+    min-height: 104px;
+    gap: 6px;
+    padding: 8px 5px;
+    border-radius: 19px;
+  }
+
+  .math-workspace-sign {
+    font-size: 25px;
+  }
+
+  .math-piece {
+    width: 43px;
+    height: 47px;
+    border-radius: 13px;
+    font-size: 29px;
+  }
+
+  .math-pieces,
+  .math-result-items,
+  .math-taken-items {
+    min-height: 49px;
+    gap: 3px;
+  }
+
+  .math-result-basket {
+    min-height: 87px;
+  }
+
+  .math-result-items span,
+  .math-taken-items span {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 640px) and (max-height: 700px) {
+  .play-main:has(.activity-stage[data-mode="add"]),
+  .play-main:has(.activity-stage[data-mode="subtract"]) {
+    padding-top: 2px;
+    padding-bottom: 8px;
+  }
+
+  .play-main:has(.activity-stage[data-mode="add"]) .guide-character,
+  .play-main:has(.activity-stage[data-mode="subtract"]) .guide-character {
+    display: none;
+  }
+
+  .play-main:has(.activity-stage[data-mode="add"]) .prompt-helper,
+  .play-main:has(.activity-stage[data-mode="subtract"]) .prompt-helper {
+    margin-bottom: 2px;
+    font-size: 11px;
+  }
+
+  .play-main:has(.activity-stage[data-mode="add"]) .play-prompt,
+  .play-main:has(.activity-stage[data-mode="subtract"]) .play-prompt {
+    font-size: 22px;
+    line-height: 1.12;
+  }
+
+  .play-main:has(.activity-stage[data-mode="add"]) .interaction-hint,
+  .play-main:has(.activity-stage[data-mode="subtract"]) .interaction-hint {
+    min-height: 32px;
+    margin-top: 5px;
+    padding-block: 4px;
+  }
+
+  .activity-stage[data-mode="add"],
+  .activity-stage[data-mode="subtract"] {
+    gap: 7px;
+    margin-top: 6px;
+  }
+
+  .activity-stage[data-mode="add"] .math-workspace {
+    gap: 2px;
+  }
+
+  .activity-stage[data-mode="add"] .math-workspace-sign {
+    font-size: 18px;
+  }
+
+  .activity-stage[data-mode="add"] .math-formula,
+  .activity-stage[data-mode="subtract"] .math-formula {
+    padding: 4px;
+  }
+
+  .activity-stage[data-mode="add"] .math-formula span,
+  .activity-stage[data-mode="subtract"] .math-formula span {
+    min-height: 38px;
+    font-size: 24px;
+  }
+
+  .activity-stage[data-mode="add"] .math-add-group,
+  .activity-stage[data-mode="subtract"] .math-subtract-group,
+  .activity-stage[data-mode="subtract"] .math-take-box {
+    min-height: 78px;
+    padding-block: 4px;
+  }
+
+  .activity-stage[data-mode="add"] .math-add-group {
+    padding-inline: 2px;
+  }
+
+  .activity-stage[data-mode="add"] .math-result-basket {
+    min-height: 65px;
+    padding-block: 3px;
+    border-top-width: 6px;
+  }
+
+  .activity-stage[data-mode="add"] .math-piece,
+  .activity-stage[data-mode="subtract"] .math-piece {
+    width: 38px;
+    height: 40px;
+    font-size: 25px;
+  }
+
+  .activity-stage[data-mode="add"] .math-pieces,
+  .activity-stage[data-mode="add"] .math-result-items,
+  .activity-stage[data-mode="subtract"] .math-pieces,
+  .activity-stage[data-mode="subtract"] .math-taken-items {
+    min-height: 41px;
+  }
+
+  .activity-stage[data-mode="add"] .math-result-items span,
+  .activity-stage[data-mode="subtract"] .math-taken-items span {
+    font-size: 25px;
+  }
+
+  .activity-stage[data-mode="add"] .math-confirm,
+  .activity-stage[data-mode="subtract"] .math-confirm {
+    min-height: 46px;
   }
 }
 
