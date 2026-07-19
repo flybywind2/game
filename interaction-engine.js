@@ -52,7 +52,6 @@
   const MODE_KEYS = Object.freeze({
     count: new Set([
       "counting",
-      "more",
       "extra016",
       "extra017",
       "extra018",
@@ -151,7 +150,7 @@
     ]),
     trace: new Set(["shapes", "extra005", "extra006", "extra007", "extra050"]),
     order: new Set(["sizes", "extra012", "extra013", "extra014"]),
-    compare: new Set(["extra023"]),
+    compare: new Set(["more", "extra023"]),
   });
 
   let activeController = null;
@@ -161,6 +160,12 @@
       return {
         label: "동작 따라가기",
         instruction: "맞는 동작 그림을 찾고 반짝이는 점을 차례로 눌러요.",
+      };
+    }
+    if (mode === "compare" && gameKey === "more") {
+      return {
+        label: "두 묶음 비교",
+        instruction: "양쪽 그림을 모두 세고 더 많은 묶음의 개수를 골라요.",
       };
     }
     return MODE_META[mode] || MODE_META.choice;
