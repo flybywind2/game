@@ -1,9 +1,9 @@
-const CACHE_VERSION = "mongle-premium-v14";
+const CACHE_VERSION = "mongle-premium-v15";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./styles.css?v=6",
+  "./styles.css?v=7",
   "./enhancements.css?v=1",
   "./catalog.css?v=1",
   "./interactions.css?v=18",
