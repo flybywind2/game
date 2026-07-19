@@ -58,6 +58,9 @@ ffmpeg -y -i /tmp/mongle-meadow.wav -codec:a libmp3lame -b:a 128k audio/music/mo
 The generated loop is about 70 seconds long and moves through music-box,
 marimba, and starlight-bell sections before returning to the start.
 
+각 게임은 `#game/게임키` 형식의 고유 주소를 사용합니다. 예를 들어
+`#game/colors`와 `#game/extra021`을 붙인 주소를 열면 해당 게임이 바로 시작됩니다.
+
 ## 생성 이미지
 
 프로젝트에서 사용하는 최적화 파일은 `assets/generated/mongle-hero.webp`, `game-look.webp`, `game-number.webp`, `game-word.webp`, `game-heart.webp`, `favicon.png`입니다. 같은 폴더의 `*-source.png`는 이미지 생성 도구가 만든 원본입니다.

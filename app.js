@@ -568,6 +568,8 @@
   const SOUND_KEY = "mongle-sound-v1";
   const MUSIC_KEY = "mongle-music-v1";
   const MUSIC_VOLUME_KEY = "mongle-music-volume-v1";
+  const GAME_HASH_PREFIX = "#game/";
+  const DEFAULT_TITLE = document.title;
   const playTemplate = document.querySelector("#play-main").innerHTML;
 
   const shell = document.querySelector("#game-shell");
@@ -913,8 +915,33 @@
     return GAMES[activeGameKey].rounds[roundIndex];
   }
 
-  function startGame(key) {
+  function gameKeyFromLocation() {
+    if (!window.location.hash.startsWith(GAME_HASH_PREFIX)) return null;
+    try {
+      const key = decodeURIComponent(window.location.hash.slice(GAME_HASH_PREFIX.length));
+      return Object.prototype.hasOwnProperty.call(GAMES, key) ? key : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function gameUrl(key) {
+    const url = new URL(window.location.href);
+    url.hash = GAME_HASH_PREFIX.slice(1) + encodeURIComponent(key);
+    return url;
+  }
+
+  function clearGameUrl() {
+    const url = new URL(window.location.href);
+    url.hash = "";
+    window.history.replaceState(null, "", url);
+  }
+
+  function startGame(key, { updateUrl = true } = {}) {
     if (!GAMES[key]) return;
+    if (updateUrl && gameKeyFromLocation() !== key) {
+      window.history.pushState({ mongleGame: key, returnToCatalog: true }, "", gameUrl(key));
+    }
     if (!shell.classList.contains("is-open")) {
       returnFocusElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     }
@@ -931,11 +958,19 @@
     shell.classList.add("is-open");
     shell.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    document.title = GAMES[key].title + " | 몽글몽글 배움 놀이터";
     renderRound();
     document.querySelector("#game-close").focus({ preventScroll: true });
   }
 
-  function closeGame() {
+  function closeGame({ updateUrl = true } = {}) {
+    if (updateUrl && gameKeyFromLocation()) {
+      if (window.history.state?.returnToCatalog) {
+        window.history.back();
+        return;
+      }
+      clearGameUrl();
+    }
     clearTimeout(advanceTimer);
     roundInstructionToken += 1;
     activeActivity?.destroy();
@@ -950,6 +985,7 @@
       shell.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
       activeGameKey = null;
+      document.title = DEFAULT_TITLE;
       if (focusTarget?.isConnected && !focusTarget.hidden) {
         focusTarget.focus({ preventScroll: true });
       } else {
@@ -1392,6 +1428,27 @@
 
   document.querySelector("#start-recommended").addEventListener("click", () => startGame(recommendedGame()));
   document.querySelector("#game-close").addEventListener("click", closeGame);
+
+  const syncGameFromUrl = () => {
+    const key = gameKeyFromLocation();
+    if (key) {
+      if (activeGameKey !== key || !shell.classList.contains("is-open")) {
+        startGame(key, { updateUrl: false });
+      }
+      return;
+    }
+    if (shell.classList.contains("is-open") && !shell.classList.contains("is-closing")) {
+      closeGame({ updateUrl: false });
+    }
+  };
+
+  window.addEventListener("popstate", syncGameFromUrl);
+  window.addEventListener("hashchange", syncGameFromUrl);
+  const initialGameKey = gameKeyFromLocation();
+  if (initialGameKey) {
+    window.history.replaceState({ mongleGame: initialGameKey, direct: true }, "", window.location.href);
+    startGame(initialGameKey, { updateUrl: false });
+  }
 
   replayButton.addEventListener("click", () => {
     const round = currentRound();
