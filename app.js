@@ -792,7 +792,7 @@
 
   function ensureBgm() {
     if (bgmAudio) return bgmAudio;
-    bgmAudio = new Audio("./audio/music/mongle-meadow.mp3");
+    bgmAudio = new Audio("./audio/music/mongle-meadow.mp3?v=2");
     bgmAudio.loop = true;
     bgmAudio.preload = "auto";
     bgmAudio.volume = musicVolume;

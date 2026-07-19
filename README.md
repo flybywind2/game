@@ -55,6 +55,9 @@ python3 scripts/generate_bgm.py /tmp/mongle-meadow.wav
 ffmpeg -y -i /tmp/mongle-meadow.wav -codec:a libmp3lame -b:a 128k audio/music/mongle-meadow.mp3
 ```
 
+The generated loop is about 70 seconds long and moves through music-box,
+marimba, and starlight-bell sections before returning to the start.
+
 ## 생성 이미지
 
 프로젝트에서 사용하는 최적화 파일은 `assets/generated/mongle-hero.webp`, `game-look.webp`, `game-number.webp`, `game-word.webp`, `game-heart.webp`, `favicon.png`입니다. 같은 폴더의 `*-source.png`는 이미지 생성 도구가 만든 원본입니다.
