@@ -572,6 +572,7 @@
   const PLAY_LIMIT_KEY = "mongle-play-limit-v1";
   const USABILITY_KEY = "mongle-usability-observations-v1";
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
+  const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
   const CATEGORY_NAMES = Object.freeze({
@@ -2721,6 +2722,15 @@
     return record;
   }
 
+  function recordUsabilityExtraChoice(recordId, gameKey) {
+    if (!USABILITY_EXTRA_CHOICES.includes(gameKey)) return;
+    const record = usabilityRecords.find((item) => item.id === recordId);
+    if (!record) return;
+    record.extraChoice = Math.max(1, safeWholeNumber(record.extraChoice, 99));
+    record.playAgain = "yes";
+    saveUsabilityRecords();
+  }
+
   function renderUsabilityCompletion(game, isNewSticker) {
     if (!usabilitySession || USABILITY_GAMES[usabilitySession.currentIndex] !== activeGameKey) return false;
     const now = Date.now();
@@ -2742,9 +2752,13 @@
         <div class="course-completion-progress" role="progressbar" aria-label="관찰 놀이 ${USABILITY_GAMES.length}개 중 ${completed}개 완료" aria-valuemin="0" aria-valuemax="${USABILITY_GAMES.length}" aria-valuenow="${completed}">
           ${USABILITY_GAMES.map((key, index) => `<span class="${index < completed ? "is-done" : ""}"><i>${index < completed ? "✓" : index + 1}</i><small>${GAMES[key].title}</small></span>`).join("")}
         </div>
-        ${finishedRecord ? `<p>첫 시작 ${finishedRecord.firstStartSeconds}초 · 자동 도움 ${finishedRecord.hints}회<br>보호자 공간에서 관찰한 모습을 마저 기록해 주세요.</p>` : `<p>${game.title} 완료! 보호자는 계속 지켜봐 주세요.</p>`}
+        ${finishedRecord ? `<p>세 가지를 모두 했어!<br>더 놀고 싶은 놀이를 아이가 직접 골라요.</p>` : `<p>${game.title} 완료! 보호자는 계속 지켜봐 주세요.</p>`}
         <div class="completion-actions">
-          ${nextKey ? `<button class="completion-usability-next" type="button">다음 관찰 놀이 · ${GAMES[nextKey].title}</button>` : `<button class="completion-usability-results" type="button">보호자와 결과 보기</button>`}
+          ${nextKey ? `<button class="completion-usability-next" type="button">다음 관찰 놀이 · ${GAMES[nextKey].title}</button>` : `
+            <div class="usability-extra-choice" role="group" aria-label="더 하고 싶은 놀이 고르기">
+              ${USABILITY_EXTRA_CHOICES.map((key) => `<button type="button" data-usability-extra="${key}"><span aria-hidden="true">${GAMES[key].icon}</span><strong>${GAMES[key].title}</strong><small>${GAMES[key].skill}</small></button>`).join("")}
+            </div>
+            <button class="completion-usability-results" type="button">보호자와 여기까지</button>`}
         </div>
       </div>`;
     playMain.querySelector(".completion-usability-next")?.addEventListener("click", () => {
@@ -2752,6 +2766,13 @@
       usabilitySession.gameStartHints = Number(dailyProgress.hints) || 0;
       usabilitySession.gameStartAttempts = Number(dailyProgress.attempts) || 0;
       startGame(nextKey);
+    });
+    playMain.querySelectorAll("[data-usability-extra]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const gameKey = button.dataset.usabilityExtra;
+        recordUsabilityExtraChoice(finishedRecord?.id, gameKey);
+        startGame(gameKey);
+      });
     });
     playMain.querySelector(".completion-usability-results")?.addEventListener("click", () => {
       requestParentAccess(() => {
@@ -2761,7 +2782,7 @@
       });
     });
     launchConfetti();
-    speak(finishedRecord ? "세 가지 관찰 놀이를 모두 해냈어! 보호자와 결과를 볼까?" : `${game.title} 완료! 다음 관찰 놀이도 해 볼까?`);
+    speak(finishedRecord ? "세 가지 놀이를 모두 해냈어! 더 놀고 싶은 놀이를 직접 골라 볼까?" : `${game.title} 완료! 다음 관찰 놀이도 해 볼까?`);
     return true;
   }
 

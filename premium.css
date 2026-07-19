@@ -1202,6 +1202,74 @@
   background: var(--mint-dark);
 }
 
+.usability-completion.is-complete .completion-actions {
+  width: min(100%, 620px);
+  grid-template-columns: 1fr;
+}
+
+.usability-extra-choice {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.usability-extra-choice button {
+  min-width: 0;
+  min-height: 116px;
+  padding: 12px 8px;
+  border: 2px solid #d8caec;
+  border-radius: 20px;
+  background: white;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.usability-extra-choice span,
+.usability-extra-choice strong,
+.usability-extra-choice small {
+  display: block;
+}
+
+.usability-extra-choice span {
+  font-size: 34px;
+}
+
+.usability-extra-choice strong {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.usability-extra-choice small {
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.usability-manual label > small {
+  display: block;
+  margin: 2px 0 5px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+@media (max-width: 420px) {
+  .usability-extra-choice {
+    gap: 7px;
+  }
+
+  .usability-extra-choice button {
+    min-height: 108px;
+    padding-inline: 5px;
+  }
+
+  .usability-extra-choice strong {
+    font-size: 11px;
+  }
+}
+
 .parent-observation-heading {
   display: flex;
   align-items: center;
