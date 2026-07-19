@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.19.7";
+  const APP_BUILD = "2026.07.19.8";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -2623,6 +2623,148 @@
     return canvas;
   }
 
+  function createCurriculumGuideCanvas() {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1240;
+    canvas.height = 1754;
+    const context = canvas.getContext("2d");
+    const nickname = learnerProfile.nickname || "꼬마 탐험가";
+    const allKeys = CURRICULUM_WEEKS.flatMap((week) => week.games);
+    const completed = allKeys.filter((key) => Boolean(learnerProfile.completed[key])).length;
+    const font = '"Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif';
+
+    context.fillStyle = "#fffaf0";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    const glow = context.createRadialGradient(1080, 100, 10, 1080, 100, 440);
+    glow.addColorStop(0, "rgba(164, 140, 231, 0.28)");
+    glow.addColorStop(1, "rgba(164, 140, 231, 0)");
+    context.fillStyle = glow;
+    context.fillRect(650, 0, 590, 560);
+
+    roundedCanvasRect(context, 70, 58, 310, 58, 29, "#f1eafa");
+    context.fillStyle = "#7359a5";
+    context.font = `850 25px ${font}`;
+    context.fillText("몽글 · 4주 가족 계획표", 105, 96);
+    context.fillStyle = "#352f2a";
+    context.font = `900 54px ${font}`;
+    context.fillText("하루 한 놀이, 스무 번의 성장 경험", 70, 178);
+    context.fillStyle = "#746c66";
+    context.font = `700 24px ${font}`;
+    context.fillText(`${nickname}의 주 5회 · 한 번 5~10분 놀이 로드맵`, 72, 225);
+
+    roundedCanvasRect(context, 70, 260, 1100, 76, 24, "#ffffff");
+    context.fillStyle = "#e8e1ef";
+    roundedCanvasRect(context, 105, 290, 830, 16, 8, "#e8e1ef");
+    if (completed) roundedCanvasRect(context, 105, 290, 830 * (completed / allKeys.length), 16, 8, "#8e71be");
+    context.fillStyle = "#7359a5";
+    context.font = `900 25px ${font}`;
+    context.fillText(`${completed} / 20회 완료`, 970, 308);
+
+    const cardWidth = 535;
+    const cardHeight = 590;
+    const positions = [
+      [70, 370], [635, 370], [70, 990], [635, 990],
+    ];
+    const cardColors = ["#ffffff", "#f8f4fd", "#f3fbf7", "#fff8e7"];
+    CURRICULUM_WEEKS.forEach((week, weekIndex) => {
+      const [x, y] = positions[weekIndex];
+      const completedGames = week.games.filter((key) => Boolean(learnerProfile.completed[key])).length;
+      roundedCanvasRect(context, x, y, cardWidth, cardHeight, 34, cardColors[weekIndex]);
+      roundedCanvasRect(context, x + 28, y + 26, 60, 60, 20, completedGames === 5 ? "#62c9a6" : "#e8def5");
+      context.fillStyle = completedGames === 5 ? "#ffffff" : "#7359a5";
+      context.font = `900 26px ${font}`;
+      context.textAlign = "center";
+      context.fillText(completedGames === 5 ? "✓" : String(weekIndex + 1), x + 58, y + 66);
+      context.textAlign = "left";
+      context.fillStyle = "#7359a5";
+      context.font = `850 18px ${font}`;
+      context.fillText(`${weekIndex + 1}주차 · ${completedGames}/5 완료`, x + 108, y + 45);
+      context.fillStyle = "#352f2a";
+      context.font = `900 30px ${font}`;
+      context.fillText(week.title, x + 108, y + 79);
+      context.fillStyle = "#746c66";
+      context.font = `650 17px ${font}`;
+      drawWrappedText(context, week.goal, x + 28, y + 116, cardWidth - 56, 25, 2);
+
+      week.games.forEach((key, gameIndex) => {
+        const game = GAMES[key];
+        const done = Boolean(learnerProfile.completed[key]);
+        const rowY = y + 177 + gameIndex * 48;
+        roundedCanvasRect(context, x + 28, rowY, 32, 32, 10, done ? "#62c9a6" : "#eee8f4");
+        context.fillStyle = done ? "#ffffff" : "#7359a5";
+        context.font = `900 16px ${font}`;
+        context.textAlign = "center";
+        context.fillText(done ? "✓" : String(gameIndex + 1), x + 44, rowY + 22);
+        context.textAlign = "left";
+        context.fillStyle = "#352f2a";
+        context.font = `800 19px ${font}`;
+        context.fillText(game.title, x + 74, rowY + 22);
+        context.fillStyle = done ? "#247a60" : "#8b837d";
+        context.font = `800 15px ${font}`;
+        context.textAlign = "right";
+        context.fillText(done ? "완료" : "해 볼 차례", x + cardWidth - 28, rowY + 22);
+        context.textAlign = "left";
+      });
+
+      roundedCanvasRect(context, x + 28, y + 430, cardWidth - 56, 126, 22, weekIndex === 3 ? "#f8edc7" : "#f4ecdc");
+      context.fillStyle = "#76591f";
+      context.font = `900 17px ${font}`;
+      context.fillText("이번 주 대화법", x + 50, y + 462);
+      context.fillStyle = "#5e554e";
+      context.font = `650 16px ${font}`;
+      drawWrappedText(context, week.coach, x + 50, y + 493, cardWidth - 100, 23, 3);
+    });
+
+    context.fillStyle = "#352f2a";
+    context.font = `900 24px ${font}`;
+    context.fillText("완주보다 중요한 것은 아이의 ‘한 번 더’예요.", 70, 1644);
+    context.fillStyle = "#746c66";
+    context.font = `650 18px ${font}`;
+    drawWrappedText(context, "같은 놀이를 반복하거나 며칠 쉬어도 괜찮아요. 이 계획표는 평가표가 아니라 가족이 즐거운 놀이 리듬을 찾는 안내입니다.", 70, 1681, 1040, 26, 2);
+    context.fillStyle = "#7359a5";
+    context.font = `850 16px ${font}`;
+    context.textAlign = "right";
+    context.fillText("MONGLE PLAYGROUND · 기기 안에서 생성", 1170, 1725);
+    context.textAlign = "left";
+    return canvas;
+  }
+
+  async function saveCurriculumGuide() {
+    const button = document.querySelector("#save-curriculum-guide");
+    if (button.disabled) return;
+    button.disabled = true;
+    try {
+      const canvas = createCurriculumGuideCanvas();
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      if (!blob) throw new Error("PNG creation failed");
+      const filename = `mongle-4week-plan-${todayKey()}.png`;
+      const file = new File([blob], filename, { type: "image/png" });
+      if (navigator.share && (!navigator.canShare || navigator.canShare({ files: [file] }))) {
+        try {
+          await navigator.share({ title: "몽글 4주 가족 계획표", text: "하루 한 놀이, 스무 번의 성장 경험을 함께해요.", files: [file] });
+          showToast("4주 가족 계획표를 공유했어요.");
+          return;
+        } catch (error) {
+          if (error?.name === "AbortError") {
+            showToast("공유를 취소했어요.");
+            return;
+          }
+        }
+      }
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.click();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast("4주 가족 계획표를 저장했어요.");
+    } catch {
+      showToast("4주 계획표를 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.");
+    } finally {
+      button.disabled = false;
+    }
+  }
+
   async function saveWeeklyReport() {
     const button = document.querySelector("#save-weekly-report");
     if (button.disabled) return;
@@ -3534,6 +3676,7 @@
     startGame(key);
   });
   document.querySelector("#save-weekly-report").addEventListener("click", saveWeeklyReport);
+  document.querySelector("#save-curriculum-guide").addEventListener("click", saveCurriculumGuide);
   document.querySelector("#export-backup").addEventListener("click", exportBackup);
   document.querySelector("#import-backup").addEventListener("click", () => document.querySelector("#backup-file").click());
   document.querySelector("#backup-file").addEventListener("change", (event) => importBackupFile(event.target.files?.[0]));

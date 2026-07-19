@@ -1369,6 +1369,58 @@
   transition: width 300ms ease;
 }
 
+.curriculum-export {
+  display: grid;
+  width: 100%;
+  min-height: 58px;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 9px 12px;
+  border: 1px solid #cfc0e5;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--purple-dark);
+  text-align: left;
+  cursor: pointer;
+}
+
+.curriculum-export > span:first-child {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--purple-soft);
+  font-size: 16px;
+}
+
+.curriculum-export strong,
+.curriculum-export small {
+  display: block;
+}
+
+.curriculum-export strong {
+  font-size: 10px;
+}
+
+.curriculum-export small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 8px;
+  font-weight: 650;
+}
+
+.curriculum-export > b {
+  font-size: 17px;
+}
+
+.curriculum-export:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .curriculum-weeks {
   display: grid;
   gap: 9px;
