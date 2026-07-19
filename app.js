@@ -720,7 +720,36 @@
       totalCorrect: 0,
       totalHints: 0,
       gameStats: {},
+      activityDays: {},
     };
+  }
+
+  function normalizeActivityDay(day) {
+    const categories = {};
+    Object.keys(CATEGORY_NAMES).forEach((category) => {
+      const saved = day?.categories?.[category] || {};
+      categories[category] = {
+        attempts: Math.max(0, Number(saved.attempts) || 0),
+        correct: Math.max(0, Number(saved.correct) || 0),
+        hints: Math.max(0, Number(saved.hints) || 0),
+      };
+    });
+    return {
+      attempts: Math.max(0, Number(day?.attempts) || 0),
+      correct: Math.max(0, Number(day?.correct) || 0),
+      hints: Math.max(0, Number(day?.hints) || 0),
+      completions: Math.max(0, Number(day?.completions) || 0),
+      completedGames: Array.isArray(day?.completedGames) ? day.completedGames.filter((key) => GAMES[key]).slice(-20) : [],
+      categories,
+    };
+  }
+
+  function trimActivityDays(days) {
+    return Object.fromEntries(Object.entries(days || {})
+      .filter(([date]) => /^\d{4}-\d{2}-\d{2}$/.test(date))
+      .sort(([left], [right]) => right.localeCompare(left))
+      .slice(0, 30)
+      .map(([date, day]) => [date, normalizeActivityDay(day)]));
   }
 
   function loadLearnerProfile() {
@@ -733,6 +762,7 @@
         completed: saved.completed || {},
         stickers: Array.isArray(saved.stickers) ? saved.stickers.filter((key) => GAMES[key]) : [],
         gameStats: saved.gameStats || {},
+        activityDays: trimActivityDays(saved.activityDays),
       };
     } catch {
       return blankLearnerProfile();
@@ -754,6 +784,34 @@
     }
     learnerProfile.gameStats[key].hints = Number(learnerProfile.gameStats[key].hints) || 0;
     return learnerProfile.gameStats[key];
+  }
+
+  function activityDay(date = todayKey()) {
+    if (!learnerProfile.activityDays) learnerProfile.activityDays = {};
+    if (!learnerProfile.activityDays[date]) learnerProfile.activityDays[date] = normalizeActivityDay();
+    return learnerProfile.activityDays[date];
+  }
+
+  function recordActivity(type, { correct = false, gameKey = activeGameKey } = {}) {
+    if (!gameKey || !GAMES[gameKey]) return;
+    const day = activityDay();
+    const category = gameCategory(gameKey);
+    const categoryDay = day.categories[category];
+    if (type === "attempt") {
+      day.attempts += 1;
+      categoryDay.attempts += 1;
+      if (correct) {
+        day.correct += 1;
+        categoryDay.correct += 1;
+      }
+    } else if (type === "hint") {
+      day.hints += 1;
+      categoryDay.hints += 1;
+    } else if (type === "completion") {
+      day.completions += 1;
+      if (!day.completedGames.includes(gameKey)) day.completedGames.push(gameKey);
+    }
+    learnerProfile.activityDays = trimActivityDays(learnerProfile.activityDays);
   }
 
   function adaptiveLevelForGame(key) {
@@ -1533,6 +1591,7 @@
     dailyProgress.hints = (Number(dailyProgress.hints) || 0) + 1;
     learnerProfile.totalHints = (Number(learnerProfile.totalHints) || 0) + 1;
     gameStat(activeGameKey).hints += 1;
+    recordActivity("hint");
     saveProgress();
     saveLearnerProfile();
   }
@@ -1574,6 +1633,7 @@
     stats.attempts += 1;
     if (correct) stats.correct += 1;
     stats.recent = [...stats.recent, Boolean(correct)].slice(-8);
+    recordActivity("attempt", { correct });
     saveProgress();
     saveLearnerProfile();
   }
@@ -1670,6 +1730,7 @@
     if (isNewSticker) learnerProfile.stickers.push(activeGameKey);
     dailyProgress.completed[activeGameKey] = (dailyProgress.completed[activeGameKey] || 0) + 1;
     dailyProgress.lastPlayed = activeGameKey;
+    recordActivity("completion");
     saveProgress();
     saveLearnerProfile();
     replayButton.disabled = true;
@@ -1729,6 +1790,120 @@
       || "colors";
   }
 
+  function dateKeyOffset(daysAgo) {
+    const date = new Date();
+    date.setHours(12, 0, 0, 0);
+    date.setDate(date.getDate() - daysAgo);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function weeklySnapshot() {
+    const days = Array.from({ length: 7 }, (_, index) => {
+      const date = dateKeyOffset(6 - index);
+      return { date, ...normalizeActivityDay(learnerProfile.activityDays?.[date]) };
+    });
+    const categories = Object.fromEntries(Object.keys(CATEGORY_NAMES).map((category) => [category, {
+      attempts: 0,
+      correct: 0,
+      hints: 0,
+    }]));
+    days.forEach((day) => {
+      Object.keys(categories).forEach((category) => {
+        categories[category].attempts += day.categories[category].attempts;
+        categories[category].correct += day.categories[category].correct;
+        categories[category].hints += day.categories[category].hints;
+      });
+    });
+    const activeDays = days.filter((day) => day.attempts || day.completions || day.hints).length;
+    const observed = Object.entries(categories).filter(([, stats]) => stats.attempts > 0);
+    const strength = observed.slice().sort(([, left], [, right]) => {
+      const leftRate = left.correct / left.attempts;
+      const rightRate = right.correct / right.attempts;
+      return rightRate - leftRate || right.attempts - left.attempts || left.hints - right.hints;
+    })[0] || null;
+    const unobserved = Object.entries(categories)
+      .filter(([, stats]) => !stats.attempts)
+      .sort(([left], [right]) => categoryProgress(left).completed - categoryProgress(right).completed);
+    const focus = unobserved[0] || observed.slice().sort(([, left], [, right]) => {
+      const leftRate = left.correct / left.attempts;
+      const rightRate = right.correct / right.attempts;
+      return leftRate - rightRate || right.hints - left.hints || left.attempts - right.attempts;
+    })[0] || null;
+    return { days, categories, activeDays, strength, focus };
+  }
+
+  function recommendationForCategory(category) {
+    if (!category) return recommendedGame();
+    const dailyCandidate = ensureDailyPlan().find((key) => gameCategory(key) === category && !dailyProgress.completed[key]);
+    if (dailyCandidate) return dailyCandidate;
+    return Object.keys(GAMES)
+      .filter((key) => gameCategory(key) === category)
+      .sort((left, right) => {
+        const leftStats = learnerProfile.gameStats[left] || {};
+        const rightStats = learnerProfile.gameStats[right] || {};
+        return (learnerProfile.completed[left] || 0) - (learnerProfile.completed[right] || 0)
+          || (leftStats.attempts || 0) - (rightStats.attempts || 0)
+          || left.localeCompare(right);
+      })[0] || recommendedGame();
+  }
+
+  function renderWeeklyReport() {
+    const snapshot = weeklySnapshot();
+    document.querySelector("#weekly-active-days").textContent = String(snapshot.activeDays);
+    const chart = document.querySelector("#weekly-chart");
+    chart.innerHTML = "";
+    const scores = snapshot.days.map((day) => day.correct + day.completions * 2);
+    const maxScore = Math.max(1, ...scores);
+    snapshot.days.forEach((day, index) => {
+      const date = new Date(`${day.date}T12:00:00`);
+      const label = index === snapshot.days.length - 1 ? "오늘" : new Intl.DateTimeFormat("ko-KR", { weekday: "short" }).format(date);
+      const score = scores[index];
+      const column = document.createElement("div");
+      column.className = `weekly-day${score ? " is-active" : ""}${index === snapshot.days.length - 1 ? " is-today" : ""}`;
+      column.setAttribute("aria-label", `${label}, 성공 ${day.correct}번, 완료 ${day.completions}개`);
+      column.innerHTML = `<span class="weekly-bar"><i style="height:${score ? Math.max(18, Math.round((score / maxScore) * 100)) : 6}%"></i></span><b>${label}</b>`;
+      chart.appendChild(column);
+    });
+
+    const strengthTitle = document.querySelector("#weekly-strength");
+    const strengthDetail = document.querySelector("#weekly-strength-detail");
+    if (snapshot.strength) {
+      const [category, stats] = snapshot.strength;
+      const accuracy = Math.round((stats.correct / stats.attempts) * 100);
+      strengthTitle.textContent = `${CATEGORY_NAMES[category]} · ${accuracy}%`;
+      strengthDetail.textContent = `${stats.attempts}번 살펴본 결과예요. 정답 횟수뿐 아니라 도움을 요청한 순간도 함께 봤어요.`;
+    } else {
+      strengthTitle.textContent = "조금 더 관찰 중이에요";
+      strengthDetail.textContent = "한두 놀이를 시작하면 아이가 편안해하는 영역을 알려드려요.";
+    }
+
+    const focusCategory = snapshot.focus?.[0] || null;
+    const focusStats = snapshot.focus?.[1] || null;
+    const focusTitle = document.querySelector("#weekly-focus");
+    const focusDetail = document.querySelector("#weekly-focus-detail");
+    if (!focusCategory) {
+      focusTitle.textContent = "오늘 코스부터 시작해요";
+      focusDetail.textContent = "짧게 성공할 수 있는 놀이를 골라 드릴게요.";
+    } else if (!focusStats.attempts) {
+      focusTitle.textContent = `${CATEGORY_NAMES[focusCategory]} 영역을 만나 볼 차례`;
+      focusDetail.textContent = "이번 주에 아직 충분히 만나지 않은 영역이라 부담 없는 첫 놀이를 추천해요.";
+    } else {
+      const accuracy = Math.round((focusStats.correct / focusStats.attempts) * 100);
+      focusTitle.textContent = `${CATEGORY_NAMES[focusCategory]} 영역을 천천히`;
+      focusDetail.textContent = `${focusStats.attempts}번 중 ${accuracy}%의 성공 경험이 있었어요. 같은 힘을 쉬운 활동으로 이어가요.`;
+    }
+
+    const recommendationKey = recommendationForCategory(focusCategory);
+    const recommendation = GAMES[recommendationKey];
+    const button = document.querySelector("#weekly-recommendation");
+    button.dataset.weeklyGame = recommendationKey;
+    button.setAttribute("aria-label", `이번 주 맞춤 추천, ${recommendation.title}, 바로 놀이`);
+    document.querySelector("#weekly-recommendation-title").textContent = `${recommendation.icon} ${recommendation.title}`;
+  }
+
   function updateParentDashboard() {
     document.querySelector("#parent-completed").textContent = `${completedCount()}`;
     document.querySelector("#parent-answers").textContent = `${dailyProgress.attempts}`;
@@ -1743,6 +1918,7 @@
     const nicknameInput = document.querySelector("#child-nickname");
     nicknameInput.value = learnerProfile.nickname || "꼬마 탐험가";
     document.querySelector("#parent-level").textContent = String(profileLevel());
+    renderWeeklyReport();
 
     const growthList = document.querySelector("#growth-skill-list");
     growthList.innerHTML = "";
@@ -2112,6 +2288,12 @@
 
   document.querySelector("#parent-open").addEventListener("click", requestParentAccess);
   document.querySelector("#parent-close").addEventListener("click", closeParentDialog);
+  document.querySelector("#weekly-recommendation").addEventListener("click", (event) => {
+    const key = event.currentTarget.dataset.weeklyGame;
+    if (!GAMES[key]) return;
+    closeParentDialog();
+    startGame(key);
+  });
   document.querySelector("#parent-gate-close").addEventListener("click", closeParentGate);
   parentGate.addEventListener("click", (event) => {
     if (event.target === parentGate) closeParentGate();
@@ -2124,7 +2306,9 @@
     if (!window.confirm("오늘의 놀이 기록을 모두 지울까요?")) return;
     const plan = ensureDailyPlan();
     dailyProgress = { ...blankProgress(), plan };
+    if (learnerProfile.activityDays) delete learnerProfile.activityDays[todayKey()];
     saveProgress();
+    saveLearnerProfile();
     updateParentDashboard();
     showToast("오늘의 놀이 기록을 지웠어요.");
   });

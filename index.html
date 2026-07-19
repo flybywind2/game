@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
     <link rel="stylesheet" href="./interactions.css?v=19" />
-    <link rel="stylesheet" href="./premium.css?v=3" />
+    <link rel="stylesheet" href="./premium.css?v=4" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -492,6 +492,34 @@
           </div>
         </div>
 
+        <section class="weekly-report" aria-labelledby="weekly-report-title">
+          <div class="weekly-report-heading">
+            <div>
+              <span class="section-kicker">최근 7일 성장</span>
+              <h3 id="weekly-report-title">이번 주의 작은 발자국</h3>
+            </div>
+            <span class="weekly-streak"><strong id="weekly-active-days">0</strong>일 놀이</span>
+          </div>
+          <div class="weekly-chart" id="weekly-chart" aria-label="최근 7일 놀이 횟수"></div>
+          <div class="weekly-insights">
+            <article class="weekly-insight-card is-strength">
+              <span>잘 자라는 힘</span>
+              <strong id="weekly-strength">조금 더 관찰 중이에요</strong>
+              <p id="weekly-strength-detail">놀이 기록이 쌓이면 아이가 편안해하는 영역을 알려드려요.</p>
+            </article>
+            <article class="weekly-insight-card is-next">
+              <span>다음에 도와줄 힘</span>
+              <strong id="weekly-focus">오늘 코스부터 시작해요</strong>
+              <p id="weekly-focus-detail">짧게 성공할 수 있는 놀이를 골라 드릴게요.</p>
+            </article>
+          </div>
+          <button class="weekly-recommendation" id="weekly-recommendation" type="button">
+            <span><small>이번 주 맞춤 추천</small><strong id="weekly-recommendation-title">첫 놀이 시작하기</strong></span>
+            <b>바로 놀이 <span aria-hidden="true">→</span></b>
+          </button>
+          <p class="weekly-privacy">최근 30일의 익명 놀이 횟수만 이 기기에 보관하며 외부로 전송하지 않아요.</p>
+        </section>
+
         <section class="child-profile-settings" aria-labelledby="child-profile-title">
           <div>
             <span class="profile-settings-icon" aria-hidden="true">☺</span>
@@ -570,6 +598,6 @@
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
     <script src="./interaction-engine.js?v=26"></script>
-    <script src="./app.js?v=26"></script>
+    <script src="./app.js?v=29"></script>
   </body>
 </html>
