@@ -69,23 +69,34 @@
     countCompare: new Set(["extra021", "extra022"]),
     drag: new Set([
       "body",
+      "sounds",
+      "emotions",
       "extra004",
       "extra008",
       "extra027",
       "extra028",
       "extra031",
       "extra032",
+      "extra033",
       "extra034",
       "extra035",
       "extra038",
+      "extra039",
       "extra040",
       "extra041",
+      "extra042",
       "extra043",
+      "extra044",
+      "extra045",
       "extra048",
       "extra049",
       "extra051",
       "extra052",
       "extra053",
+      "extra054",
+      "extra055",
+      "extra056",
+      "extra058",
       "extra067",
       "extra061",
       "extra075",
@@ -131,21 +142,10 @@
       "extra088",
     ]),
     memory: new Set([
-      "sounds",
-      "emotions",
       "matching",
       "extra009",
       "extra010",
       "extra011",
-      "extra033",
-      "extra039",
-      "extra042",
-      "extra044",
-      "extra045",
-      "extra054",
-      "extra055",
-      "extra056",
-      "extra058",
     ]),
     pattern: new Set(["patterns", "extra024", "extra025", "extra026"]),
     spot: new Set([
@@ -172,6 +172,20 @@
     "extra084",
   ]);
 
+  const SEMANTIC_RELATION_KEYS = new Set([
+    "sounds",
+    "emotions",
+    "extra033",
+    "extra039",
+    "extra042",
+    "extra044",
+    "extra045",
+    "extra054",
+    "extra055",
+    "extra056",
+    "extra058",
+  ]);
+
   let activeController = null;
 
   function metaFor(mode, gameKey) {
@@ -191,6 +205,24 @@
       return {
         label: "몸의 쓰임 연결",
         instruction: "질문 그림을 보고 알맞은 몸 부분을 빈자리에 놓아요.",
+      };
+    }
+    if (mode === "drag" && gameKey === "sounds") {
+      return {
+        label: "소리 짝 연결",
+        instruction: "소리 말과 알맞은 동물을 하나씩 연결해요.",
+      };
+    }
+    if (mode === "drag" && gameKey === "emotions") {
+      return {
+        label: "마음 상황 연결",
+        instruction: "상황을 읽고 어울리는 마음 얼굴을 연결해요.",
+      };
+    }
+    if (mode === "drag" && SEMANTIC_RELATION_KEYS.has(gameKey)) {
+      return {
+        label: "뜻 연결",
+        instruction: "말 단서와 알맞은 그림을 하나씩 연결해요.",
       };
     }
     if (mode === "drag" && SAFETY_RELATION_KEYS.has(gameKey)) {
@@ -1438,6 +1470,7 @@
   function renderDrag(context) {
     const { controller, stage, game, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     const isSafetyJourney = SAFETY_RELATION_KEYS.has(gameKey);
+    const usesTextClues = isSafetyJourney || SEMANTIC_RELATION_KEYS.has(gameKey);
     const pairCount = difficulty === "support"
       ? 2
       : difficulty === "challenge"
@@ -1447,7 +1480,7 @@
       game.rounds[(roundIndex + offset) % game.rounds.length],
     );
     const pairs = selectedRounds.map((item, match) => ({
-      clue: isSafetyJourney ? [] : (item.scene || []).map(cleanVisual),
+      clue: usesTextClues ? [] : (item.scene || []).map(cleanVisual),
       prompt: item.prompt,
       option: correctOption(item),
       match,
@@ -1456,12 +1489,14 @@
     const targetsBoard = document.createElement("div");
     targetsBoard.className = "sequence-slots relation-targets";
     if (isSafetyJourney) targetsBoard.classList.add("safety-relation-targets");
-    targetsBoard.style.gridTemplateColumns = isSafetyJourney ? "1fr" : "repeat(" + pairCount + ", minmax(0, 1fr))";
+    if (usesTextClues) targetsBoard.classList.add("text-relation-targets");
+    targetsBoard.style.gridTemplateColumns = usesTextClues ? "1fr" : "repeat(" + pairCount + ", minmax(0, 1fr))";
     const targets = shuffled(pairs, seed + ":clues").map((pair) => {
       const target = document.createElement("button");
       target.type = "button";
       target.className = "sequence-slot relation-target";
       if (isSafetyJourney) target.classList.add("safety-relation-target");
+      if (usesTextClues) target.classList.add("text-relation-target");
       target.dataset.activityDrop = String(pair.match);
       const clue = document.createElement("span");
       clue.className = pair.clue.length ? "relation-clue-visual" : "relation-clue-text";
@@ -1511,6 +1546,19 @@
       announce,
     );
 
+    let relationPrompt = "단서 " + pairCount + "개와 알맞은 그림을 모두 연결해 볼까?";
+    let relationHelper = "단서를 하나씩 보고 어울리는 그림을 놓아요.";
+    if (isSafetyJourney) {
+      relationPrompt = "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?";
+      relationHelper = pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요.";
+    } else if (gameKey === "sounds") {
+      relationPrompt = "소리 말과 동물 친구를 모두 연결해 볼까?";
+      relationHelper = "멍멍, 음메 같은 소리를 보고 동물 그림을 놓아요.";
+    } else if (gameKey === "emotions") {
+      relationPrompt = "상황과 어울리는 마음 얼굴을 모두 연결해 볼까?";
+      relationHelper = "상황을 하나씩 보고 기쁨, 슬픔, 놀람 얼굴을 놓아요.";
+    }
+
     stage.append(tray, targetsBoard);
     return {
       requiredActions: pairCount,
@@ -1521,12 +1569,8 @@
         source: sources[0],
         target: targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
       },
-      prompt: isSafetyJourney
-        ? "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?"
-        : "단서 " + pairCount + "개와 알맞은 그림을 모두 연결해 볼까?",
-      helper: isSafetyJourney
-        ? pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요."
-        : "단서를 하나씩 보고 어울리는 그림을 놓아요.",
+      prompt: relationPrompt,
+      helper: relationHelper,
       hint: () => {
         const source = sources.find((item) => !item.disabled);
         if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);

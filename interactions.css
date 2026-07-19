@@ -1067,12 +1067,14 @@ button.pattern-cell {
   font-weight: 850;
 }
 
-.safety-relation-targets {
+.safety-relation-targets,
+.text-relation-targets {
   width: min(100%, 680px);
   gap: 10px;
 }
 
-.safety-relation-target {
+.safety-relation-target,
+.text-relation-target {
   min-height: 76px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1082,12 +1084,14 @@ button.pattern-cell {
   text-align: left;
 }
 
-.safety-relation-target .relation-clue-text {
+.safety-relation-target .relation-clue-text,
+.text-relation-target .relation-clue-text {
   font-size: 15px;
   -webkit-line-clamp: 3;
 }
 
-.safety-relation-target small {
+.safety-relation-target small,
+.text-relation-target small {
   max-width: 72px;
   text-align: center;
 }
@@ -1522,12 +1526,14 @@ button.pattern-cell {
     font-size: 11px;
   }
 
-  .safety-relation-target {
+  .safety-relation-target,
+  .text-relation-target {
     min-height: 72px;
     padding: 10px 12px;
   }
 
-  .safety-relation-target .relation-clue-text {
+  .safety-relation-target .relation-clue-text,
+  .text-relation-target .relation-clue-text {
     font-size: 12px;
   }
 
