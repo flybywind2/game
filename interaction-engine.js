@@ -683,12 +683,14 @@
   }
 
   function renderCount(context) {
-    const { controller, stage, round, onComplete, onMistake, announce } = context;
+    const { controller, stage, round, difficulty, onComplete, onMistake, announce } = context;
     const target = Math.max(1, Math.min(5, parseTargetCount(round)));
-    const total = 5;
+    const total = Math.max(target, difficulty === "support" ? 4 : difficulty === "challenge" ? 6 : 5);
     const counter = createCounter("바구니", 0, target);
     const board = document.createElement("div");
     board.className = "count-board";
+    board.dataset.itemCount = String(total);
+    board.style.gridTemplateColumns = "repeat(" + (total === 6 ? 3 : total) + ", minmax(0, 1fr))";
     const basket = document.createElement("div");
     basket.className = "count-basket";
     basket.setAttribute("aria-label", target + "개를 담는 바구니");
@@ -736,6 +738,7 @@
     });
     stage.append(counter, basket, board, confirm);
     return {
+      requiredActions: target + 1,
       hint: () => pulse([counter, basket]),
       replay: () => pulse(board.querySelectorAll(".count-piece:not(.is-counted)"), "is-replay"),
     };
@@ -821,7 +824,11 @@
 
   function renderMemory(context) {
     const { controller, stage, game, round, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
-    const desiredPairs = difficulty === "support" && roundIndex === 0 ? 2 : Math.min(3, 2 + roundIndex);
+    const desiredPairs = difficulty === "support"
+      ? 2
+      : difficulty === "challenge"
+        ? 3
+        : Math.min(3, 2 + roundIndex);
     const candidates = [];
     [...game.rounds.map(correctOption), ...round.options].forEach((option) => {
       const visual = cleanVisual(option?.visual);
@@ -1023,7 +1030,7 @@
   }
 
   function renderPattern(context) {
-    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, round, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     const correct = correctOption(round);
     const rawSequence = (round.scene || []).slice(-6);
     const missingIndex = Math.max(0, rawSequence.findIndex((item) => item === "❓"));
@@ -1033,8 +1040,12 @@
     const knownIndex = completed.findIndex((visual, index) =>
       index !== missingIndex && round.options.some((option) => cleanVisual(option.visual) === visual),
     );
-    const hiddenIndexes = [...new Set([knownIndex >= 0 ? knownIndex : 0, missingIndex])].slice(0, 2);
-    while (hiddenIndexes.length < 2 && hiddenIndexes.length < completed.length) {
+    const targetBlankCount = Math.min(completed.length, difficulty === "support" ? 1 : difficulty === "challenge" ? 3 : 2);
+    const startingIndexes = difficulty === "support"
+      ? [missingIndex]
+      : [knownIndex >= 0 ? knownIndex : 0, missingIndex];
+    const hiddenIndexes = [...new Set(startingIndexes)].slice(0, targetBlankCount);
+    while (hiddenIndexes.length < targetBlankCount && hiddenIndexes.length < completed.length) {
       const next = completed.findIndex((_, index) => !hiddenIndexes.includes(index));
       if (next < 0) break;
       hiddenIndexes.push(next);
@@ -1058,7 +1069,8 @@
 
     const track = document.createElement("div");
     track.className = "pattern-track pattern-two-blanks";
-    track.setAttribute("aria-label", "규칙에서 빠진 두 칸을 채워요");
+    track.dataset.blankCount = String(targetBlankCount);
+    track.setAttribute("aria-label", "규칙에서 빠진 " + targetBlankCount + "칸을 채워요");
     const targets = [];
     completed.forEach((visual, index) => {
       if (!hiddenIndexes.includes(index)) {
@@ -1081,8 +1093,8 @@
 
     const tray = document.createElement("div");
     tray.className = "activity-tray pattern-answer-tray";
-    tray.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
     const sourceItems = shuffled([...answers, ...distractors], seed);
+    tray.style.gridTemplateColumns = "repeat(" + Math.min(5, sourceItems.length) + ", minmax(0, 1fr))";
     const sources = sourceItems.map((item, index) => {
       const token = createToken(item.option);
       token.dataset.sourceIndex = String(index);
@@ -1172,7 +1184,7 @@
   });
 
   function renderSort(context) {
-    const { controller, stage, game, gameKey, round, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, game, gameKey, round, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     const tray = document.createElement("div");
     tray.className = "activity-tray sort-tray";
     const deepLabels = DEEP_SORT_CONFIG[gameKey];
@@ -1195,7 +1207,8 @@
       bins.appendChild(target);
       return target;
     });
-    const chosenRounds = roundIndex === 0 ? game.rounds.slice(0, 2) : game.rounds;
+    const deepRoundCount = difficulty === "support" ? 2 : difficulty === "challenge" ? 3 : roundIndex === 0 ? 2 : 3;
+    const chosenRounds = game.rounds.slice(0, deepRoundCount);
     const items = deepLabels
       ? chosenRounds.flatMap((item, itemIndex) => {
           const correct = correctOption(item);
@@ -1412,9 +1425,13 @@
   }
 
   function renderDrag(context) {
-    const { controller, stage, game, gameKey, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, game, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     const isSafetyJourney = SAFETY_RELATION_KEYS.has(gameKey);
-    const pairCount = roundIndex === 0 ? 2 : Math.min(3, game.rounds.length);
+    const pairCount = difficulty === "support"
+      ? 2
+      : difficulty === "challenge"
+        ? Math.min(3, game.rounds.length)
+        : roundIndex === 0 ? 2 : Math.min(3, game.rounds.length);
     const selectedRounds = Array.from({ length: pairCount }, (_, offset) =>
       game.rounds[(roundIndex + offset) % game.rounds.length],
     );
@@ -1493,8 +1510,12 @@
         source: sources[0],
         target: targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
       },
-      prompt: isSafetyJourney ? "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?" : "",
-      helper: isSafetyJourney ? pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요." : "",
+      prompt: isSafetyJourney
+        ? "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?"
+        : "단서 " + pairCount + "개와 알맞은 그림을 모두 연결해 볼까?",
+      helper: isSafetyJourney
+        ? pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요."
+        : "단서를 하나씩 보고 어울리는 그림을 놓아요.",
       hint: () => {
         const source = sources.find((item) => !item.disabled);
         if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
@@ -1513,7 +1534,7 @@
   }
 
   function renderSequence(context) {
-    const { controller, stage, game, round, gameKey, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, game, round, gameKey, roundIndex, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
     let steps;
     let distractor = null;
 
@@ -1525,18 +1546,22 @@
         step: index,
       }));
     } else {
-      const selectedRounds = roundIndex < 2
-        ? game.rounds.slice(roundIndex, roundIndex + 2)
-        : game.rounds;
+      const selectedRounds = difficulty === "support"
+        ? game.rounds.slice(0, 2)
+        : difficulty === "challenge"
+          ? game.rounds
+          : roundIndex < 2
+            ? game.rounds.slice(roundIndex, roundIndex + 2)
+            : game.rounds;
       steps = selectedRounds.map((item, index) => ({ option: correctOption(item), step: index }));
-      if (roundIndex >= 2) distractor = round.options.find((option) => !option.correct) || null;
+      if (difficulty === "challenge" || roundIndex >= 2) distractor = round.options.find((option) => !option.correct) || null;
     }
 
     const task = document.createElement("p");
     task.className = "sequence-task";
     task.textContent = ROUND_SEQUENCE_KEYS.has(gameKey)
       ? "그림 조각을 처음부터 차례대로 놓아요."
-      : roundIndex < 2
+      : steps.length === 2
         ? "지금 장면과 다음 장면을 차례대로 놓아요."
         : "세 장면을 처음부터 다시 차례대로 놓아요.";
 
@@ -1601,6 +1626,9 @@
     );
     stage.append(task, slots, tray);
     return {
+      requiredActions: steps.length,
+      prompt: "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓아 볼까?",
+      helper: "먼저 할 그림부터 하나씩 번호 자리에 놓아요.",
       completion: "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓았어!",
       demo: {
         source: sources.find((item) => item.dataset.step === "0"),
@@ -2819,6 +2847,7 @@
     stage.innerHTML = "";
     stage.className = "activity-stage mode-" + mode;
     stage.dataset.mode = mode;
+    stage.dataset.difficulty = config.difficulty || "standard";
     stage.setAttribute("role", "group");
     stage.setAttribute("aria-label", metaFor(mode, config.gameKey).label);
 
