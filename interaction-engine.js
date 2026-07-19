@@ -33,7 +33,7 @@
     },
     memory: {
       label: "정답 기억하기",
-      instruction: "세 그림의 자리를 기억한 뒤 질문의 정답 하나를 찾아요.",
+      instruction: "그림들의 자리를 기억한 뒤 질문의 정답 하나를 찾아요.",
     },
     pattern: {
       label: "규칙 완성",
@@ -481,12 +481,31 @@
   }
 
   function renderSpot(context) {
-    const { controller, stage, game, round, seed, onComplete, onMistake, announce } = context;
+    const { controller, stage, game, round, roundIndex, seed, onComplete, onMistake, announce } = context;
     const correct = correctOption(round);
+    const desiredCount = [4, 5, 6][Math.min(2, roundIndex || 0)];
+    const optionVisuals = new Set(round.options.map((option) => cleanVisual(option.visual)));
+    const sceneDistractors = (round.scene || [])
+      .map(cleanVisual)
+      .filter((visual, index, visuals) =>
+        visual !== cleanVisual(correct.visual) &&
+        !optionVisuals.has(visual) &&
+        visuals.indexOf(visual) === index,
+      )
+      .map((visual) => ({ label: "주변 그림", visual }));
+    const wrongOptions = round.options.filter((option) => option !== correct);
+    const distractorPool = [...sceneDistractors, ...wrongOptions];
     const items = round.options.map((option) => ({ option, target: option === correct }));
+    let distractorIndex = 0;
+    while (items.length < desiredCount && distractorPool.length) {
+      const source = distractorPool[distractorIndex % distractorPool.length];
+      items.push({ option: { ...source }, target: false });
+      distractorIndex += 1;
+    }
     const board = document.createElement("div");
     board.className = "spot-board spot-single-target";
-    board.setAttribute("aria-label", "세 그림 중 정답 하나 찾기");
+    board.dataset.itemCount = String(items.length);
+    board.setAttribute("aria-label", items.length + "개 그림 중 정답 하나 찾기");
     const targetButtons = [];
 
     shuffled(items, seed).forEach((item, index) => {
@@ -720,15 +739,27 @@
   }
 
   function renderMemory(context) {
-    const { controller, stage, round, seed, onAttempt, onComplete, onMistake, announce } = context;
+    const { controller, stage, round, roundIndex, seed, onAttempt, onComplete, onMistake, announce } = context;
     const requested = correctOption(round);
+    const desiredCount = [3, 4, 6][Math.min(2, roundIndex || 0)];
+    const indexedOptions = round.options.map((option, optionIndex) => ({ option, optionIndex }));
+    const wrongCards = indexedOptions.filter((card) => card.option !== requested);
+    const cardPool = [...indexedOptions];
+    let extraIndex = 0;
+    while (cardPool.length < desiredCount && wrongCards.length) {
+      const source = wrongCards[extraIndex % wrongCards.length];
+      cardPool.push({ option: { ...source.option }, optionIndex: source.optionIndex });
+      extraIndex += 1;
+    }
     const cards = shuffled(
-      round.options.map((option, optionIndex) => ({ option, optionIndex })),
+      cardPool,
       seed,
     );
     const counter = createCounter("정답 찾기", 0, 1);
     const board = document.createElement("div");
     board.className = "memory-board memory-answer-board";
+    board.dataset.cardCount = String(cards.length);
+    board.setAttribute("aria-label", cards.length + "장 기억 카드");
     const cardButtons = [];
     let locked = true;
 
@@ -806,7 +837,7 @@
         button.classList.add("is-preview");
         button.disabled = true;
       });
-      announce("세 그림을 다시 보여줄게요. 정답 자리를 기억해요.");
+      announce(cards.length + "개 그림을 다시 보여줄게요. 정답 자리를 기억해요.");
       controller.later(() => {
         cardButtons.forEach((button, index) => {
           button.classList.remove("is-preview");
@@ -819,7 +850,7 @@
     };
 
     stage.append(counter, board, startButton);
-    announce("세 그림을 보고 질문의 정답이 어디 있는지 기억해요.");
+    announce(cards.length + "개 그림을 보고 질문의 정답이 어디 있는지 기억해요.");
     return {
       requiredActions: 2,
       hint: () => pulse(cardButtons.find(

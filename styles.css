@@ -1643,6 +1643,11 @@ img {
   font-weight: 900;
 }
 
+.feedback:empty {
+  min-height: 0;
+  margin-top: 0;
+}
+
 .feedback.success {
   color: var(--mint-dark);
 }
