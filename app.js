@@ -675,6 +675,7 @@
       attempts: 0,
       hints: 0,
       lastPlayed: null,
+      plan: [],
     };
   }
 
@@ -688,18 +689,23 @@
         attempts: Number(saved.attempts) || 0,
         hints: Number(saved.hints) || 0,
         lastPlayed: saved.lastPlayed || null,
+        plan: Array.isArray(saved.plan) ? saved.plan.filter((key) => GAMES[key]).slice(0, 3) : [],
       };
     } catch {
       return blankProgress();
     }
   }
 
-  function saveProgress() {
+  function persistProgress() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(dailyProgress));
     } catch {
       // The games still work when storage is unavailable.
     }
+  }
+
+  function saveProgress() {
+    persistProgress();
     updateTodayCard();
   }
 
@@ -859,16 +865,83 @@
     return Object.values(dailyProgress.completed).filter((count) => count > 0).length;
   }
 
+  function dailySeed(value = "") {
+    let hash = 2166136261;
+    for (const character of todayKey() + value) {
+      hash = Math.imul(hash ^ character.codePointAt(0), 16777619);
+    }
+    return hash >>> 0;
+  }
+
+  function ensureDailyPlan() {
+    const saved = Array.isArray(dailyProgress.plan)
+      ? dailyProgress.plan.filter((key, index, keys) => GAMES[key] && keys.indexOf(key) === index).slice(0, 3)
+      : [];
+    if (saved.length === 3) return saved;
+
+    const alternatingCategory = dailySeed() % 2 === 0 ? "word" : "heart";
+    const categories = ["look", "number", alternatingCategory];
+    const rotation = dailySeed("order") % categories.length;
+    const orderedCategories = [...categories.slice(rotation), ...categories.slice(0, rotation)];
+    const plan = orderedCategories.map((category) => {
+      const candidates = Object.keys(GAMES).filter((key) => gameCategory(key) === category);
+      candidates.sort((left, right) => {
+        const completionGap = (learnerProfile.completed[left] || 0) - (learnerProfile.completed[right] || 0);
+        if (completionGap) return completionGap;
+        return dailySeed(left) - dailySeed(right) || left.localeCompare(right);
+      });
+      return candidates[0];
+    }).filter(Boolean);
+    dailyProgress.plan = plan;
+    persistProgress();
+    return plan;
+  }
+
+  function dailyPlanCompletedCount(plan = ensureDailyPlan()) {
+    return plan.filter((key) => Number(dailyProgress.completed[key]) > 0).length;
+  }
+
+  function renderDailyPlan(plan) {
+    const container = document.querySelector("#daily-plan");
+    if (!container) return;
+    container.innerHTML = "";
+    plan.forEach((key, index) => {
+      const game = GAMES[key];
+      const category = gameCategory(key);
+      const done = Number(dailyProgress.completed[key]) > 0;
+      const mode = window.MONGLE_INTERACTIONS?.resolveMode(key) || "choice";
+      const modeLabel = window.MONGLE_INTERACTIONS?.metaFor(mode, key)?.label || "놀이";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "daily-plan-item" + (done ? " is-complete" : "");
+      button.dataset.dailyGame = key;
+      button.dataset.category = category;
+      button.setAttribute("aria-label", `${index + 1}번째 오늘 놀이, ${game.title}, ${modeLabel}, ${done ? "완료" : "시작"}`);
+      button.innerHTML = `
+        <span class="daily-plan-step" aria-hidden="true">${done ? "✓" : index + 1}</span>
+        <img src="${CATEGORY_ART[category]}" alt="" width="144" height="108" loading="lazy" decoding="async" />
+        <span class="daily-plan-copy">
+          <small>${CATEGORY_NAMES[category]} · ${modeLabel}</small>
+          <strong>${game.title}</strong>
+          <em>${done ? "오늘 완료!" : "약 3분 · 시작하기 →"}</em>
+        </span>`;
+      button.addEventListener("click", () => startGame(key));
+      container.appendChild(button);
+    });
+  }
+
   function updateTodayCard() {
-    const count = completedCount();
+    const plan = ensureDailyPlan();
+    const count = dailyPlanCompletedCount(plan);
     document.querySelectorAll(".stamp").forEach((stamp, index) => {
       stamp.classList.toggle("filled", index < Math.min(count, 3));
     });
 
     const status = document.querySelector("#today-status");
-    if (count === 0) status.textContent = "아직 시작 전이에요";
-    else if (count < 3) status.textContent = `${count}개 완료했어요`;
-    else status.textContent = "오늘 목표 완료!";
+    if (count === 0) status.textContent = "첫 코스를 시작해요";
+    else if (count < 3) status.textContent = `오늘 코스 ${count} / 3`;
+    else status.textContent = "오늘 코스 완료!";
+    renderDailyPlan(plan);
   }
 
   function updatePremiumDashboard() {
@@ -1646,6 +1719,8 @@
   }
 
   function recommendedGame() {
+    const dailyNext = ensureDailyPlan().find((key) => !dailyProgress.completed[key]);
+    if (dailyNext) return dailyNext;
     const category = Object.keys(CATEGORY_NAMES)
       .map((key) => ({ key, ...categoryProgress(key) }))
       .sort((a, b) => a.percent - b.percent || a.completed - b.completed)[0]?.key;
@@ -2047,7 +2122,8 @@
 
   document.querySelector("#reset-progress").addEventListener("click", () => {
     if (!window.confirm("오늘의 놀이 기록을 모두 지울까요?")) return;
-    dailyProgress = blankProgress();
+    const plan = ensureDailyPlan();
+    dailyProgress = { ...blankProgress(), plan };
     saveProgress();
     updateParentDashboard();
     showToast("오늘의 놀이 기록을 지웠어요.");

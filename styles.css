@@ -620,12 +620,125 @@ img {
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 20px;
-  margin-bottom: -50px;
+  margin-bottom: 24px;
   padding: 23px 28px;
   border: 2px solid rgba(116, 91, 72, 0.1);
   border-radius: 25px;
   background: white;
   box-shadow: var(--shadow);
+}
+
+.daily-plan {
+  grid-column: 1 / -1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.daily-plan-loading {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.daily-plan-item {
+  position: relative;
+  min-width: 0;
+  min-height: 92px;
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 11px 8px 8px;
+  overflow: hidden;
+  border: 2px solid #eadfce;
+  border-radius: 20px;
+  background: #fffaf2;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.daily-plan-item:hover,
+body.is-keyboard-nav .daily-plan-item:focus {
+  border-color: var(--mint);
+  box-shadow: 0 6px 0 rgba(98, 201, 166, 0.22);
+  transform: translateY(-2px);
+}
+
+.daily-plan-item img {
+  width: 74px;
+  height: 74px;
+  display: block;
+  object-fit: cover;
+  border-radius: 15px;
+}
+
+.daily-plan-step {
+  position: absolute;
+  z-index: 1;
+  top: 5px;
+  left: 5px;
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border: 2px solid white;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+  box-shadow: 0 2px 0 rgba(75, 59, 48, 0.15);
+}
+
+.daily-plan-copy,
+.daily-plan-copy small,
+.daily-plan-copy strong,
+.daily-plan-copy em {
+  min-width: 0;
+  display: block;
+}
+
+.daily-plan-copy small {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-plan-copy strong {
+  margin: 4px 0;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-plan-copy em {
+  color: var(--purple-dark);
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.daily-plan-item.is-complete {
+  border-color: #a9dbc9;
+  background: var(--mint-soft);
+}
+
+.daily-plan-item.is-complete .daily-plan-step {
+  background: var(--mint-dark);
 }
 
 .today-icon {
@@ -2261,7 +2374,7 @@ img {
   .today-card {
     grid-template-columns: auto 1fr;
     gap: 14px;
-    margin-bottom: -54px;
+    margin-bottom: 18px;
     padding: 18px;
     text-align: left;
   }
@@ -2284,6 +2397,21 @@ img {
   .stamp {
     width: 46px;
     height: 40px;
+  }
+
+  .daily-plan {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .daily-plan-item {
+    min-height: 82px;
+    grid-template-columns: 64px 1fr;
+  }
+
+  .daily-plan-item img {
+    width: 64px;
+    height: 64px;
   }
 
   .games-section {

@@ -1,9 +1,9 @@
-const CACHE_VERSION = "mongle-premium-v19";
+const CACHE_VERSION = "mongle-premium-v20";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
-  "./styles.css?v=7",
+  "./styles.css?v=8",
   "./enhancements.css?v=1",
   "./catalog.css?v=1",
   "./interactions.css?v=19",
@@ -11,7 +11,7 @@ const APP_SHELL = [
   "./extra-games.js?v=5",
   "./tts-manifest.js?v=4",
   "./interaction-engine.js?v=26",
-  "./app.js?v=25",
+  "./app.js?v=26",
   "./assets/generated/favicon.png",
   "./assets/generated/app-icon-192.png",
   "./assets/generated/app-icon-512.png",
