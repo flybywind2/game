@@ -1175,6 +1175,33 @@
   cursor: pointer;
 }
 
+.usability-completion {
+  border-color: #d7c9ed;
+  background: linear-gradient(150deg, #faf7ff, #fffdf5);
+}
+
+.usability-completion.is-complete {
+  border-color: #b9e2d3;
+  background: linear-gradient(150deg, #f2fff9, #fffdf5);
+}
+
+.completion-usability-next,
+.completion-usability-results {
+  min-height: 58px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 17px;
+  background: var(--purple);
+  color: white;
+  font-size: 12px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.completion-usability-results {
+  background: var(--mint-dark);
+}
+
 .parent-observation-heading {
   display: flex;
   align-items: center;
@@ -1268,6 +1295,288 @@
   font-size: 9px;
   font-weight: 650;
   line-height: 1.45;
+}
+
+.usability-observation {
+  margin: 18px 0;
+  padding: 18px;
+  border: 2px solid #d7c9ed;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #f8f4ff, #fff);
+}
+
+.usability-observation-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.usability-observation-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 19px;
+  font-weight: 950;
+}
+
+.usability-observation-heading strong,
+.usability-observation-heading small {
+  display: block;
+}
+
+.usability-observation-heading strong {
+  font-size: 14px;
+}
+
+.usability-observation-heading small {
+  margin-top: 3px;
+  color: var(--ink-soft);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.usability-observation-heading > b {
+  padding: 7px 9px;
+  border-radius: 11px;
+  background: white;
+  color: var(--purple-dark);
+  font-size: 11px;
+}
+
+.usability-observation-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.usability-observation-actions button {
+  min-height: 52px;
+  border: 0;
+  border-radius: 15px;
+  background: var(--purple);
+  color: white;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.usability-observation-actions button:last-child {
+  border: 2px solid #d4c4e9;
+  background: white;
+  color: var(--purple-dark);
+}
+
+.usability-observation-actions button:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.usability-observation-status,
+.usability-privacy {
+  margin: 9px 2px 0;
+  color: var(--ink-soft);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.usability-observation-list {
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.usability-result-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #e1d7ed;
+  border-radius: 15px;
+  background: white;
+}
+
+.usability-result-card > i {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 950;
+}
+
+.usability-result-card strong,
+.usability-result-card small {
+  display: block;
+}
+
+.usability-result-card strong {
+  font-size: 10px;
+}
+
+.usability-result-card small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 8px;
+}
+
+.usability-result-card > b {
+  color: var(--mint-dark);
+  font-size: 9px;
+}
+
+.usability-manual {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 13px 0 0;
+  padding: 12px;
+  border: 1px solid #ded2eb;
+  border-radius: 16px;
+  background: white;
+}
+
+.usability-manual[hidden] {
+  display: none;
+}
+
+.usability-manual legend {
+  padding: 0 5px;
+  color: var(--purple-dark);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.usability-manual label {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.usability-manual input,
+.usability-manual select {
+  min-height: 38px;
+  border: 1px solid #d5c8e4;
+  border-radius: 11px;
+  background: #fbf9ff;
+  color: var(--ink);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.usability-manual input {
+  width: 52px;
+  padding: 0 7px;
+}
+
+.usability-manual select {
+  max-width: 118px;
+  padding: 0 6px;
+}
+
+.usability-ready {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 20px;
+  border: 0;
+  background: var(--cream);
+}
+
+.usability-ready::backdrop {
+  background: var(--cream);
+}
+
+.usability-ready[open] {
+  display: grid;
+  place-items: center;
+}
+
+.usability-ready-card {
+  position: relative;
+  width: min(100%, 520px);
+  display: grid;
+  justify-items: center;
+  padding: 28px 24px 24px;
+  border: 3px solid #e4d8c8;
+  border-radius: 34px;
+  background: white;
+  box-shadow: 0 10px 0 #e4d8c8;
+  text-align: center;
+}
+
+.usability-ready-card img {
+  width: 170px;
+  height: 170px;
+  margin-bottom: 13px;
+  border-radius: 35px;
+  object-fit: cover;
+}
+
+.usability-ready-card h2 {
+  margin: 8px 0;
+  font-size: clamp(26px, 7vw, 40px);
+  line-height: 1.15;
+}
+
+.usability-ready-card p {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.65;
+}
+
+.usability-ready-card > small {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 10px;
+}
+
+.usability-child-start {
+  width: min(100%, 330px);
+  min-height: 68px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 22px;
+  background: var(--coral);
+  box-shadow: 0 7px 0 #d85f4b;
+  color: white;
+  font-size: 21px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.usability-ready-cancel {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border: 2px solid #dfd5ca;
+  border-radius: 14px;
+  background: white;
+  color: var(--ink-soft);
+  font-size: 21px;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .growth-report-heading {
@@ -1640,6 +1949,38 @@
 
   .parent-observation {
     padding: 15px;
+  }
+
+  .usability-observation {
+    padding: 15px;
+  }
+
+  .usability-observation-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .usability-observation-heading > b {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    text-align: center;
+  }
+
+  .usability-manual {
+    grid-template-columns: 1fr;
+  }
+
+  .usability-ready {
+    padding: 12px;
+  }
+
+  .usability-ready-card {
+    padding: 24px 16px 20px;
+    border-radius: 28px;
+  }
+
+  .usability-ready-card img {
+    width: 140px;
+    height: 140px;
   }
 
   .backup-actions {

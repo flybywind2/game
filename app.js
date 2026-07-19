@@ -570,6 +570,8 @@
   const MUSIC_KEY = "mongle-music-v1";
   const MUSIC_VOLUME_KEY = "mongle-music-volume-v1";
   const PLAY_LIMIT_KEY = "mongle-play-limit-v1";
+  const USABILITY_KEY = "mongle-usability-observations-v1";
+  const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
   const CATEGORY_NAMES = Object.freeze({
@@ -649,6 +651,8 @@
   let soundEnabled = loadSoundPreference();
   let dailyProgress = loadProgress();
   let learnerProfile = loadLearnerProfile();
+  let usabilityRecords = loadUsabilityRecords();
+  let usabilitySession = null;
   let audioContext = null;
   let activeUtterance = null;
   let activeVoiceAudio = null;
@@ -689,6 +693,52 @@
   function safeWholeNumber(value, maximum = 999999) {
     const number = Math.floor(Number(value));
     return Number.isFinite(number) ? Math.min(maximum, Math.max(0, number)) : 0;
+  }
+
+  function normalizeUsabilityRecord(record) {
+    if (!record || typeof record !== "object") return null;
+    const gamesCompleted = safeWholeNumber(record.gamesCompleted, USABILITY_GAMES.length);
+    const playAgain = ["yes", "no", "unknown"].includes(record.playAgain) ? record.playAgain : "unknown";
+    return {
+      id: safeWholeNumber(record.id, Number.MAX_SAFE_INTEGER) || Date.now(),
+      date: /^\d{4}-\d{2}-\d{2}$/.test(record.date) ? record.date : todayKey(),
+      firstStartSeconds: safeWholeNumber(record.firstStartSeconds, 3600),
+      totalSeconds: safeWholeNumber(record.totalSeconds, 7200),
+      gamesCompleted,
+      hints: safeWholeNumber(record.hints, 999),
+      attempts: safeWholeNumber(record.attempts, 9999),
+      parentTaps: safeWholeNumber(record.parentTaps, 99),
+      scrollConfusion: safeWholeNumber(record.scrollConfusion, 99),
+      mismatch: safeWholeNumber(record.mismatch, 99),
+      extraChoice: safeWholeNumber(record.extraChoice, 99),
+      playAgain,
+      steps: Array.isArray(record.steps) ? record.steps
+        .filter((step) => step && USABILITY_GAMES.includes(step.game))
+        .slice(0, USABILITY_GAMES.length)
+        .map((step) => ({
+          game: step.game,
+          seconds: safeWholeNumber(step.seconds, 3600),
+          hints: safeWholeNumber(step.hints, 99),
+          attempts: safeWholeNumber(step.attempts, 999),
+        })) : [],
+    };
+  }
+
+  function loadUsabilityRecords() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(USABILITY_KEY));
+      return Array.isArray(saved) ? saved.map(normalizeUsabilityRecord).filter(Boolean).slice(-3) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveUsabilityRecords() {
+    try {
+      localStorage.setItem(USABILITY_KEY, JSON.stringify(usabilityRecords.slice(-3)));
+    } catch {
+      // Observation mode remains usable when storage is unavailable.
+    }
   }
 
   function normalizeDailyProgress(saved) {
@@ -1002,6 +1052,12 @@
   }
 
   function updatePlayTimeChip() {
+    if (usabilitySession) {
+      playTimeChip.hidden = false;
+      playTimeChip.textContent = `관찰 ${usabilitySession.currentIndex + 1} / ${USABILITY_GAMES.length}`;
+      playTimeChip.setAttribute("aria-label", `혼자 놀이 관찰 ${USABILITY_GAMES.length}개 중 ${usabilitySession.currentIndex + 1}번째`);
+      return;
+    }
     if (!playLimitMinutes) {
       playTimeChip.hidden = true;
       return;
@@ -1898,6 +1954,8 @@
       dot.classList.add("done");
     });
 
+    if (renderUsabilityCompletion(game, isNewSticker)) return;
+
     if (playLimitReached()) {
       playMain.innerHTML = `
         <div class="completion-card break-completion">
@@ -2312,6 +2370,7 @@
       app: { games: Object.keys(GAMES).length, profileVersion: 2 },
       profile: learnerProfile,
       daily: dailyProgress,
+      usability: usabilityRecords,
       settings: {
         soundEnabled,
         musicEnabled,
@@ -2339,6 +2398,9 @@
       const profile = normalizeLearnerProfile(payload.profile);
       if (!profile) throw new Error("invalid profile");
       const daily = normalizeDailyProgress(payload.daily);
+      const importedUsability = Array.isArray(payload.usability)
+        ? payload.usability.map(normalizeUsabilityRecord).filter(Boolean).slice(-3)
+        : [];
       if (!window.confirm("현재 이 기기의 기록을 백업 파일의 기록으로 바꿀까요?")) {
         setBackupStatus("불러오기를 취소했어요. 현재 기록은 그대로예요.");
         return;
@@ -2346,6 +2408,7 @@
 
       learnerProfile = profile;
       dailyProgress = daily;
+      usabilityRecords = importedUsability;
       if (typeof payload.settings?.soundEnabled === "boolean") soundEnabled = payload.settings.soundEnabled;
       if (typeof payload.settings?.musicEnabled === "boolean") musicEnabled = payload.settings.musicEnabled;
       const importedVolume = Number(payload.settings?.musicVolume);
@@ -2354,6 +2417,7 @@
       if ([0, 5, 10, 15].includes(importedPlayLimit)) playLimitMinutes = importedPlayLimit;
       resetPlayClock();
       persistProgress();
+      saveUsabilityRecords();
       try {
         localStorage.setItem(PROFILE_KEY, JSON.stringify(learnerProfile));
       } catch {
@@ -2369,6 +2433,7 @@
       updateTodayCard();
       updatePremiumDashboard();
       updateParentDashboard();
+      renderUsabilityDashboard();
       setBackupStatus("몽글 기록을 안전하게 불러왔어요.", "success");
       showToast("몽글 기록을 불러왔어요.");
     } catch {
@@ -2508,8 +2573,201 @@
     document.querySelector("#offline-tip-text").textContent = offline.text;
   }
 
+  function usabilityCriteria(records = usabilityRecords) {
+    const ready = records.length >= 3;
+    const firstStart = records.filter((record) => record.firstStartSeconds <= 30).length >= 2;
+    const independentCompletion = records.length > 0 && records.every((record) => record.gamesCompleted >= 2 && record.parentTaps === 0);
+    const hints = records.length > 0 && records.every((record) => record.hints <= 3);
+    const scroll = records.reduce((sum, record) => sum + record.scrollConfusion, 0) <= 1;
+    const extraChoice = records.filter((record) => record.extraChoice > 0).length >= 2;
+    const playAgain = records.filter((record) => record.playAgain === "yes").length >= 2;
+    const mismatch = records.reduce((sum, record) => sum + record.mismatch, 0) === 0;
+    return { ready, firstStart, independentCompletion, hints, scroll, extraChoice, playAgain, mismatch };
+  }
+
+  function usabilitySummaryText() {
+    const lines = ["몽글 놀이터 · 10분 혼자 놀이 관찰", `기록일: ${todayKey()}`, ""];
+    usabilityRecords.forEach((record, index) => {
+      lines.push(
+        `아이 ${index + 1}: 첫 시작 ${record.firstStartSeconds}초 · 완료 ${record.gamesCompleted}/3 · 자동 도움 ${record.hints}회 · 총 ${Math.ceil(record.totalSeconds / 60)}분`,
+        `  보호자 조작 ${record.parentTaps}회 · 스크롤 혼동 ${record.scrollConfusion}회 · 내용 불일치 ${record.mismatch}회 · 추가 선택 ${record.extraChoice}회 · 다시 하기 ${record.playAgain === "yes" ? "예" : record.playAgain === "no" ? "아니요" : "미기록"}`,
+      );
+    });
+    const criteria = usabilityCriteria();
+    lines.push(
+      "",
+      "19,000원 출시 관찰 기준",
+      `${criteria.firstStart ? "✓" : "□"} 3명 중 2명 이상 30초 안에 시작`,
+      `${criteria.independentCompletion ? "✓" : "□"} 3명 모두 보호자 조작 없이 2개 이상 완료`,
+      `${criteria.hints ? "✓" : "□"} 아이마다 자동 도움 3회 이하`,
+      `${criteria.scroll ? "✓" : "□"} 스크롤 혼동 합계 1회 이하`,
+      `${criteria.extraChoice ? "✓" : "□"} 3명 중 2명 이상 추가 놀이 선택`,
+      `${criteria.playAgain ? "✓" : "□"} 3명 중 2명 이상 다시 하고 싶다고 표현`,
+      `${criteria.mismatch ? "✓" : "□"} 내용과 정답 불일치 0건`,
+      "",
+      criteria.ready && Object.values(criteria).every(Boolean) ? "종합: 관찰 기준 통과" : criteria.ready ? "종합: 보완 후 재관찰 필요" : "종합: 3명 관찰 기록이 아직 필요함",
+    );
+    return lines.join("\n");
+  }
+
+  function renderUsabilityDashboard() {
+    const count = document.querySelector("#usability-observation-count");
+    if (!count) return;
+    count.textContent = String(usabilityRecords.length);
+    const start = document.querySelector("#start-usability-observation");
+    start.textContent = usabilitySession ? `관찰 이어하기 · ${usabilitySession.steps.length}/3` : "관찰 준비하기";
+    const copy = document.querySelector("#copy-usability-observation");
+    copy.disabled = usabilityRecords.length === 0;
+    const status = document.querySelector("#usability-observation-status");
+    if (usabilitySession) {
+      status.textContent = `${GAMES[USABILITY_GAMES[usabilitySession.currentIndex]]?.title || "다음 놀이"}부터 관찰을 이어갈 수 있어요.`;
+    } else if (usabilityRecords.length < 3) {
+      status.textContent = `${3 - usabilityRecords.length}명의 관찰 기록이 더 필요해요. 화면을 대신 누르지 말고 지켜봐 주세요.`;
+    } else {
+      const criteria = usabilityCriteria();
+      const passed = Object.entries(criteria).filter(([key, value]) => key !== "ready" && value).length;
+      status.textContent = `출시 관찰 기준 7개 중 ${passed}개를 확인했어요.`;
+    }
+
+    const list = document.querySelector("#usability-observation-list");
+    list.innerHTML = "";
+    usabilityRecords.forEach((record, index) => {
+      const card = document.createElement("div");
+      card.className = "usability-result-card";
+      const automaticPass = record.firstStartSeconds <= 30 && record.gamesCompleted >= 2 && record.hints <= 3;
+      card.innerHTML = `<i>${index + 1}</i><span><strong>첫 시작 ${record.firstStartSeconds}초 · ${record.gamesCompleted}/3 완료</strong><small>자동 도움 ${record.hints}회 · 약 ${Math.max(1, Math.ceil(record.totalSeconds / 60))}분</small></span><b>${automaticPass ? "자동 지표 통과" : "확인 필요"}</b>`;
+      list.appendChild(card);
+    });
+
+    const latest = usabilityRecords.at(-1);
+    const manual = document.querySelector("#usability-manual");
+    manual.hidden = !latest;
+    if (!latest) return;
+    document.querySelector("#usability-parent-taps").value = String(latest.parentTaps);
+    document.querySelector("#usability-scroll-confusion").value = String(latest.scrollConfusion);
+    document.querySelector("#usability-mismatch").value = String(latest.mismatch);
+    document.querySelector("#usability-extra-choice").value = String(latest.extraChoice);
+    document.querySelector("#usability-play-again").value = latest.playAgain;
+  }
+
+  function showUsabilityReady() {
+    const ready = document.querySelector("#usability-ready");
+    const title = document.querySelector("#usability-ready-title");
+    title.textContent = usabilitySession?.firstStartSeconds === null
+      ? "몽글이와 세 가지 놀이를 해볼까?"
+      : "몽글이와 다음 놀이를 이어갈까?";
+    if (typeof ready.showModal === "function") ready.showModal();
+    else ready.setAttribute("open", "");
+    window.setTimeout(() => document.querySelector("#usability-child-start")?.focus({ preventScroll: true }), 80);
+  }
+
+  function closeUsabilityReady() {
+    const ready = document.querySelector("#usability-ready");
+    if (typeof ready.close === "function") ready.close();
+    else ready.removeAttribute("open");
+  }
+
+  function prepareUsabilityObservation() {
+    if (!usabilitySession) {
+      usabilitySession = {
+        readyAt: Date.now(),
+        firstStartSeconds: null,
+        currentIndex: 0,
+        steps: [],
+        baselineHints: Number(dailyProgress.hints) || 0,
+        baselineAttempts: Number(dailyProgress.attempts) || 0,
+        gameStartedAt: null,
+        gameStartHints: Number(dailyProgress.hints) || 0,
+        gameStartAttempts: Number(dailyProgress.attempts) || 0,
+      };
+    }
+    closeParentDialog();
+    showUsabilityReady();
+  }
+
+  function startUsabilityGame() {
+    if (!usabilitySession) return;
+    if (usabilitySession.firstStartSeconds === null) {
+      usabilitySession.firstStartSeconds = Math.max(0, Math.round((Date.now() - usabilitySession.readyAt) / 1000));
+    }
+    usabilitySession.gameStartedAt = Date.now();
+    usabilitySession.gameStartHints = Number(dailyProgress.hints) || 0;
+    usabilitySession.gameStartAttempts = Number(dailyProgress.attempts) || 0;
+    const gameKey = USABILITY_GAMES[usabilitySession.currentIndex];
+    closeUsabilityReady();
+    startGame(gameKey);
+  }
+
+  function finishUsabilityRecord() {
+    const now = Date.now();
+    const record = normalizeUsabilityRecord({
+      id: now,
+      date: todayKey(),
+      firstStartSeconds: usabilitySession.firstStartSeconds,
+      totalSeconds: Math.round((now - usabilitySession.readyAt) / 1000),
+      gamesCompleted: usabilitySession.steps.length,
+      hints: Math.max(0, (Number(dailyProgress.hints) || 0) - usabilitySession.baselineHints),
+      attempts: Math.max(0, (Number(dailyProgress.attempts) || 0) - usabilitySession.baselineAttempts),
+      parentTaps: 0,
+      scrollConfusion: 0,
+      mismatch: 0,
+      extraChoice: 0,
+      playAgain: "unknown",
+      steps: usabilitySession.steps,
+    });
+    usabilityRecords = [...usabilityRecords, record].slice(-3);
+    saveUsabilityRecords();
+    usabilitySession = null;
+    return record;
+  }
+
+  function renderUsabilityCompletion(game, isNewSticker) {
+    if (!usabilitySession || USABILITY_GAMES[usabilitySession.currentIndex] !== activeGameKey) return false;
+    const now = Date.now();
+    usabilitySession.steps.push({
+      game: activeGameKey,
+      seconds: Math.max(0, Math.round((now - usabilitySession.gameStartedAt) / 1000)),
+      hints: Math.max(0, (Number(dailyProgress.hints) || 0) - usabilitySession.gameStartHints),
+      attempts: Math.max(0, (Number(dailyProgress.attempts) || 0) - usabilitySession.gameStartAttempts),
+    });
+    usabilitySession.currentIndex += 1;
+    const completed = usabilitySession.steps.length;
+    const nextKey = USABILITY_GAMES[usabilitySession.currentIndex] || null;
+    const finishedRecord = nextKey ? null : finishUsabilityRecord();
+    playMain.innerHTML = `
+      <div class="completion-card usability-completion ${finishedRecord ? "is-complete" : ""}">
+        <div class="completion-sticker ${isNewSticker ? "is-new-sticker" : ""}" aria-hidden="true">${finishedRecord ? "🔎" : game.icon}</div>
+        <p class="completion-label">혼자 놀이 관찰 ${completed} / ${USABILITY_GAMES.length}</p>
+        <h2>${finishedRecord ? "세 가지 관찰 완료!" : "다음 놀이도 준비됐어!"}</h2>
+        <div class="course-completion-progress" role="progressbar" aria-label="관찰 놀이 ${USABILITY_GAMES.length}개 중 ${completed}개 완료" aria-valuemin="0" aria-valuemax="${USABILITY_GAMES.length}" aria-valuenow="${completed}">
+          ${USABILITY_GAMES.map((key, index) => `<span class="${index < completed ? "is-done" : ""}"><i>${index < completed ? "✓" : index + 1}</i><small>${GAMES[key].title}</small></span>`).join("")}
+        </div>
+        ${finishedRecord ? `<p>첫 시작 ${finishedRecord.firstStartSeconds}초 · 자동 도움 ${finishedRecord.hints}회<br>보호자 공간에서 관찰한 모습을 마저 기록해 주세요.</p>` : `<p>${game.title} 완료! 보호자는 계속 지켜봐 주세요.</p>`}
+        <div class="completion-actions">
+          ${nextKey ? `<button class="completion-usability-next" type="button">다음 관찰 놀이 · ${GAMES[nextKey].title}</button>` : `<button class="completion-usability-results" type="button">보호자와 결과 보기</button>`}
+        </div>
+      </div>`;
+    playMain.querySelector(".completion-usability-next")?.addEventListener("click", () => {
+      usabilitySession.gameStartedAt = Date.now();
+      usabilitySession.gameStartHints = Number(dailyProgress.hints) || 0;
+      usabilitySession.gameStartAttempts = Number(dailyProgress.attempts) || 0;
+      startGame(nextKey);
+    });
+    playMain.querySelector(".completion-usability-results")?.addEventListener("click", () => {
+      requestParentAccess(() => {
+        clearGameUrl();
+        closeGame({ updateUrl: false });
+        window.setTimeout(openParentDialog, 230);
+      });
+    });
+    launchConfetti();
+    speak(finishedRecord ? "세 가지 관찰 놀이를 모두 해냈어! 보호자와 결과를 볼까?" : `${game.title} 완료! 다음 관찰 놀이도 해 볼까?`);
+    return true;
+  }
+
   function openParentDialog() {
     updateParentDashboard();
+    renderUsabilityDashboard();
     if (typeof parentDialog.showModal === "function") parentDialog.showModal();
     else parentDialog.setAttribute("open", "");
   }
@@ -2825,6 +3083,41 @@
       ? "기지개 완료 <span aria-hidden=\"true\">♥</span>"
       : "기지개 약속 <span aria-hidden=\"true\">♡</span>";
     showToast(promised ? "두 팔을 쭉! 몸도 마음도 시원해요." : "언제든 다시 기지개를 켤 수 있어요.");
+  });
+
+  function updateLatestUsabilityManual() {
+    const latest = usabilityRecords.at(-1);
+    if (!latest) return;
+    latest.parentTaps = safeWholeNumber(document.querySelector("#usability-parent-taps").value, 99);
+    latest.scrollConfusion = safeWholeNumber(document.querySelector("#usability-scroll-confusion").value, 99);
+    latest.mismatch = safeWholeNumber(document.querySelector("#usability-mismatch").value, 99);
+    latest.extraChoice = safeWholeNumber(document.querySelector("#usability-extra-choice").value, 99);
+    latest.playAgain = document.querySelector("#usability-play-again").value;
+    saveUsabilityRecords();
+    const criteria = usabilityCriteria();
+    const passed = Object.entries(criteria).filter(([key, value]) => key !== "ready" && value).length;
+    document.querySelector("#usability-observation-status").textContent = usabilityRecords.length < 3
+      ? `${3 - usabilityRecords.length}명의 관찰 기록이 더 필요해요.`
+      : `출시 관찰 기준 7개 중 ${passed}개를 확인했어요.`;
+  }
+
+  document.querySelector("#start-usability-observation").addEventListener("click", prepareUsabilityObservation);
+  document.querySelector("#usability-child-start").addEventListener("click", startUsabilityGame);
+  document.querySelector("#usability-ready-cancel").addEventListener("click", () => {
+    if (usabilitySession?.firstStartSeconds === null) usabilitySession = null;
+    closeUsabilityReady();
+    openParentDialog();
+  });
+  document.querySelector("#copy-usability-observation").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(usabilitySummaryText());
+      showToast("관찰 결과를 복사했어요.");
+    } catch {
+      showToast("복사하지 못했어요. 브라우저의 클립보드 권한을 확인해 주세요.");
+    }
+  });
+  ["#usability-parent-taps", "#usability-scroll-confusion", "#usability-mismatch", "#usability-extra-choice", "#usability-play-again"].forEach((selector) => {
+    document.querySelector(selector).addEventListener("change", updateLatestUsabilityManual);
   });
 
   document.querySelector("#parent-open").addEventListener("click", requestParentAccess);

@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
     <link rel="stylesheet" href="./interactions.css?v=21" />
-    <link rel="stylesheet" href="./premium.css?v=10" />
+    <link rel="stylesheet" href="./premium.css?v=12" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -542,6 +542,38 @@
           <p class="observation-status" id="observation-status" role="status">보호자의 관찰은 다음 놀이 난이도에 바로 반영돼요.</p>
         </section>
 
+        <section class="usability-observation" aria-labelledby="usability-observation-title">
+          <div class="usability-observation-heading">
+            <span class="usability-observation-icon" aria-hidden="true">◉</span>
+            <span>
+              <strong id="usability-observation-title">10분 혼자 놀이 관찰</strong>
+              <small>대표 놀이 3개를 이어 하고 시작 시간·완료·자동 도움을 기기에 기록해요.</small>
+            </span>
+            <b><span id="usability-observation-count">0</span>/3명</b>
+          </div>
+          <div class="usability-observation-actions">
+            <button id="start-usability-observation" type="button">관찰 준비하기</button>
+            <button id="copy-usability-observation" type="button" disabled>결과 복사</button>
+          </div>
+          <p class="usability-observation-status" id="usability-observation-status" role="status">아이에게 화면을 대신 눌러 주지 않고 10분 동안 지켜봐 주세요.</p>
+          <div class="usability-observation-list" id="usability-observation-list"></div>
+          <fieldset class="usability-manual" id="usability-manual" hidden>
+            <legend>방금 관찰한 모습 보완 기록</legend>
+            <label>보호자가 대신 누른 횟수 <input id="usability-parent-taps" type="number" min="0" max="99" inputmode="numeric" value="0" /></label>
+            <label>스크롤과 놀이를 혼동한 횟수 <input id="usability-scroll-confusion" type="number" min="0" max="99" inputmode="numeric" value="0" /></label>
+            <label>내용과 정답이 어긋난 횟수 <input id="usability-mismatch" type="number" min="0" max="99" inputmode="numeric" value="0" /></label>
+            <label>스스로 추가 놀이를 고른 횟수 <input id="usability-extra-choice" type="number" min="0" max="99" inputmode="numeric" value="0" /></label>
+            <label>다시 하고 싶어 했나요?
+              <select id="usability-play-again">
+                <option value="unknown">아직 기록 안 함</option>
+                <option value="yes">예</option>
+                <option value="no">아니요</option>
+              </select>
+            </label>
+          </fieldset>
+          <p class="usability-privacy">관찰 기록은 이 기기에만 최대 3개 보관되며 언제든 새 관찰로 바꿀 수 있어요.</p>
+        </section>
+
         <section class="child-profile-settings" aria-labelledby="child-profile-title">
           <div>
             <span class="profile-settings-icon" aria-hidden="true">☺</span>
@@ -642,11 +674,23 @@
       </div>
     </dialog>
 
+    <dialog class="usability-ready" id="usability-ready" aria-labelledby="usability-ready-title">
+      <div class="usability-ready-card">
+        <button class="usability-ready-cancel" id="usability-ready-cancel" type="button" aria-label="관찰 준비 취소">×</button>
+        <img src="./assets/generated/mongle-hero.webp" alt="웃고 있는 몽글이" width="512" height="512" />
+        <span class="section-kicker">아이에게 화면을 건네주세요</span>
+        <h2 id="usability-ready-title">몽글이와 세 가지 놀이를 해볼까?</h2>
+        <p>보호자는 옆에서 조용히 지켜보고,<br />아이가 아래 버튼을 직접 누르게 해 주세요.</p>
+        <button class="usability-child-start" id="usability-child-start" type="button">놀이 시작!</button>
+        <small>첫 버튼을 누르기까지 걸린 시간부터 자동으로 기록해요.</small>
+      </div>
+    </dialog>
+
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
     <script src="./interaction-engine.js?v=29"></script>
-    <script src="./app.js?v=41"></script>
+    <script src="./app.js?v=43"></script>
   </body>
 </html>
