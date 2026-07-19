@@ -1272,7 +1272,7 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
         "options": [
           {
             "label": "큰 세모",
-            "visual": "▲",
+            "visual": "🔺",
             "subtitle": "큼"
           },
           {
@@ -2747,17 +2747,17 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
         "options": [
           {
             "label": "중간 작은 큰",
-            "visual": "▲ ▴ ▲",
+            "visual": "▲ ▴ 🔺",
             "subtitle": "중간-작음-큼"
           },
           {
             "label": "큰 중간 작은",
-            "visual": "▲ ▲ ▴",
+            "visual": "🔺 ▲ ▴",
             "subtitle": "큼-중간-작음"
           },
           {
             "label": "작은 중간 큰",
-            "visual": "▴ ▲ ▲",
+            "visual": "▴ ▲ 🔺",
             "subtitle": "작음-중간-큼",
             "correct": true
           }

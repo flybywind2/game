@@ -711,7 +711,7 @@
         "speech": "세 세모를 작은 것부터 중간, 큰 것 순서로 놓아 보자.",
         "success": "조그만 세모를 정확히 골랐네!",
         "options": [
-          {"label": "큰 세모", "visual": "▲", "subtitle": "큼"},
+          {"label": "큰 세모", "visual": "🔺", "subtitle": "큼"},
           {"label": "작은 세모", "visual": "▴", "subtitle": "작음", "correct": true},
           {"label": "중간 세모", "visual": "▲", "subtitle": "중간"}
         ]
@@ -1540,9 +1540,9 @@
         "speech": "세모가 차례로 커지는 기차를 골라 보자.",
         "success": "세모도 세 단계로 가지런히 섰네!",
         "options": [
-          {"label": "중간 작은 큰", "visual": "▲ ▴ ▲", "subtitle": "중간-작음-큼"},
-          {"label": "큰 중간 작은", "visual": "▲ ▲ ▴", "subtitle": "큼-중간-작음"},
-          {"label": "작은 중간 큰", "visual": "▴ ▲ ▲", "subtitle": "작음-중간-큼", "correct": true}
+          {"label": "중간 작은 큰", "visual": "▲ ▴ 🔺", "subtitle": "중간-작음-큼"},
+          {"label": "큰 중간 작은", "visual": "🔺 ▲ ▴", "subtitle": "큼-중간-작음"},
+          {"label": "작은 중간 큰", "visual": "▴ ▲ 🔺", "subtitle": "작음-중간-큼", "correct": true}
         ]
       }
     ]
