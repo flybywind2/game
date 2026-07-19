@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.19.6";
+  const APP_BUILD = "2026.07.19.7";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -631,6 +631,32 @@
     { key: "routines", title: "포근한 하루 마무리", subtitle: "생활 습관", art: "./assets/generated/story/chapter-10-bedtime.webp", intro: "신나게 논 뒤에는 손을 씻고 이를 닦고 잠자리를 준비해요. 몽글이와 하루를 포근하게 마무리해요.", mission: "생활 그림을 살펴 알맞은 곳에 모두 나눠요." },
   ]);
   const STORY_BY_KEY = Object.freeze(Object.fromEntries(STORY_CHAPTERS.map((chapter, index) => [chapter.key, { ...chapter, index }])));
+  const CURRICULUM_WEEKS = Object.freeze([
+    {
+      title: "보고 듣는 힘 열기",
+      goal: "색·모양·수·소리·마음을 편안하게 만나며 화면 조작에 익숙해져요.",
+      coach: "정답을 먼저 말하지 말고 5초 기다린 뒤, 아이가 본 것을 말이나 몸짓으로 표현하게 해 주세요.",
+      games: ["colors", "shapes", "counting", "sounds", "emotions"],
+    },
+    {
+      title: "비교하고 기억하기",
+      goal: "같고 다름, 많고 적음, 반복 규칙과 생활 범주를 스스로 찾아요.",
+      coach: "‘왜 그쪽일까?’보다 ‘어디가 같아 보여?’처럼 관찰한 특징을 짧게 되물어 주세요.",
+      games: ["matching", "more", "patterns", "words", "routines"],
+    },
+    {
+      title: "순서대로 해결하기",
+      goal: "크기·몸의 쓰임·세 단계 순서와 안전 행동을 여러 번의 손동작으로 완성해요.",
+      coach: "중간에 막히면 손을 대신 움직이지 말고 ‘먼저 할 것은 무엇일까?’ 한 문장만 건네주세요.",
+      games: ["sizes", "body", "extra015", "extra030", "extra068"],
+    },
+    {
+      title: "말하고 표현하며 지키기",
+      goal: "규칙과 범주를 말로 설명하고, 자유롭게 그리며, 위험한 상황에서 멈추는 힘을 길러요.",
+      coach: "완성 결과보다 아이가 고른 이유와 그린 이야기를 들어주고, 안전 문장은 함께 소리 내어 반복해 주세요.",
+      games: ["extra024", "extra037", "extra057", "extra075", "extra089"],
+    },
+  ]);
   const playTemplate = document.querySelector("#play-main").innerHTML;
 
   const shell = document.querySelector("#game-shell");
@@ -2361,6 +2387,50 @@
       })[0] || recommendedGame();
   }
 
+  function renderCurriculumRoadmap() {
+    const allKeys = CURRICULUM_WEEKS.flatMap((week) => week.games);
+    const completed = allKeys.filter((key) => Boolean(learnerProfile.completed[key])).length;
+    document.querySelector("#curriculum-completed").textContent = String(completed);
+    document.querySelector("#curriculum-overall-bar").style.width = `${Math.round((completed / allKeys.length) * 100)}%`;
+    const currentWeekIndex = CURRICULUM_WEEKS.findIndex((week) => week.games.some((key) => !learnerProfile.completed[key]));
+    const weeks = document.querySelector("#curriculum-weeks");
+    weeks.innerHTML = "";
+
+    CURRICULUM_WEEKS.forEach((week, weekIndex) => {
+      const completedKeys = week.games.filter((key) => Boolean(learnerProfile.completed[key]));
+      const weekComplete = completedKeys.length === week.games.length;
+      const current = weekIndex === currentWeekIndex;
+      const nextKey = week.games.find((key) => !learnerProfile.completed[key]);
+      const details = document.createElement("details");
+      details.className = `curriculum-week${weekComplete ? " is-complete" : ""}${current ? " is-current" : ""}`;
+      details.open = current || (currentWeekIndex === -1 && weekIndex === CURRICULUM_WEEKS.length - 1);
+      details.innerHTML = `
+        <summary>
+          <span class="curriculum-week-number">${weekComplete ? "✓" : weekIndex + 1}</span>
+          <span><small>${weekIndex + 1}주차 · ${completedKeys.length}/5 완료</small><strong>${week.title}</strong><em>${week.goal}</em></span>
+          <b aria-hidden="true">⌄</b>
+        </summary>
+        <div class="curriculum-week-body">
+          <div class="curriculum-game-list">
+            ${week.games.map((key, gameIndex) => {
+              const game = GAMES[key];
+              const done = Boolean(learnerProfile.completed[key]);
+              return `<button type="button" data-curriculum-game="${key}" class="${done ? "is-done" : ""}" aria-label="${weekIndex + 1}주차 ${gameIndex + 1}회, ${game.title}${done ? ", 완료" : ", 시작"}">
+                <span class="curriculum-game-order">${done ? "✓" : gameIndex + 1}</span>
+                <span aria-hidden="true">${game.icon}</span>
+                <span><strong>${game.title}</strong><small>${game.skill}</small></span>
+                <b>${done ? "완료" : "놀이"}</b>
+              </button>`;
+            }).join("")}
+          </div>
+          <p class="curriculum-coach"><strong>이번 주 대화법</strong>${week.coach}</p>
+          ${nextKey ? `<button class="curriculum-next" type="button" data-curriculum-game="${nextKey}">${GAMES[nextKey].icon} ${GAMES[nextKey].title} 이어 하기 <span aria-hidden="true">→</span></button>` : `<p class="curriculum-week-done">이 주의 다섯 경험을 모두 만났어요. 좋아하는 놀이는 언제든 다시 해도 좋아요.</p>`}
+        </div>`;
+      weeks.appendChild(details);
+    });
+    document.querySelector(".curriculum-overall").setAttribute("aria-label", `4주 활용 로드맵 20회 중 ${completed}회 완료`);
+  }
+
   function renderWeeklyReport() {
     const snapshot = weeklySnapshot();
     document.querySelector("#weekly-active-days").textContent = String(snapshot.activeDays);
@@ -2744,6 +2814,7 @@
     renderPlayLimitSettings();
     document.querySelector("#parent-level").textContent = String(profileLevel());
     renderWeeklyReport();
+    renderCurriculumRoadmap();
     renderParentObservation();
 
     const growthList = document.querySelector("#growth-skill-list");
@@ -3450,6 +3521,14 @@
   document.querySelector("#parent-close").addEventListener("click", closeParentDialog);
   document.querySelector("#weekly-recommendation").addEventListener("click", (event) => {
     const key = event.currentTarget.dataset.weeklyGame;
+    if (!GAMES[key]) return;
+    closeParentDialog();
+    startGame(key);
+  });
+  document.querySelector("#curriculum-weeks").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-curriculum-game]");
+    if (!button) return;
+    const key = button.dataset.curriculumGame;
     if (!GAMES[key]) return;
     closeParentDialog();
     startGame(key);

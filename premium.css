@@ -1296,6 +1296,331 @@
   line-height: 1.45;
 }
 
+.curriculum-roadmap {
+  margin: 18px 0;
+  padding: 20px;
+  border: 2px solid #d8cdec;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 96% 2%, rgba(164, 140, 231, 0.16), transparent 28%),
+    linear-gradient(150deg, #fbf8ff, #fffdf7);
+}
+
+.curriculum-roadmap-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.curriculum-roadmap-heading h3 {
+  margin: 5px 0 0;
+  font-size: 20px;
+  line-height: 1.25;
+  letter-spacing: -0.6px;
+}
+
+.curriculum-roadmap-heading p {
+  margin: 6px 0 0;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.curriculum-total {
+  display: flex;
+  min-width: 78px;
+  min-height: 58px;
+  flex: 0 0 auto;
+  align-items: baseline;
+  justify-content: center;
+  padding: 10px 8px;
+  border: 2px solid #d8cdec;
+  border-radius: 18px;
+  background: white;
+  color: var(--purple-dark);
+}
+
+.curriculum-total strong {
+  font-size: 24px;
+}
+
+.curriculum-total small {
+  margin-left: 3px;
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.curriculum-overall {
+  height: 10px;
+  margin: 14px 0 12px;
+  border-radius: 999px;
+  background: #e7e0ef;
+  overflow: hidden;
+}
+
+.curriculum-overall i {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--purple), var(--mint));
+  transition: width 300ms ease;
+}
+
+.curriculum-weeks {
+  display: grid;
+  gap: 9px;
+}
+
+.curriculum-week {
+  border: 1px solid #ded6e7;
+  border-radius: 19px;
+  background: rgba(255, 255, 255, 0.86);
+  overflow: hidden;
+}
+
+.curriculum-week.is-current {
+  border: 2px solid var(--purple);
+  box-shadow: 0 5px 0 rgba(112, 82, 158, 0.13);
+}
+
+.curriculum-week.is-complete {
+  border-color: #b9dfd2;
+  background: rgba(241, 252, 247, 0.9);
+}
+
+.curriculum-week summary {
+  display: grid;
+  min-height: 76px;
+  grid-template-columns: 42px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.curriculum-week summary::-webkit-details-marker {
+  display: none;
+}
+
+.curriculum-week-number {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 15px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.curriculum-week.is-complete .curriculum-week-number {
+  background: var(--mint);
+  color: white;
+}
+
+.curriculum-week summary small,
+.curriculum-week summary strong,
+.curriculum-week summary em {
+  display: block;
+}
+
+.curriculum-week summary small {
+  color: var(--purple-dark);
+  font-size: 9px;
+  font-weight: 900;
+}
+
+.curriculum-week summary strong {
+  margin-top: 2px;
+  font-size: 13px;
+}
+
+.curriculum-week summary em {
+  margin-top: 3px;
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 650;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.curriculum-week summary > b {
+  color: var(--purple-dark);
+  font-size: 15px;
+  transition: transform 180ms ease;
+}
+
+.curriculum-week[open] summary > b {
+  transform: rotate(180deg);
+}
+
+.curriculum-week-body {
+  padding: 0 13px 14px;
+}
+
+.curriculum-game-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+  padding-top: 11px;
+  border-top: 1px solid #e8e1ec;
+}
+
+.curriculum-game-list button {
+  display: grid;
+  min-width: 0;
+  min-height: 62px;
+  grid-template-columns: 24px 30px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 8px;
+  border: 1px solid #ddd5e5;
+  border-radius: 15px;
+  background: white;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.curriculum-game-list button.is-done {
+  border-color: #b8dfd1;
+  background: var(--mint-soft);
+}
+
+.curriculum-game-order {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  border-radius: 9px;
+  background: #eee8f4;
+  color: var(--purple-dark);
+  font-size: 9px;
+  font-weight: 950;
+}
+
+.curriculum-game-list button.is-done .curriculum-game-order {
+  background: var(--mint);
+  color: white;
+}
+
+.curriculum-game-list button > span:nth-child(2) {
+  font-size: 22px;
+  text-align: center;
+}
+
+.curriculum-game-list strong,
+.curriculum-game-list small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.curriculum-game-list strong {
+  font-size: 10px;
+}
+
+.curriculum-game-list small {
+  margin-top: 2px;
+  color: var(--ink-soft);
+  font-size: 7px;
+  font-weight: 650;
+}
+
+.curriculum-game-list button > b {
+  padding: 5px 6px;
+  border-radius: 8px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 7px;
+}
+
+.curriculum-game-list button.is-done > b {
+  background: white;
+  color: var(--mint-dark);
+}
+
+.curriculum-coach {
+  margin: 10px 0;
+  padding: 10px 11px;
+  border-radius: 14px;
+  background: var(--yellow-soft);
+  color: #705820;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.curriculum-coach strong {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 9px;
+}
+
+.curriculum-next {
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--purple);
+  color: white;
+  font-size: 10px;
+  font-weight: 950;
+  cursor: pointer;
+}
+
+.curriculum-week-done {
+  margin: 10px 0 0;
+  color: var(--mint-dark);
+  font-size: 9px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.curriculum-note {
+  margin: 12px 2px 0;
+  color: var(--ink-soft);
+  font-size: 9px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.curriculum-note strong {
+  color: var(--purple-dark);
+}
+
+@media (max-width: 540px) {
+  .curriculum-roadmap {
+    padding: 15px 12px;
+  }
+
+  .curriculum-roadmap-heading h3 {
+    font-size: 17px;
+  }
+
+  .curriculum-total {
+    min-width: 67px;
+  }
+
+  .curriculum-game-list {
+    grid-template-columns: 1fr;
+  }
+
+  .curriculum-week summary em {
+    white-space: normal;
+  }
+}
+
 .parent-observation {
   margin: 18px 0;
   padding: 18px;
