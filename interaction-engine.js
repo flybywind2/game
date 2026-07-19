@@ -21,15 +21,15 @@
     },
     drag: {
       label: "관계 연결",
-      instruction: "질문 단서와 알맞은 그림을 모두 연결해요.",
+      instruction: "그림을 누른 뒤 알맞은 자리를 눌러 모두 연결해요.",
     },
     sort: {
       label: "두 바구니 분류",
-      instruction: "현재 질문에 맞는 그림과 다른 그림을 두 바구니에 나눠요.",
+      instruction: "그림을 누른 뒤 알맞은 바구니를 눌러 모두 나눠요.",
     },
     sequence: {
       label: "순서 만들기",
-      instruction: "처음부터 마지막까지 차례대로 놓아요.",
+      instruction: "그림과 자리를 차례로 눌러 처음부터 마지막까지 놓아요.",
     },
     memory: {
       label: "기억 카드 짝맞추기",
@@ -37,7 +37,7 @@
     },
     pattern: {
       label: "규칙 완성",
-      instruction: "맞는 그림을 고른 뒤 빈칸에 쏙 넣어요.",
+      instruction: "그림을 누른 뒤 알맞은 빈칸을 눌러 규칙을 완성해요.",
     },
     spot: {
       label: "그림 속에서 찾기",
@@ -49,7 +49,7 @@
     },
     order: {
       label: "크기 비교",
-      instruction: "그림들의 실제 크기를 생각하고 알맞은 그림을 자리에 놓아요.",
+      instruction: "그림과 자리를 차례로 눌러 실제 크기 순서대로 놓아요.",
     },
     draw: {
       label: "자유 그림",
@@ -495,6 +495,69 @@
         return picked;
       },
     };
+  }
+
+  const DEMO_SESSION_PREFIX = "mongle-place-demo-v1:";
+
+  function showTapToPlaceDemo(context, demo) {
+    const { controller, stage, mode, roundIndex } = context;
+    const source = demo?.source;
+    const target = demo?.target;
+    if (roundIndex !== 0 || !source || !target) return;
+
+    const storageKey = DEMO_SESSION_PREFIX + mode;
+    try {
+      if (window.sessionStorage.getItem(storageKey)) return;
+      window.sessionStorage.setItem(storageKey, "seen");
+    } catch {
+      // Storage can be unavailable in strict privacy modes; the demo still works.
+    }
+
+    const overlay = document.createElement("div");
+    overlay.className = "tap-place-demo";
+    overlay.setAttribute("aria-hidden", "true");
+    const hand = document.createElement("span");
+    hand.className = "tap-place-demo-hand";
+    hand.textContent = "☝️";
+    const note = document.createElement("span");
+    note.className = "tap-place-demo-note";
+    note.textContent = demo.text || "그림을 한 번 누르고, 반짝이는 자리를 눌러요";
+    overlay.append(hand, note);
+
+    let dismissed = false;
+    const dismiss = () => {
+      if (dismissed) return;
+      dismissed = true;
+      source.classList.remove("is-demo-start");
+      target.classList.remove("is-demo-target");
+      overlay.classList.add("is-leaving");
+      controller.later(() => overlay.remove(), 180);
+    };
+
+    controller.later(() => {
+      if (dismissed) return;
+      if (!source.isConnected || !target.isConnected || source.disabled || target.disabled) return;
+      const stageRect = stage.getBoundingClientRect();
+      const sourceRect = source.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      overlay.style.setProperty("--demo-source-x", sourceRect.left + sourceRect.width / 2 - stageRect.left + "px");
+      overlay.style.setProperty("--demo-source-y", sourceRect.top + sourceRect.height / 2 - stageRect.top + "px");
+      overlay.style.setProperty("--demo-target-x", targetRect.left + targetRect.width / 2 - stageRect.left + "px");
+      overlay.style.setProperty("--demo-target-y", targetRect.top + targetRect.height / 2 - stageRect.top + "px");
+      source.classList.add("is-demo-start");
+      target.classList.add("is-demo-target");
+      stage.appendChild(overlay);
+      controller.later(dismiss, 3300);
+    }, 260);
+
+    controller.on(stage, "pointerdown", dismiss, { capture: true });
+    controller.on(stage, "click", dismiss, { capture: true });
+    controller.on(stage, "keydown", dismiss, { capture: true });
+    controller.addCleanup(() => {
+      source.classList.remove("is-demo-start");
+      target.classList.remove("is-demo-target");
+      overlay.remove();
+    });
   }
 
   function renderSpot(context) {
@@ -1059,6 +1122,10 @@
     stage.append(track, tray);
     return {
       requiredActions: targets.length,
+      demo: {
+        source: sources.find((item) => item.dataset.targetIndex !== "extra"),
+        target: targets.find((item) => item.dataset.activityDrop === sources.find((source) => source.dataset.targetIndex !== "extra")?.dataset.targetIndex),
+      },
       hint: () => {
         const source = sources.find((item) => item.dataset.targetIndex !== "extra" && !item.disabled);
         if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.targetIndex)]);
@@ -1186,6 +1253,11 @@
     stage.append(task, counter, tray, bins);
     return {
       requiredActions: items.length,
+      demo: {
+        source: sources[0],
+        target: targets[sources[0]?.dataset.expected === "correct" ? 0 : 1],
+        text: "그림을 누르고, 어울리는 바구니를 눌러요",
+      },
       prompt: deepLabels || roundLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
       helper: "그림 하나를 고른 뒤 알맞은 바구니를 눌러요.",
       hint: () => {
@@ -1255,6 +1327,7 @@
     );
     stage.append(tray, target);
     return {
+      demo: { source: correctSource, target },
       hint: () => pulse([correctSource, target].filter(Boolean)),
       replay: () => pulse([...sources.filter((source) => !source.disabled), target], "is-replay"),
     };
@@ -1410,6 +1483,10 @@
     stage.append(tray, targetsBoard);
     return {
       requiredActions: pairCount,
+      demo: {
+        source: sources[0],
+        target: targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
+      },
       prompt: isSafetyJourney ? "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?" : "",
       helper: isSafetyJourney ? pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요." : "",
       hint: () => {
@@ -1518,6 +1595,11 @@
     );
     stage.append(task, slots, tray);
     return {
+      demo: {
+        source: sources.find((item) => item.dataset.step === "0"),
+        target: targets[0],
+        text: "먼저 할 그림을 누르고, 1번 자리를 눌러요",
+      },
       hint: () => {
         const source = sources.find((item) => !item.disabled && item.dataset.step !== "extra");
         if (source) pulse([source, targets[Number(source.dataset.step)]]);
@@ -1675,6 +1757,11 @@
     stage.append(tray, slots);
     return {
       requiredActions: ordered.length,
+      demo: {
+        source: sources.find((item) => item.dataset.rank === "0"),
+        target: targets[0],
+        text: "가장 작은 그림을 누르고, 첫 자리를 눌러요",
+      },
       hint: () => {
         const source = sources.find((item) => !item.disabled);
         if (source) pulse([source, targets[Number(source.dataset.rank)]]);
@@ -2329,6 +2416,11 @@
     stage.append(target, tray, traceBoard);
     return {
       requiredActions: gameKey === "extra050" ? 3 : 2,
+      demo: {
+        source: sources.find((source) => round.options[Number(source.dataset.optionIndex)]?.correct),
+        target,
+        text: "맞는 그림을 누르고, 그리기 자리를 눌러요",
+      },
       hint: () =>
         pulse(
           traceBoard.hidden
@@ -2730,6 +2822,7 @@
     };
     const renderer = RENDERERS[mode];
     const activity = renderer ? renderer(context) : null;
+    if (activity?.demo) showTapToPlaceDemo(context, activity.demo);
     const minimumActions = {
       count: 2,
       countCompare: 4,

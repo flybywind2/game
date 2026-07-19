@@ -48,6 +48,7 @@
 }
 
 .activity-stage {
+  position: relative;
   width: min(100%, 820px);
   min-height: 280px;
   display: grid;
@@ -55,6 +56,116 @@
   align-content: center;
   gap: 22px;
   margin-top: 24px;
+}
+
+.tap-place-demo {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tap-place-demo-hand {
+  position: absolute;
+  left: var(--demo-source-x);
+  top: var(--demo-source-y);
+  z-index: 2;
+  font-size: 42px;
+  line-height: 1;
+  filter: drop-shadow(0 5px 3px rgba(68, 50, 41, 0.2));
+  animation: tap-place-hand 2.75s ease-in-out both;
+}
+
+.tap-place-demo-note {
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  padding: 9px 15px;
+  border: 2px solid #d8c9ee;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 5px 0 rgba(188, 169, 218, 0.3);
+  color: var(--purple-dark);
+  font-size: 14px;
+  font-weight: 950;
+  line-height: 1.25;
+  text-align: center;
+  transform: translateX(-50%);
+  animation: tap-place-note 2.9s ease both;
+}
+
+.tap-place-demo.is-leaving {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.activity-stage .is-demo-start,
+.activity-stage .is-demo-target {
+  position: relative;
+  z-index: 21;
+}
+
+.activity-stage .is-demo-start {
+  animation: demo-start-pulse 1.25s ease-in-out 1;
+}
+
+.activity-stage .is-demo-target {
+  animation: demo-target-pulse 1.25s 1.25s ease-in-out 1;
+}
+
+@keyframes tap-place-hand {
+  0% {
+    left: var(--demo-source-x);
+    top: var(--demo-source-y);
+    opacity: 0;
+    transform: translate(-45%, -72%) scale(1.15);
+  }
+  10%, 28% {
+    left: var(--demo-source-x);
+    top: var(--demo-source-y);
+    opacity: 1;
+    transform: translate(-45%, -72%) scale(0.88);
+  }
+  38% {
+    left: var(--demo-source-x);
+    top: var(--demo-source-y);
+    opacity: 0;
+    transform: translate(-45%, -72%) scale(1.12);
+  }
+  49% {
+    left: var(--demo-target-x);
+    top: var(--demo-target-y);
+    opacity: 0;
+    transform: translate(-45%, -72%) scale(1.12);
+  }
+  60%, 82% {
+    left: var(--demo-target-x);
+    top: var(--demo-target-y);
+    opacity: 1;
+    transform: translate(-45%, -72%) scale(0.88);
+  }
+  100% {
+    left: var(--demo-target-x);
+    top: var(--demo-target-y);
+    opacity: 0;
+    transform: translate(-45%, -72%) scale(1.12);
+  }
+}
+
+@keyframes tap-place-note {
+  0%, 100% { opacity: 0; transform: translate(-50%, 5px); }
+  10%, 88% { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes demo-start-pulse {
+  35%, 70% { outline: 5px solid rgba(142, 113, 190, 0.4); outline-offset: 4px; transform: translateY(-4px) scale(1.025); }
+}
+
+@keyframes demo-target-pulse {
+  35%, 70% { outline: 5px solid rgba(98, 201, 166, 0.45); outline-offset: 4px; transform: translateY(-3px) scale(1.02); }
 }
 
 .activity-stage button {
@@ -1671,6 +1782,26 @@ button.pattern-cell {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .tap-place-demo-hand {
+    display: none;
+  }
+
+  .tap-place-demo-note {
+    opacity: 1;
+    animation: none;
+  }
+
+  .activity-stage .is-demo-start {
+    outline: 5px solid rgba(142, 113, 190, 0.4);
+    outline-offset: 4px;
+    animation: none;
+  }
+
+  .activity-stage .is-demo-target {
+    outline: 5px solid rgba(98, 201, 166, 0.45);
+    outline-offset: 4px;
+    animation: none;
+  }
   .activity-drag-ghost,
   .memory-card,
   .trace-canvas-shell,
