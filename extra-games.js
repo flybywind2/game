@@ -8349,7 +8349,100 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
         ]
       }
     ]
+  },
+  "extra089": {
+    "title": "알록달록 그림방",
+    "icon": "🎨",
+    "category": "look",
+    "cardColor": "purple",
+    "description": "색과 굵기를 골라 손가락으로 자유롭게 그림을 그려요.",
+    "duration": "4분",
+    "preview": [
+      "☀️",
+      "😊",
+      "🎨"
+    ],
+    "skill": "손가락 조절과 자유로운 표현",
+    "insight": "무엇을 닮았는지 맞히기보다 아이가 사용한 색과 선을 그대로 말해 주면 표현하는 즐거움이 커져요.",
+    "offline": {
+      "title": "큰 종이 그림방",
+      "text": "큰 종이에 굵은 크레용으로 긴 선, 짧은 선, 동그란 선을 자유롭게 그려 보세요."
+    },
+    "rounds": [
+      {
+        "helper": "노랑과 빨강으로 따뜻한 해를 그려요",
+        "prompt": "커다란 해를 자유롭게 그려볼까?",
+        "speech": "색을 골라 커다란 해를 자유롭게 그려 보자.",
+        "scene": [
+          "☀️"
+        ],
+        "success": "따뜻한 햇살이 가득한 멋진 그림이야!",
+        "options": [
+          {
+            "label": "해",
+            "visual": "☀️",
+            "correct": true
+          },
+          {
+            "label": "구름",
+            "visual": "☁️"
+          },
+          {
+            "label": "별",
+            "visual": "⭐"
+          }
+        ]
+      },
+      {
+        "helper": "눈과 입을 마음대로 그려 표정을 만들어요",
+        "prompt": "기분 좋은 얼굴을 그려볼까?",
+        "speech": "눈과 입을 그려 기분 좋은 얼굴을 만들어 보자.",
+        "scene": [
+          "😊"
+        ],
+        "success": "웃는 얼굴을 나만의 선과 색으로 잘 표현했어!",
+        "options": [
+          {
+            "label": "웃는 얼굴",
+            "visual": "😊",
+            "correct": true
+          },
+          {
+            "label": "하트",
+            "visual": "💜"
+          },
+          {
+            "label": "꽃",
+            "visual": "🌼"
+          }
+        ]
+      },
+      {
+        "helper": "좋아하는 색을 모두 써도 좋아요",
+        "prompt": "이번에는 그리고 싶은 것을 마음대로 그려볼까?",
+        "speech": "좋아하는 색을 골라 그리고 싶은 것을 마음대로 그려 보자.",
+        "scene": [
+          "🎨"
+        ],
+        "success": "세상에 하나뿐인 멋진 그림을 완성했어!",
+        "options": [
+          {
+            "label": "자유 그림",
+            "visual": "🎨",
+            "correct": true
+          },
+          {
+            "label": "색연필",
+            "visual": "🖍️"
+          },
+          {
+            "label": "종이",
+            "visual": "📄"
+          }
+        ]
+      }
+    ]
   }
 }
 );
-window.MONGLE_EXTRA_META = Object.freeze({ gameCount: 88, roundCount: 264 });
+window.MONGLE_EXTRA_META = Object.freeze({ gameCount: 89, roundCount: 267 });

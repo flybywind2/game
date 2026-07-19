@@ -47,6 +47,10 @@
       label: "크기 비교",
       instruction: "그림들의 실제 크기를 생각하고 알맞은 그림을 자리에 놓아요.",
     },
+    draw: {
+      label: "자유 그림",
+      instruction: "색과 굵기를 고르고 손가락으로 그림을 그려요.",
+    },
   });
 
   const MODE_KEYS = Object.freeze({
@@ -151,6 +155,7 @@
     trace: new Set(["shapes", "extra005", "extra006", "extra007", "extra050"]),
     order: new Set(["sizes", "extra012", "extra013", "extra014"]),
     compare: new Set(["more", "extra023"]),
+    draw: new Set(["extra089"]),
   });
 
   let activeController = null;
@@ -1902,6 +1907,280 @@
     };
   }
 
+  function renderDraw(context) {
+    const { controller, stage, round, roundIndex, onComplete, onMistake, onProgress, announce } = context;
+    const board = document.createElement("div");
+    board.className = "drawing-board";
+
+    const promptCard = document.createElement("div");
+    promptCard.className = "drawing-prompt-card";
+    const promptVisual = document.createElement("span");
+    promptVisual.setAttribute("aria-hidden", "true");
+    promptVisual.textContent = cleanVisual(round.scene?.[0] || "🎨");
+    const promptText = document.createElement("strong");
+    promptText.textContent = roundIndex === 2 ? "마음대로 그려요" : "보고 떠오르는 그림을 그려요";
+    promptCard.append(promptVisual, promptText);
+
+    const toolbar = document.createElement("div");
+    toolbar.className = "drawing-toolbar";
+    toolbar.setAttribute("aria-label", "그림 도구");
+    const palette = document.createElement("div");
+    palette.className = "drawing-palette";
+    const colors = [
+      ["빨강", "#ef6258"],
+      ["노랑", "#f4b942"],
+      ["초록", "#39a97b"],
+      ["파랑", "#3f8fd2"],
+      ["보라", "#8a67b7"],
+      ["검정", "#4b3b35"],
+    ];
+    let activeColor = colors[Math.min(roundIndex, colors.length - 1)][1];
+    let activeWidth = 14;
+    const colorButtons = colors.map(([label, color]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "drawing-color";
+      button.style.setProperty("--drawing-color", color);
+      button.setAttribute("aria-label", label + " 색연필");
+      button.setAttribute("aria-pressed", String(color === activeColor));
+      controller.on(button, "click", () => {
+        activeColor = color;
+        colorButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        announce(label + " 색을 골랐어요.");
+      });
+      palette.appendChild(button);
+      return button;
+    });
+
+    const sizes = document.createElement("div");
+    sizes.className = "drawing-sizes";
+    const sizeButtons = [
+      ["가는 선", 8],
+      ["보통 선", 14],
+      ["굵은 선", 24],
+    ].map(([label, width]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "drawing-size";
+      button.setAttribute("aria-label", label);
+      button.setAttribute("aria-pressed", String(width === activeWidth));
+      const dot = document.createElement("span");
+      dot.style.width = Math.max(8, width) + "px";
+      dot.style.height = Math.max(8, width) + "px";
+      button.appendChild(dot);
+      controller.on(button, "click", () => {
+        activeWidth = width;
+        sizeButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        announce(label + "을 골랐어요.");
+      });
+      sizes.appendChild(button);
+      return button;
+    });
+    toolbar.append(palette, sizes);
+
+    const shell = document.createElement("div");
+    shell.className = "drawing-canvas-shell";
+    const canvas = document.createElement("canvas");
+    canvas.className = "drawing-canvas";
+    canvas.tabIndex = 0;
+    canvas.setAttribute("role", "img");
+    canvas.setAttribute("aria-label", "빈 그림판. 손가락이나 마우스로 자유롭게 그려요.");
+    shell.appendChild(canvas);
+
+    const status = document.createElement("p");
+    status.className = "drawing-status";
+    status.setAttribute("aria-live", "polite");
+    status.textContent = "색을 고르고 그림판에 두 번 이상 그려 봐요.";
+
+    const actions = document.createElement("div");
+    actions.className = "drawing-actions";
+    const undo = document.createElement("button");
+    undo.type = "button";
+    undo.className = "drawing-tool-button";
+    undo.textContent = "↶ 되돌리기";
+    const clear = document.createElement("button");
+    clear.type = "button";
+    clear.className = "drawing-tool-button";
+    clear.textContent = "모두 지우기";
+    const stamp = document.createElement("button");
+    stamp.type = "button";
+    stamp.className = "drawing-tool-button";
+    stamp.textContent = "● 점 도장";
+    const finish = document.createElement("button");
+    finish.type = "button";
+    finish.className = "activity-confirm drawing-finish";
+    finish.textContent = "그림 완성!";
+    actions.append(undo, clear, stamp, finish);
+
+    board.append(promptCard, toolbar, shell, status, actions);
+    stage.appendChild(board);
+
+    const context2d = canvas.getContext("2d");
+    let width = 0;
+    let height = 0;
+    let strokes = [];
+    let activeStroke = null;
+    let activePointer = null;
+    let finished = false;
+    const syncStrokeCount = () => {
+      canvas.dataset.strokeCount = String(strokes.length);
+    };
+    syncStrokeCount();
+
+    const renderCanvas = () => {
+      if (!width || !height) return;
+      context2d.clearRect(0, 0, width, height);
+      context2d.fillStyle = "#fffdf8";
+      context2d.fillRect(0, 0, width, height);
+      context2d.save();
+      context2d.globalAlpha = 0.075;
+      context2d.font = Math.round(Math.min(width, height) * 0.38) + "px sans-serif";
+      context2d.textAlign = "center";
+      context2d.textBaseline = "middle";
+      context2d.fillText(cleanVisual(round.scene?.[0] || "🎨"), width / 2, height / 2);
+      context2d.restore();
+      strokes.forEach((stroke) => {
+        if (!stroke.points.length) return;
+        context2d.beginPath();
+        const first = stroke.points[0];
+        context2d.moveTo(first.x * width, first.y * height);
+        stroke.points.slice(1).forEach((point) => context2d.lineTo(point.x * width, point.y * height));
+        if (stroke.points.length === 1) {
+          context2d.lineTo(first.x * width + 0.1, first.y * height + 0.1);
+        }
+        context2d.strokeStyle = stroke.color;
+        context2d.lineWidth = stroke.width;
+        context2d.lineCap = "round";
+        context2d.lineJoin = "round";
+        context2d.stroke();
+      });
+    };
+
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      width = rect.width;
+      height = rect.height;
+      const scale = Math.min(window.devicePixelRatio || 1, 2.5);
+      canvas.width = Math.round(width * scale);
+      canvas.height = Math.round(height * scale);
+      context2d.setTransform(scale, 0, 0, scale, 0, 0);
+      renderCanvas();
+    };
+    const observer = typeof ResizeObserver === "function" ? new ResizeObserver(resizeCanvas) : null;
+    observer?.observe(canvas);
+    controller.addCleanup(() => observer?.disconnect());
+    controller.on(window, "resize", resizeCanvas);
+    controller.later(resizeCanvas, 0);
+
+    const eventPoint = (event) => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)),
+        y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height)),
+      };
+    };
+    const totalLength = () => strokes.reduce((sum, stroke) => {
+      let length = 0;
+      for (let index = 1; index < stroke.points.length; index += 1) {
+        length += Math.hypot(
+          (stroke.points[index].x - stroke.points[index - 1].x) * width,
+          (stroke.points[index].y - stroke.points[index - 1].y) * height,
+        );
+      }
+      return sum + length;
+    }, 0);
+    const updateStatus = () => {
+      const count = strokes.length;
+      status.textContent = count < 2
+        ? "좋아요! 선을 한 번 더 그려 볼까요?"
+        : "멋져요! 더 그리거나 그림 완성을 눌러요.";
+    };
+
+    controller.on(canvas, "pointerdown", (event) => {
+      if (finished || activePointer !== null || (event.pointerType === "mouse" && event.button !== 0)) return;
+      event.preventDefault();
+      activePointer = event.pointerId;
+      activeStroke = { color: activeColor, width: activeWidth, points: [eventPoint(event)] };
+      strokes.push(activeStroke);
+      syncStrokeCount();
+      canvas.setPointerCapture?.(activePointer);
+      canvas.classList.add("is-drawing");
+      renderCanvas();
+    });
+    controller.on(canvas, "pointermove", (event) => {
+      if (event.pointerId !== activePointer || !activeStroke) return;
+      event.preventDefault();
+      const point = eventPoint(event);
+      const previous = activeStroke.points.at(-1);
+      if (Math.hypot((point.x - previous.x) * width, (point.y - previous.y) * height) >= 2) {
+        activeStroke.points.push(point);
+        renderCanvas();
+      }
+    });
+    const stopStroke = (event) => {
+      if (event.pointerId !== activePointer) return;
+      canvas.releasePointerCapture?.(activePointer);
+      activePointer = null;
+      activeStroke = null;
+      canvas.classList.remove("is-drawing");
+      updateStatus();
+      onProgress("prompt");
+    };
+    controller.on(canvas, "pointerup", stopStroke);
+    controller.on(canvas, "pointercancel", stopStroke);
+
+    controller.on(undo, "click", () => {
+      if (finished || !strokes.length) return;
+      strokes.pop();
+      syncStrokeCount();
+      renderCanvas();
+      updateStatus();
+      announce("마지막 선을 되돌렸어요.");
+    });
+    controller.on(clear, "click", () => {
+      if (finished) return;
+      strokes = [];
+      syncStrokeCount();
+      renderCanvas();
+      status.textContent = "깨끗해졌어요. 다시 그려 봐요.";
+      announce("그림판을 모두 지웠어요.");
+    });
+    controller.on(stamp, "click", () => {
+      if (finished) return;
+      const index = strokes.length % 6;
+      strokes.push({
+        color: activeColor,
+        width: Math.max(18, activeWidth),
+        points: [{ x: 0.2 + (index % 3) * 0.3, y: 0.28 + Math.floor(index / 3) * 0.38 }],
+      });
+      syncStrokeCount();
+      renderCanvas();
+      updateStatus();
+      onProgress("prompt");
+      announce("점 도장을 찍었어요.");
+    });
+    controller.on(finish, "click", () => {
+      if (finished) return;
+      if (strokes.length < 2 || (totalLength() < 70 && strokes.filter((stroke) => stroke.points.length === 1).length < 3)) {
+        status.textContent = "선을 두 번 이상 길게 그려 주세요.";
+        onMistake(finish, canvas);
+        announce("그림판에 선을 조금 더 그려 볼까요?");
+        return;
+      }
+      finished = true;
+      shell.classList.add("is-complete");
+      status.textContent = "멋진 그림이 완성됐어요!";
+      announce("나만의 그림을 완성했어요.");
+      controller.later(() => onComplete(finish), 280);
+    });
+
+    return {
+      hint: () => pulse([canvas, finish]),
+      replay: () => pulse(promptCard, "is-replay"),
+    };
+  }
+
   const RENDERERS = Object.freeze({
     count: renderCount,
     compare: renderCompare,
@@ -1913,6 +2192,7 @@
     spot: renderSpot,
     trace: renderTrace,
     order: renderOrder,
+    draw: renderDraw,
   });
 
   function render(config) {

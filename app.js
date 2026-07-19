@@ -996,6 +996,7 @@
       spot: "⌕",
       trace: "•—•",
       order: "◔",
+      draw: "✎",
       choice: "☝",
     }[mode] || "☝";
   }
@@ -1029,7 +1030,7 @@
     const modeMeta = engine?.metaFor(mode, activeGameKey) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
     interactionHintElement.textContent = modeMeta.label + " · " + modeMeta.instruction;
     interactionHintElement.dataset.icon = interactionIcon(mode);
-    const ownsScene = ["count", "compare", "memory", "pattern", "spot", "trace", "order", "sequence"].includes(mode);
+    const ownsScene = ["count", "compare", "memory", "pattern", "spot", "trace", "order", "sequence", "draw"].includes(mode);
     renderScene(ownsScene ? [] : round.scene);
 
     if (!engine || mode === "choice") {

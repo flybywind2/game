@@ -843,6 +843,152 @@ button.pattern-cell {
   background: rgba(237, 247, 255, 0.82);
 }
 
+.drawing-board {
+  width: min(100%, 650px);
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 3px solid #d8cae8;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 9px 0 rgba(185, 167, 211, 0.35);
+}
+
+.drawing-prompt-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 58px;
+  padding: 8px 14px;
+  border-radius: 18px;
+  background: var(--yellow-soft);
+  color: var(--ink);
+}
+
+.drawing-prompt-card > span {
+  font-size: 38px;
+}
+
+.drawing-prompt-card strong {
+  font-size: 17px;
+  font-weight: 950;
+}
+
+.drawing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.drawing-palette,
+.drawing-sizes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.drawing-color,
+.drawing-size {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--drawing-color, #f5efe8);
+  box-shadow: 0 0 0 2px #d8cbbf;
+  cursor: pointer;
+}
+
+.drawing-color[aria-pressed="true"],
+.drawing-size[aria-pressed="true"] {
+  box-shadow: 0 0 0 4px var(--blue);
+  transform: scale(1.08);
+}
+
+.drawing-size {
+  background: white;
+}
+
+.drawing-size > span {
+  display: block;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+.drawing-canvas-shell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 4px solid #a98bc7;
+  border-radius: 26px;
+  background: #fffdf8;
+  box-shadow: inset 0 0 0 2px white;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.drawing-canvas-shell.is-complete {
+  border-color: var(--mint-dark);
+  box-shadow: 0 0 0 6px rgba(47, 149, 111, 0.16);
+}
+
+.drawing-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.drawing-canvas:focus-visible {
+  outline: 5px solid var(--blue);
+  outline-offset: -8px;
+  border-radius: 22px;
+}
+
+.drawing-status {
+  min-height: 24px;
+  margin: 0;
+  color: var(--purple-dark);
+  font-size: 15px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.drawing-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.drawing-tool-button,
+.drawing-finish {
+  min-width: 0;
+  min-height: 54px;
+  padding: 8px;
+  border: 2px solid #d5c7e4;
+  border-radius: 17px;
+  background: var(--purple-soft);
+  color: var(--purple-dark);
+  font-size: 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.drawing-finish {
+  border-color: var(--mint);
+  background: var(--mint);
+  color: #174e3d;
+}
+
 .compare-group:nth-child(2) {
   border-color: #ddcfea;
   background: rgba(247, 241, 255, 0.84);
@@ -977,6 +1123,27 @@ button.pattern-cell {
 
   .activity-token-label {
     font-size: 11px;
+  }
+
+  .drawing-board {
+    gap: 10px;
+    padding: 10px;
+    border-radius: 24px;
+  }
+
+  .drawing-toolbar {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .drawing-color,
+  .drawing-size {
+    width: 42px;
+    height: 42px;
+  }
+
+  .drawing-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .spot-board {
