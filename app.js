@@ -679,18 +679,29 @@
     };
   }
 
+  function safeWholeNumber(value, maximum = 999999) {
+    const number = Math.floor(Number(value));
+    return Number.isFinite(number) ? Math.min(maximum, Math.max(0, number)) : 0;
+  }
+
+  function normalizeDailyProgress(saved) {
+    if (!saved || saved.date !== todayKey()) return blankProgress();
+    const completed = Object.fromEntries(Object.entries(saved.completed || {})
+      .filter(([key, count]) => GAMES[key] && safeWholeNumber(count) > 0)
+      .map(([key, count]) => [key, safeWholeNumber(count, 99)]));
+    return {
+      date: todayKey(),
+      completed,
+      attempts: safeWholeNumber(saved.attempts),
+      hints: safeWholeNumber(saved.hints),
+      lastPlayed: GAMES[saved.lastPlayed] ? saved.lastPlayed : null,
+      plan: Array.isArray(saved.plan) ? [...new Set(saved.plan.filter((key) => GAMES[key]))].slice(0, 3) : [],
+    };
+  }
+
   function loadProgress() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-      if (!saved || saved.date !== todayKey()) return blankProgress();
-      return {
-        date: saved.date,
-        completed: saved.completed || {},
-        attempts: Number(saved.attempts) || 0,
-        hints: Number(saved.hints) || 0,
-        lastPlayed: saved.lastPlayed || null,
-        plan: Array.isArray(saved.plan) ? saved.plan.filter((key) => GAMES[key]).slice(0, 3) : [],
-      };
+      return normalizeDailyProgress(JSON.parse(localStorage.getItem(STORAGE_KEY)));
     } catch {
       return blankProgress();
     }
@@ -729,18 +740,20 @@
     const categories = {};
     Object.keys(CATEGORY_NAMES).forEach((category) => {
       const saved = day?.categories?.[category] || {};
+      const attempts = safeWholeNumber(saved.attempts);
       categories[category] = {
-        attempts: Math.max(0, Number(saved.attempts) || 0),
-        correct: Math.max(0, Number(saved.correct) || 0),
-        hints: Math.max(0, Number(saved.hints) || 0),
+        attempts,
+        correct: Math.min(attempts, safeWholeNumber(saved.correct)),
+        hints: safeWholeNumber(saved.hints),
       };
     });
+    const attempts = safeWholeNumber(day?.attempts);
     return {
-      attempts: Math.max(0, Number(day?.attempts) || 0),
-      correct: Math.max(0, Number(day?.correct) || 0),
-      hints: Math.max(0, Number(day?.hints) || 0),
-      completions: Math.max(0, Number(day?.completions) || 0),
-      completedGames: Array.isArray(day?.completedGames) ? day.completedGames.filter((key) => GAMES[key]).slice(-20) : [],
+      attempts,
+      correct: Math.min(attempts, safeWholeNumber(day?.correct)),
+      hints: safeWholeNumber(day?.hints),
+      completions: safeWholeNumber(day?.completions, 99),
+      completedGames: Array.isArray(day?.completedGames) ? [...new Set(day.completedGames.filter((key) => GAMES[key]))].slice(-20) : [],
       categories,
     };
   }
@@ -753,23 +766,46 @@
       .map(([date, day]) => [date, normalizeActivityDay(day)]));
   }
 
+  function normalizeLearnerProfile(saved) {
+    if (!saved || typeof saved !== "object" || saved.version !== 2) return null;
+    const completed = Object.fromEntries(Object.entries(saved.completed || {})
+      .filter(([key, count]) => GAMES[key] && safeWholeNumber(count) > 0)
+      .map(([key, count]) => [key, safeWholeNumber(count, 999)]));
+    const gameStats = {};
+    Object.entries(saved.gameStats || {}).forEach(([key, stats]) => {
+      if (!GAMES[key] || !stats || typeof stats !== "object") return;
+      const attempts = safeWholeNumber(stats.attempts);
+      gameStats[key] = {
+        attempts,
+        correct: Math.min(attempts, safeWholeNumber(stats.correct)),
+        hints: safeWholeNumber(stats.hints),
+        recent: Array.isArray(stats.recent) ? stats.recent.slice(-8).map(Boolean) : [],
+      };
+    });
+    const totalAttempts = safeWholeNumber(saved.totalAttempts);
+    const nickname = typeof saved.nickname === "string" ? saved.nickname.trim().slice(0, 10) : "";
+    return {
+      ...blankLearnerProfile(),
+      nickname: nickname || "꼬마 탐험가",
+      xp: safeWholeNumber(saved.xp, 9999999),
+      completed,
+      stickers: Array.isArray(saved.stickers) ? [...new Set(saved.stickers.filter((key) => GAMES[key]))].slice(0, 101) : [],
+      totalAttempts,
+      totalCorrect: Math.min(totalAttempts, safeWholeNumber(saved.totalCorrect)),
+      totalHints: safeWholeNumber(saved.totalHints),
+      gameStats,
+      activityDays: trimActivityDays(saved.activityDays),
+      observations: Array.isArray(saved.observations) ? saved.observations
+        .filter((item) => item && GAMES[item.game] && ["independent", "together", "hard"].includes(item.level) && /^\d{4}-\d{2}-\d{2}$/.test(item.date))
+        .filter((item) => item.date >= dateKeyOffset(29))
+        .slice(-60)
+        .map((item) => ({ date: item.date, game: item.game, level: item.level })) : [],
+    };
+  }
+
   function loadLearnerProfile() {
     try {
-      const saved = JSON.parse(localStorage.getItem(PROFILE_KEY));
-      if (!saved || saved.version !== 2) return blankLearnerProfile();
-      return {
-        ...blankLearnerProfile(),
-        ...saved,
-        completed: saved.completed || {},
-        stickers: Array.isArray(saved.stickers) ? saved.stickers.filter((key) => GAMES[key]) : [],
-        gameStats: saved.gameStats || {},
-        activityDays: trimActivityDays(saved.activityDays),
-        observations: Array.isArray(saved.observations) ? saved.observations
-          .filter((item) => item && GAMES[item.game] && ["independent", "together", "hard"].includes(item.level) && /^\d{4}-\d{2}-\d{2}$/.test(item.date))
-          .filter((item) => item.date >= dateKeyOffset(29))
-          .slice(-60)
-          .map((item) => ({ date: item.date, game: item.game, level: item.level })) : [],
-      };
+      return normalizeLearnerProfile(JSON.parse(localStorage.getItem(PROFILE_KEY))) || blankLearnerProfile();
     } catch {
       return blankLearnerProfile();
     }
@@ -2096,6 +2132,83 @@
     }
   }
 
+  function setBackupStatus(message, state = "") {
+    const section = document.querySelector(".backup-settings");
+    section.classList.toggle("is-success", state === "success");
+    section.classList.toggle("is-error", state === "error");
+    document.querySelector("#backup-status").textContent = message;
+  }
+
+  function exportBackup() {
+    const payload = {
+      format: "mongle-local-backup",
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      app: { games: Object.keys(GAMES).length, profileVersion: 2 },
+      profile: learnerProfile,
+      daily: dailyProgress,
+      settings: {
+        soundEnabled,
+        musicEnabled,
+        musicVolume,
+      },
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `mongle-backup-${todayKey()}.mongle.json`;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    setBackupStatus("백업 파일을 저장했어요. 새 기기의 보호자 공간에서 불러올 수 있어요.", "success");
+    showToast("몽글 기록 백업을 저장했어요.");
+  }
+
+  async function importBackupFile(file) {
+    if (!file) return;
+    try {
+      if (file.size <= 0 || file.size > 1024 * 1024) throw new Error("invalid size");
+      const payload = JSON.parse(await file.text());
+      if (payload?.format !== "mongle-local-backup" || payload.version !== 1) throw new Error("invalid format");
+      const profile = normalizeLearnerProfile(payload.profile);
+      if (!profile) throw new Error("invalid profile");
+      const daily = normalizeDailyProgress(payload.daily);
+      if (!window.confirm("현재 이 기기의 기록을 백업 파일의 기록으로 바꿀까요?")) {
+        setBackupStatus("불러오기를 취소했어요. 현재 기록은 그대로예요.");
+        return;
+      }
+
+      learnerProfile = profile;
+      dailyProgress = daily;
+      if (typeof payload.settings?.soundEnabled === "boolean") soundEnabled = payload.settings.soundEnabled;
+      if (typeof payload.settings?.musicEnabled === "boolean") musicEnabled = payload.settings.musicEnabled;
+      const importedVolume = Number(payload.settings?.musicVolume);
+      if (Number.isFinite(importedVolume) && importedVolume >= 0 && importedVolume <= 0.35) musicVolume = importedVolume;
+      persistProgress();
+      try {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(learnerProfile));
+      } catch {
+        // The restored data still remains available for this session.
+      }
+      saveSoundPreference();
+      saveMusicPreference();
+      saveMusicVolume();
+      updateSoundButton();
+      updateMusicControls();
+      if (!musicEnabled) stopBgm();
+      updateTodayCard();
+      updatePremiumDashboard();
+      updateParentDashboard();
+      setBackupStatus("몽글 기록을 안전하게 불러왔어요.", "success");
+      showToast("몽글 기록을 불러왔어요.");
+    } catch {
+      setBackupStatus("몽글 백업 파일을 확인하지 못했어요. 다른 파일을 선택해 주세요.", "error");
+      showToast("올바른 몽글 백업 파일이 아니에요.");
+    } finally {
+      document.querySelector("#backup-file").value = "";
+    }
+  }
+
   function renderParentObservation() {
     const key = dailyProgress.lastPlayed && GAMES[dailyProgress.lastPlayed] ? dailyProgress.lastPlayed : null;
     const gameLabel = document.querySelector("#observation-game");
@@ -2540,6 +2653,9 @@
     startGame(key);
   });
   document.querySelector("#save-weekly-report").addEventListener("click", saveWeeklyReport);
+  document.querySelector("#export-backup").addEventListener("click", exportBackup);
+  document.querySelector("#import-backup").addEventListener("click", () => document.querySelector("#backup-file").click());
+  document.querySelector("#backup-file").addEventListener("change", (event) => importBackupFile(event.target.files?.[0]));
   document.querySelectorAll("[data-observation]").forEach((button) => {
     button.addEventListener("click", () => recordParentObservation(button.dataset.observation));
   });

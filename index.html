@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
     <link rel="stylesheet" href="./interactions.css?v=19" />
-    <link rel="stylesheet" href="./premium.css?v=6" />
+    <link rel="stylesheet" href="./premium.css?v=7" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -549,6 +549,19 @@
           <label><span class="sr-only">아이 애칭</span><input id="child-nickname" type="text" maxlength="10" autocomplete="off" value="꼬마 탐험가" /></label>
         </section>
 
+        <section class="backup-settings" aria-labelledby="backup-settings-title">
+          <div class="backup-settings-heading">
+            <span class="backup-settings-icon" aria-hidden="true">↕</span>
+            <span><strong id="backup-settings-title">기록 백업 · 새 기기로 옮기기</strong><small>애칭·진도·관찰 기록을 파일 하나로 안전하게 보관해요.</small></span>
+          </div>
+          <div class="backup-actions">
+            <button id="export-backup" type="button">백업 파일 저장</button>
+            <button id="import-backup" type="button">백업 불러오기</button>
+            <input id="backup-file" type="file" accept="application/json,.json,.mongle" hidden />
+          </div>
+          <p id="backup-status" role="status">파일은 서버로 전송되지 않으며 보호자가 직접 보관해요.</p>
+        </section>
+
         <section class="offline-settings" aria-labelledby="offline-settings-title">
           <div>
             <span class="offline-settings-icon" aria-hidden="true">⌂</span>
@@ -619,6 +632,6 @@
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
     <script src="./interaction-engine.js?v=26"></script>
-    <script src="./app.js?v=32"></script>
+    <script src="./app.js?v=34"></script>
   </body>
 </html>
