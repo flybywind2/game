@@ -824,6 +824,34 @@ button.pattern-cell {
   font-weight: 850;
 }
 
+.relation-clue-visual {
+  display: grid;
+  place-items: center;
+  min-height: 58px;
+  font-size: clamp(38px, 7vw, 58px);
+  line-height: 1.15;
+}
+
+.relation-clue-text {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 850;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+
+.relation-target small {
+  color: var(--ink-soft);
+  font-weight: 850;
+}
+
+.pattern-answer-tray .activity-token {
+  min-height: 100px;
+}
+
 .compare-groups {
   width: min(100%, 680px);
   display: grid;
@@ -1144,6 +1172,24 @@ button.pattern-cell {
 
   .drawing-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .relation-targets,
+  .relation-tray {
+    gap: 7px;
+  }
+
+  .relation-target {
+    min-height: 112px;
+    padding: 9px 6px;
+  }
+
+  .relation-clue-text {
+    font-size: 11px;
+  }
+
+  .pattern-answer-tray {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 
   .spot-board {

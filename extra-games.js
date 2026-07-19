@@ -1053,8 +1053,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
     "rounds": [
       {
         "helper": "코끼리와 생쥐의 실제 크기를 떠올려요.",
-        "prompt": "코끼리와 생쥐 중 더 큰 동물은 누구일까?",
-        "speech": "더 큰 동물을 골라 보자.",
+        "prompt": "생쥐와 코끼리를 작은 동물부터 놓아볼까?",
+        "speech": "생쥐와 코끼리를 작은 동물부터 큰 동물 순서로 놓아 보자.",
         "success": "맞아, 코끼리는 생쥐보다 훨씬 커!",
         "scene": [
           "🐘",
@@ -1078,8 +1078,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
       },
       {
         "helper": "기린과 달팽이의 실제 크기를 생각해요.",
-        "prompt": "기린과 달팽이 가운데 더 큰 친구는 누구일까?",
-        "speech": "더 큰 친구를 찾아 보자.",
+        "prompt": "달팽이와 기린을 작은 친구부터 놓아볼까?",
+        "speech": "달팽이와 기린을 작은 친구부터 큰 친구 순서로 놓아 보자.",
         "success": "키가 큰 기린을 잘 골랐어!",
         "scene": [
           "🦒",
@@ -1103,8 +1103,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
       },
       {
         "helper": "고래와 물고기의 실제 크기를 비교해요.",
-        "prompt": "고래와 작은 물고기 중 더 큰 쪽은 무엇일까?",
-        "speech": "더 큰 바다 친구를 골라 보자.",
+        "prompt": "작은 물고기와 고래를 작은 순서부터 놓아볼까?",
+        "speech": "작은 물고기와 고래를 작은 바다 친구부터 순서대로 놓아 보자.",
         "success": "커다란 고래를 정확히 찾았네!",
         "scene": [
           "🐋",
@@ -1149,8 +1149,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
     "rounds": [
       {
         "helper": "개미와 소의 실제 크기를 떠올려요.",
-        "prompt": "개미와 소 중 더 작은 동물은 누구일까?",
-        "speech": "더 작은 동물을 골라 보자.",
+        "prompt": "개미와 소를 작은 동물부터 놓아볼까?",
+        "speech": "개미와 소를 작은 동물부터 큰 동물 순서로 놓아 보자.",
         "success": "작디작은 개미를 찾았어!",
         "scene": [
           "🐜",
@@ -1174,8 +1174,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
       },
       {
         "helper": "무당벌레와 말의 실제 크기를 비교해요.",
-        "prompt": "무당벌레와 말 가운데 더 작은 친구는 무엇일까?",
-        "speech": "더 작은 친구를 찾아 보자.",
+        "prompt": "무당벌레와 말을 작은 친구부터 놓아볼까?",
+        "speech": "무당벌레와 말을 작은 친구부터 큰 친구 순서로 놓아 보자.",
         "success": "조그만 무당벌레를 잘 골랐네!",
         "scene": [
           "🐞",
@@ -1199,8 +1199,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
       },
       {
         "helper": "나비와 코끼리의 실제 크기를 생각해요.",
-        "prompt": "나비와 코끼리 중 더 작은 쪽을 골라볼까?",
-        "speech": "더 작은 동물을 톡 눌러 보자.",
+        "prompt": "나비와 코끼리를 작은 동물부터 놓아볼까?",
+        "speech": "나비와 코끼리를 작은 동물부터 큰 동물 순서로 놓아 보자.",
         "success": "가벼운 나비가 더 작아!",
         "scene": [
           "🦋",
@@ -1245,8 +1245,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
     "rounds": [
       {
         "helper": "동그라미 세 개의 넓이를 비교해요.",
-        "prompt": "세 동그라미 중 가장 큰 동그라미는 무엇일까?",
-        "speech": "가장 큰 동그라미를 골라 보자.",
+        "prompt": "세 동그라미를 작은 것부터 차례로 놓아볼까?",
+        "speech": "세 동그라미를 작은 것부터 중간, 큰 것 순서로 놓아 보자.",
         "success": "커다란 동그라미를 한눈에 찾았어!",
         "options": [
           {
@@ -1266,8 +1266,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
       },
       {
         "helper": "세모 세 개의 크기를 천천히 봐요.",
-        "prompt": "세 세모 가운데 가장 작은 세모는 어디에 있을까?",
-        "speech": "가장 작은 세모를 찾아 보자.",
+        "prompt": "세 세모를 작은 것부터 차례로 놓아볼까?",
+        "speech": "세 세모를 작은 것부터 중간, 큰 것 순서로 놓아 보자.",
         "success": "조그만 세모를 정확히 골랐네!",
         "options": [
           {
@@ -1290,8 +1290,8 @@ window.MONGLE_EXTRA_GAMES = Object.freeze(
       },
       {
         "helper": "네모의 크기만 비교하면 돼요.",
-        "prompt": "큰 네모라고 적힌 모양을 골라 줄래?",
-        "speech": "큰 네모를 톡 눌러 보자.",
+        "prompt": "세 네모를 작은 것부터 차례로 놓아볼까?",
+        "speech": "세 네모를 작은 것부터 중간, 큰 것 순서로 놓아 보자.",
         "success": "반듯하고 커다란 네모야!",
         "options": [
           {

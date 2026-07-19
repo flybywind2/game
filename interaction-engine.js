@@ -16,8 +16,8 @@
       instruction: "양쪽 그림을 하나씩 세고 알맞은 관계를 골라요.",
     },
     drag: {
-      label: "그림 짝 놓기",
-      instruction: "그림을 똑같은 그림 자리와 모두 짝지어 놓아요.",
+      label: "관계 연결",
+      instruction: "질문 단서와 알맞은 그림을 모두 연결해요.",
     },
     sort: {
       label: "두 바구니 분류",
@@ -771,7 +771,7 @@
     };
   }
 
-  function renderPattern(context) {
+  function renderLegacyPattern(context) {
     const { controller, stage, round, seed, onComplete, onMistake, announce } = context;
     const track = document.createElement("div");
     track.className = "pattern-track";
@@ -832,6 +832,115 @@
     };
   }
 
+  function renderPattern(context) {
+    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const rawSequence = (round.scene || []).slice(-6);
+    const missingIndex = Math.max(0, rawSequence.findIndex((item) => item === "❓"));
+    const completed = rawSequence.length
+      ? rawSequence.map((item) => item === "❓" ? cleanVisual(correct.visual) : cleanVisual(item))
+      : [cleanVisual(correct.visual), "●", cleanVisual(correct.visual), "●"];
+    const knownIndex = completed.findIndex((visual, index) =>
+      index !== missingIndex && round.options.some((option) => cleanVisual(option.visual) === visual),
+    );
+    const hiddenIndexes = [...new Set([knownIndex >= 0 ? knownIndex : 0, missingIndex])].slice(0, 2);
+    while (hiddenIndexes.length < 2 && hiddenIndexes.length < completed.length) {
+      const next = completed.findIndex((_, index) => !hiddenIndexes.includes(index));
+      if (next < 0) break;
+      hiddenIndexes.push(next);
+    }
+
+    const answerFor = (index) =>
+      round.options.find((option) => cleanVisual(option.visual) === completed[index]) || {
+        label: completed[index],
+        visual: completed[index],
+      };
+    const answers = hiddenIndexes.map((index) => ({ option: answerFor(index), targetIndex: index }));
+    const usedVisuals = new Set(answers.map((item) => cleanVisual(item.option.visual)));
+    const distractors = round.options
+      .filter((option) => !usedVisuals.has(cleanVisual(option.visual)))
+      .slice(0, 2)
+      .map((option) => ({ option, targetIndex: "extra" }));
+    while (distractors.length < 2) {
+      const fallback = round.options[distractors.length % round.options.length];
+      distractors.push({ option: fallback, targetIndex: "extra" });
+    }
+
+    const track = document.createElement("div");
+    track.className = "pattern-track pattern-two-blanks";
+    track.setAttribute("aria-label", "규칙에서 빠진 두 칸을 채워요");
+    const targets = [];
+    completed.forEach((visual, index) => {
+      if (!hiddenIndexes.includes(index)) {
+        const cell = document.createElement("span");
+        cell.className = "pattern-cell";
+        cell.textContent = visual;
+        cell.setAttribute("aria-hidden", "true");
+        track.appendChild(cell);
+        return;
+      }
+      const target = document.createElement("button");
+      target.type = "button";
+      target.className = "pattern-cell pattern-blank";
+      target.dataset.activityDrop = String(index);
+      target.textContent = "?";
+      target.setAttribute("aria-label", index + 1 + "번째 빠진 칸");
+      targets.push(target);
+      track.appendChild(target);
+    });
+
+    const tray = document.createElement("div");
+    tray.className = "activity-tray pattern-answer-tray";
+    tray.style.gridTemplateColumns = "repeat(4, minmax(0, 1fr))";
+    const sourceItems = shuffled([...answers, ...distractors], seed);
+    const sources = sourceItems.map((item, index) => {
+      const token = createToken(item.option);
+      token.dataset.sourceIndex = String(index);
+      token.dataset.targetIndex = String(item.targetIndex);
+      token.dataset.label = optionName(item.option);
+      tray.appendChild(token);
+      return token;
+    });
+
+    let placed = 0;
+    setupPickAndDrop(
+      controller,
+      sources,
+      targets,
+      (source, target) => {
+        if (source.dataset.targetIndex !== target.dataset.activityDrop) {
+          const expected = targets.find((item) => item.dataset.activityDrop === source.dataset.targetIndex)
+            || sources.find((item) => item.dataset.targetIndex !== "extra" && !item.disabled);
+          onMistake(source, expected);
+          return false;
+        }
+        const item = sourceItems[Number(source.dataset.sourceIndex)];
+        source.disabled = true;
+        source.classList.add("is-placed");
+        target.textContent = "";
+        target.appendChild(createVisual(item.option));
+        target.classList.add("is-filled");
+        target.setAttribute("aria-label", optionName(item.option) + "로 채움");
+        target.disabled = true;
+        placed += 1;
+        onProgress("prompt");
+        announce("빠진 칸 " + placed + "개를 채웠어요.");
+        if (placed === targets.length) onComplete(target);
+        return true;
+      },
+      announce,
+    );
+    stage.append(track, tray);
+    return {
+      requiredActions: targets.length,
+      hint: () => {
+        const source = sources.find((item) => item.dataset.targetIndex !== "extra" && !item.disabled);
+        if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.targetIndex)]);
+      },
+      replay: () => pulse(targets.filter((target) => !target.disabled), "is-replay"),
+    };
+  }
+
   function binLabels(game) {
     if (game.category === "heart" || /안전|약속|마음|생활/.test(game.title || "")) {
       return ["해도 좋아요", "다른 방법"];
@@ -840,7 +949,7 @@
   }
 
   function renderSort(context) {
-    const { controller, stage, game, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const { controller, stage, game, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
     const tray = document.createElement("div");
     tray.className = "activity-tray sort-tray";
     const labels = binLabels(game);
@@ -861,11 +970,20 @@
       bins.appendChild(target);
       return target;
     });
+    const items = game.rounds.flatMap((item, itemRoundIndex) => {
+      const correct = correctOption(item);
+      const wrong = item.options.filter((option) => option !== correct);
+      return [
+        { option: correct, expected: "correct" },
+        { option: wrong[(roundIndex + itemRoundIndex) % wrong.length], expected: "other" },
+      ];
+    });
     let placed = 0;
-    const sources = shuffled(round.options, seed).map((option) => {
-      const token = createToken(option);
-      token.dataset.optionIndex = String(round.options.indexOf(option));
-      token.dataset.label = optionName(option);
+    const sources = shuffled(items, seed).map((item) => {
+      const token = createToken(item.option);
+      token.dataset.itemIndex = String(items.indexOf(item));
+      token.dataset.expected = item.expected;
+      token.dataset.label = optionName(item.option);
       tray.appendChild(token);
       return token;
     });
@@ -875,8 +993,9 @@
       sources,
       targets,
       (source, target) => {
-        const option = round.options[Number(source.dataset.optionIndex)];
-        const expected = option.correct ? "correct" : "other";
+        const item = items[Number(source.dataset.itemIndex)];
+        const option = item.option;
+        const expected = item.expected;
         if (target.dataset.activityDrop !== expected) {
           onMistake(source, targets.find((item) => item.dataset.activityDrop === expected));
           return false;
@@ -898,11 +1017,11 @@
     );
     stage.append(tray, bins);
     return {
+      requiredActions: items.length,
       hint: () => {
         const source = sources.find((item) => !item.disabled);
         if (!source) return;
-        const option = round.options[Number(source.dataset.optionIndex)];
-        pulse([source, targets[option.correct ? 0 : 1]]);
+        pulse([source, targets[source.dataset.expected === "correct" ? 0 : 1]]);
       },
       replay: () => pulse(sources.filter((source) => !source.disabled), "is-replay"),
     };
@@ -971,7 +1090,7 @@
     };
   }
 
-  function renderDrag(context) {
+  function renderLegacyDrag(context) {
     if (context.gameKey === "body") return renderBodyFunction(context);
     const { controller, stage, round, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
     const pairCount = roundIndex === 0 ? 2 : Math.min(3, round.options.length);
@@ -1043,6 +1162,86 @@
         if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
       },
       replay: () => pulse(sources.filter((source) => !source.disabled), "is-replay"),
+    };
+  }
+
+  function renderDrag(context) {
+    const { controller, stage, game, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
+    const pairCount = roundIndex === 0 ? 2 : Math.min(3, game.rounds.length);
+    const selectedRounds = Array.from({ length: pairCount }, (_, offset) =>
+      game.rounds[(roundIndex + offset) % game.rounds.length],
+    );
+    const pairs = selectedRounds.map((item, match) => ({
+      clue: (item.scene || []).map(cleanVisual),
+      prompt: item.prompt,
+      option: correctOption(item),
+      match,
+    }));
+
+    const targetsBoard = document.createElement("div");
+    targetsBoard.className = "sequence-slots relation-targets";
+    targetsBoard.style.gridTemplateColumns = "repeat(" + pairCount + ", minmax(0, 1fr))";
+    const targets = shuffled(pairs, seed + ":clues").map((pair) => {
+      const target = document.createElement("button");
+      target.type = "button";
+      target.className = "sequence-slot relation-target";
+      target.dataset.activityDrop = String(pair.match);
+      const clue = document.createElement("span");
+      clue.className = pair.clue.length ? "relation-clue-visual" : "relation-clue-text";
+      clue.textContent = pair.clue.length ? pair.clue.join(" ") : pair.prompt;
+      const caption = document.createElement("small");
+      caption.textContent = "알맞은 그림 자리";
+      target.append(clue, caption);
+      target.setAttribute("aria-label", pair.prompt + ", 알맞은 그림 놓는 자리");
+      targetsBoard.appendChild(target);
+      return target;
+    });
+
+    const tray = document.createElement("div");
+    tray.className = "activity-tray relation-tray";
+    tray.style.gridTemplateColumns = "repeat(" + pairCount + ", minmax(0, 1fr))";
+    const sources = shuffled(pairs, seed + ":answers").map((pair) => {
+      const token = createToken(pair.option);
+      token.dataset.match = String(pair.match);
+      token.dataset.label = optionName(pair.option);
+      tray.appendChild(token);
+      return token;
+    });
+
+    let placed = 0;
+    setupPickAndDrop(
+      controller,
+      sources,
+      targets,
+      (source, target) => {
+        if (source.dataset.match !== target.dataset.activityDrop) {
+          onMistake(source, targets.find((item) => item.dataset.activityDrop === source.dataset.match));
+          return false;
+        }
+        const pair = pairs[Number(source.dataset.match)];
+        source.disabled = true;
+        source.classList.add("is-placed");
+        target.replaceChildren(createVisual(pair.option, "sequence-slot-visual"));
+        target.classList.add("is-filled");
+        target.setAttribute("aria-label", pair.prompt + ", " + optionName(pair.option) + " 연결 완료");
+        target.disabled = true;
+        placed += 1;
+        onProgress("prompt");
+        announce(optionName(pair.option) + " 연결 완료. " + placed + "개 했어요.");
+        if (placed === pairCount) onComplete(target);
+        return true;
+      },
+      announce,
+    );
+
+    stage.append(tray, targetsBoard);
+    return {
+      requiredActions: pairCount,
+      hint: () => {
+        const source = sources.find((item) => !item.disabled);
+        if (source) pulse([source, targets.find((item) => item.dataset.activityDrop === source.dataset.match)]);
+      },
+      replay: () => pulse(targets.filter((target) => !target.disabled), "is-replay"),
     };
   }
 
@@ -1142,7 +1341,7 @@
     };
   }
 
-  function renderOrder(context) {
+  function renderLegacyOrder(context) {
     const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
     const correct = correctOption(round);
     const tray = document.createElement("div");
@@ -1202,6 +1401,99 @@
     return {
       hint: () => pulse([correctSource, target].filter(Boolean)),
       replay: () => pulse([...sources.filter((source) => !source.disabled), target], "is-replay"),
+    };
+  }
+
+  function sizeOrderOptions(gameKey, round) {
+    if (round.options.every((option) => Number.isInteger(option.sizeRank))) {
+      return [...round.options].sort((left, right) => left.sizeRank - right.sizeRank);
+    }
+    if (gameKey === "extra014") {
+      const rankFor = (option) => {
+        const text = optionName(option) + " " + String(option.subtitle || "");
+        if (/작은|작음/.test(text)) return 0;
+        if (/중간/.test(text)) return 1;
+        return 2;
+      };
+      return [...round.options].sort((left, right) => rankFor(left) - rankFor(right));
+    }
+    if (gameKey === "extra012" || gameKey === "extra013") {
+      const actual = round.options.filter((option) => !/같/.test(optionName(option)) && option.visual !== "〓");
+      return actual.sort((left, right) => {
+        if (gameKey === "extra012") return Number(left.correct) - Number(right.correct);
+        return Number(right.correct) - Number(left.correct);
+      });
+    }
+    return [...round.options];
+  }
+
+  function renderOrder(context) {
+    const { controller, stage, round, gameKey, seed, onComplete, onMistake, onProgress, announce } = context;
+    const ordered = sizeOrderOptions(gameKey, round);
+    const sizeLabels = ordered.length === 2 ? ["더 작게", "더 크게"] : ["작게", "중간", "크게"];
+    const tray = document.createElement("div");
+    tray.className = "activity-tray size-tray";
+    tray.style.gridTemplateColumns = "repeat(" + ordered.length + ", minmax(0, 1fr))";
+    const sourceItems = shuffled(ordered.map((option, rank) => ({ option, rank })), seed);
+    const sources = sourceItems.map((item) => {
+      const token = createToken(item.option, "activity-token size-token");
+      token.dataset.rank = String(item.rank);
+      token.dataset.label = optionName(item.option);
+      tray.appendChild(token);
+      return token;
+    });
+
+    const slots = document.createElement("div");
+    slots.className = "sequence-slots size-slots";
+    slots.style.gridTemplateColumns = "repeat(" + ordered.length + ", minmax(0, 1fr))";
+    const targets = ordered.map((option, rank) => {
+      const target = document.createElement("button");
+      target.type = "button";
+      target.className = "sequence-slot size-slot size-" + (rank + 1);
+      target.dataset.activityDrop = String(rank);
+      target.innerHTML = "<span class=\"slot-number\">" + (rank + 1) + "</span><small>" + sizeLabels[rank] + "</small>";
+      target.setAttribute("aria-label", sizeLabels[rank] + " 자리");
+      slots.appendChild(target);
+      return target;
+    });
+
+    let placed = 0;
+    setupPickAndDrop(
+      controller,
+      sources,
+      targets,
+      (source, target) => {
+        if (source.dataset.rank !== target.dataset.activityDrop) {
+          onMistake(source, targets[Number(source.dataset.rank)]);
+          return false;
+        }
+        const rank = Number(source.dataset.rank);
+        const option = ordered[rank];
+        source.disabled = true;
+        source.classList.add("is-placed");
+        target.replaceChildren(
+          Object.assign(document.createElement("span"), { className: "slot-number", textContent: String(rank + 1) }),
+          createVisual(option, "sequence-slot-visual size-" + (rank + 1)),
+        );
+        target.classList.add("is-filled");
+        target.setAttribute("aria-label", sizeLabels[rank] + " " + optionName(option) + " 놓음");
+        target.disabled = true;
+        placed += 1;
+        onProgress("prompt");
+        announce(optionName(option) + "를 " + sizeLabels[rank] + " 자리에 놓았어요.");
+        if (placed === ordered.length) onComplete(target);
+        return true;
+      },
+      announce,
+    );
+    stage.append(tray, slots);
+    return {
+      requiredActions: ordered.length,
+      hint: () => {
+        const source = sources.find((item) => !item.disabled);
+        if (source) pulse([source, targets[Number(source.dataset.rank)]]);
+      },
+      replay: () => pulse(targets.filter((target) => !target.disabled), "is-replay"),
     };
   }
 
@@ -2215,6 +2507,20 @@
     };
     const renderer = RENDERERS[mode];
     const activity = renderer ? renderer(context) : null;
+    const minimumActions = {
+      count: 2,
+      compare: 3,
+      drag: 2,
+      sort: 6,
+      sequence: 2,
+      memory: 4,
+      pattern: 2,
+      spot: 3,
+      trace: 2,
+      order: 2,
+      draw: 3,
+    };
+    stage.dataset.requiredActions = String(activity?.requiredActions || minimumActions[mode] || 1);
 
     return {
       mode,
