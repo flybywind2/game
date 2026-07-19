@@ -367,6 +367,17 @@ body.is-keyboard-nav .count-piece:focus {
   perspective: 900px;
 }
 
+.memory-preview-note {
+  margin: 0;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #fff2b8;
+  color: #76561d;
+  font-size: 14px;
+  font-weight: 900;
+  text-align: center;
+}
+
 .memory-board[data-card-count="4"] {
   width: min(100%, 540px);
   grid-template-columns: repeat(2, minmax(0, 1fr));

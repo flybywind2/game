@@ -772,23 +772,30 @@
       ]),
       seed + ":pairs",
     );
+    const initialPreviewDuration = cards.length <= 4 ? 2200 : 3000;
+    const replayPreviewDuration = cards.length <= 4 ? 1600 : 2200;
     const counter = createCounter("찾은 짝", 0, pairOptions.length);
+    const previewNote = document.createElement("p");
+    previewNote.className = "memory-preview-note";
+    previewNote.setAttribute("aria-live", "polite");
+    previewNote.textContent = "먼저 그림을 보여줄게요. 어디에 있는지 기억해요!";
     const board = document.createElement("div");
     board.className = "memory-board memory-pair-board";
     board.dataset.cardCount = String(cards.length);
     board.setAttribute("aria-label", cards.length + "장 카드에서 " + pairOptions.length + "쌍 찾기");
     const cardButtons = [];
     let first = null;
-    let locked = false;
+    let locked = true;
     let matched = 0;
 
     cards.forEach((card, index) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "memory-card";
+      button.className = "memory-card is-preview";
       button.dataset.pair = String(card.pair);
       button.dataset.copy = String(card.copy);
-      button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
+      button.disabled = true;
+      button.setAttribute("aria-label", optionName(card.option) + " 그림 미리 보기");
       const front = document.createElement("span");
       front.className = "memory-front";
       front.textContent = "?";
@@ -845,18 +852,47 @@
       board.appendChild(button);
     });
 
-    stage.append(counter, board);
-    announce("카드를 두 장씩 뒤집어 같은 그림 " + pairOptions.length + "쌍을 모두 찾아요.");
+    const coverCards = () => {
+      cardButtons.forEach((button, index) => {
+        if (button.classList.contains("is-matched")) return;
+        button.classList.remove("is-preview", "is-open", "is-miss", "try-again");
+        button.disabled = false;
+        button.setAttribute("aria-label", "기억 카드 " + (index + 1) + " 뒤집기");
+      });
+      locked = false;
+      previewNote.textContent = "이제 카드를 두 장씩 뒤집어 같은 그림을 찾아요.";
+      announce("그림을 모두 덮었어요. 같은 그림 두 장을 찾아요.");
+    };
+
+    const previewCards = () => {
+      if (locked) return;
+      locked = true;
+      first = null;
+      cardButtons.forEach((button) => {
+        if (button.classList.contains("is-matched")) return;
+        button.classList.remove("is-open", "is-miss", "try-again");
+        button.classList.add("is-preview");
+        button.disabled = true;
+      });
+      previewNote.textContent = "그림 위치를 한 번 더 기억해요!";
+      announce("아직 찾지 못한 그림을 한 번 더 보여줄게요.");
+      controller.later(coverCards, replayPreviewDuration);
+    };
+
+    stage.append(previewNote, counter, board);
+    announce("먼저 모든 그림을 보여줄게요. 어디에 있는지 기억해요.");
+    controller.later(coverCards, initialPreviewDuration);
     return {
       requiredActions: pairOptions.length * 2,
       prompt: "같은 그림 두 장을 찾아 짝을 모두 맞춰 볼까?",
       helper: "한 번에 두 장씩 뒤집고 자리를 기억해요.",
+      speech: "먼저 그림 위치를 보여줄게요. 어디에 있는지 기억한 뒤 같은 그림 두 장씩 찾아 보자.",
       hint: () => {
         const source = first || cardButtons.find((item) => !item.disabled);
         const match = source && cardButtons.find((item) => item !== source && !item.disabled && item.dataset.pair === source.dataset.pair);
         pulse([source, match].filter(Boolean));
       },
-      replay: () => pulse(cardButtons.filter((button) => !button.disabled), "is-replay"),
+      replay: previewCards,
     };
   }
 
@@ -2716,6 +2752,7 @@
       instruction: metaFor(mode, config.gameKey).instruction,
       prompt: activity?.prompt || "",
       helper: activity?.helper || "",
+      speech: activity?.speech || activity?.prompt || "",
       hint: activity?.hint || (() => {}),
       replay: activity?.replay || (() => {}),
       destroy() {

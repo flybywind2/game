@@ -1279,7 +1279,7 @@
 
   function speakRoundInstruction(round) {
     roundInstructionToken += 1;
-    speak(round.speech || round.prompt);
+    speak(activeActivity?.speech || activeActivity?.prompt || round.speech || round.prompt);
   }
 
   function renderRound() {
