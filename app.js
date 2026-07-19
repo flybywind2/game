@@ -721,6 +721,7 @@
       totalHints: 0,
       gameStats: {},
       activityDays: {},
+      observations: [],
     };
   }
 
@@ -763,6 +764,11 @@
         stickers: Array.isArray(saved.stickers) ? saved.stickers.filter((key) => GAMES[key]) : [],
         gameStats: saved.gameStats || {},
         activityDays: trimActivityDays(saved.activityDays),
+        observations: Array.isArray(saved.observations) ? saved.observations
+          .filter((item) => item && GAMES[item.game] && ["independent", "together", "hard"].includes(item.level) && /^\d{4}-\d{2}-\d{2}$/.test(item.date))
+          .filter((item) => item.date >= dateKeyOffset(29))
+          .slice(-60)
+          .map((item) => ({ date: item.date, game: item.game, level: item.level })) : [],
       };
     } catch {
       return blankLearnerProfile();
@@ -815,12 +821,24 @@
   }
 
   function adaptiveLevelForGame(key) {
+    const observation = latestObservation(key);
+    if (observation?.level === "hard") return "support";
+    if (observation?.level === "independent") return "challenge";
+    if (observation?.level === "together") return "standard";
     const recent = (learnerProfile.gameStats[key]?.recent || []).slice(-6);
     if (recent.length < 4) return "standard";
     const accuracy = recent.filter(Boolean).length / recent.length;
     if (accuracy >= 0.84) return "challenge";
     if (accuracy <= 0.55) return "support";
     return "standard";
+  }
+
+  function latestObservation(key) {
+    const observations = learnerProfile?.observations || [];
+    for (let index = observations.length - 1; index >= 0; index -= 1) {
+      if (observations[index].game === key) return observations[index];
+    }
+    return null;
   }
 
   function profileLevel() {
@@ -1904,6 +1922,56 @@
     document.querySelector("#weekly-recommendation-title").textContent = `${recommendation.icon} ${recommendation.title}`;
   }
 
+  function renderParentObservation() {
+    const key = dailyProgress.lastPlayed && GAMES[dailyProgress.lastPlayed] ? dailyProgress.lastPlayed : null;
+    const gameLabel = document.querySelector("#observation-game");
+    const status = document.querySelector("#observation-status");
+    const buttons = [...document.querySelectorAll("[data-observation]")];
+    if (!key) {
+      gameLabel.textContent = "오늘 놀이를 마친 뒤 아이의 모습을 알려 주세요.";
+      status.textContent = "놀이 기록이 생기면 보호자의 관찰을 남길 수 있어요.";
+      buttons.forEach((button) => {
+        button.disabled = true;
+        button.setAttribute("aria-pressed", "false");
+      });
+      return;
+    }
+
+    const observation = latestObservation(key);
+    const labels = {
+      independent: "혼자 해낸 모습으로 기록했어요. 다음에는 한 단계 도전해요.",
+      together: "함께한 모습으로 기록했어요. 현재 단계를 편안하게 이어가요.",
+      hard: "아직 어려운 모습으로 기록했어요. 다음에는 그림과 단서를 줄여 도와줘요.",
+    };
+    gameLabel.textContent = `최근 놀이 · ${GAMES[key].title}`;
+    status.textContent = observation
+      ? labels[observation.level]
+      : "보호자의 관찰은 이 놀이의 다음 난이도에 바로 반영돼요.";
+    buttons.forEach((button) => {
+      button.disabled = false;
+      button.setAttribute("aria-pressed", String(button.dataset.observation === observation?.level));
+      button.setAttribute("aria-label", `${GAMES[key].title}, ${button.querySelector("strong").textContent}, ${button.querySelector("small").textContent}`);
+    });
+  }
+
+  function recordParentObservation(level) {
+    const key = dailyProgress.lastPlayed;
+    if (!GAMES[key] || !["independent", "together", "hard"].includes(level)) return;
+    const date = todayKey();
+    const existing = (learnerProfile.observations || []).filter((item) => !(item.date === date && item.game === key));
+    learnerProfile.observations = [...existing, { date, game: key, level }]
+      .filter((item) => item.date >= dateKeyOffset(29))
+      .slice(-60);
+    saveLearnerProfile();
+    updateParentDashboard();
+    const toastLabels = {
+      independent: "다음에는 한 단계 도전하도록 맞췄어요.",
+      together: "현재 단계로 편안하게 이어갈게요.",
+      hard: "다음에는 단서를 더해 천천히 도와줄게요.",
+    };
+    showToast(toastLabels[level]);
+  }
+
   function updateParentDashboard() {
     document.querySelector("#parent-completed").textContent = `${completedCount()}`;
     document.querySelector("#parent-answers").textContent = `${dailyProgress.attempts}`;
@@ -1919,6 +1987,7 @@
     nicknameInput.value = learnerProfile.nickname || "꼬마 탐험가";
     document.querySelector("#parent-level").textContent = String(profileLevel());
     renderWeeklyReport();
+    renderParentObservation();
 
     const growthList = document.querySelector("#growth-skill-list");
     growthList.innerHTML = "";
@@ -1935,10 +2004,12 @@
     });
 
     const levels = Object.keys(learnerProfile.gameStats).map(adaptiveLevelForGame);
+    const observationCount = (learnerProfile.observations || []).length;
     const challengeCount = levels.filter((level) => level === "challenge").length;
     const supportCount = levels.filter((level) => level === "support").length;
     const adaptiveSummary = document.querySelector("#adaptive-summary");
-    if (!levels.length) adaptiveSummary.textContent = "아이의 최근 시도를 모은 뒤 알맞은 단계를 추천해요.";
+    if (observationCount) adaptiveSummary.textContent = `최근 보호자 관찰 ${observationCount}개와 아이의 시도를 함께 반영하고 있어요.`;
+    else if (!levels.length) adaptiveSummary.textContent = "아이의 최근 시도와 보호자의 관찰을 모아 알맞은 단계를 추천해요.";
     else if (supportCount > challengeCount) adaptiveSummary.textContent = "천천히 성공을 쌓도록 그림 수와 단서를 부드럽게 조절하고 있어요.";
     else if (challengeCount) adaptiveSummary.textContent = "익숙한 놀이에는 그림과 기억 카드를 늘려 한 단계 더 도전하고 있어요.";
     else adaptiveSummary.textContent = "현재 기본 단계가 잘 맞아요. 성공과 어려움을 계속 살펴볼게요.";
@@ -2294,6 +2365,9 @@
     closeParentDialog();
     startGame(key);
   });
+  document.querySelectorAll("[data-observation]").forEach((button) => {
+    button.addEventListener("click", () => recordParentObservation(button.dataset.observation));
+  });
   document.querySelector("#parent-gate-close").addEventListener("click", closeParentGate);
   parentGate.addEventListener("click", (event) => {
     if (event.target === parentGate) closeParentGate();
@@ -2307,6 +2381,7 @@
     const plan = ensureDailyPlan();
     dailyProgress = { ...blankProgress(), plan };
     if (learnerProfile.activityDays) delete learnerProfile.activityDays[todayKey()];
+    learnerProfile.observations = (learnerProfile.observations || []).filter((item) => item.date !== todayKey());
     saveProgress();
     saveLearnerProfile();
     updateParentDashboard();

@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
     <link rel="stylesheet" href="./interactions.css?v=19" />
-    <link rel="stylesheet" href="./premium.css?v=4" />
+    <link rel="stylesheet" href="./premium.css?v=5" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -520,6 +520,22 @@
           <p class="weekly-privacy">최근 30일의 익명 놀이 횟수만 이 기기에 보관하며 외부로 전송하지 않아요.</p>
         </section>
 
+        <section class="parent-observation" aria-labelledby="parent-observation-title">
+          <div class="parent-observation-heading">
+            <span class="observation-icon" aria-hidden="true">◎</span>
+            <span>
+              <strong id="parent-observation-title">보호자가 본 오늘의 반응</strong>
+              <small id="observation-game">놀이를 마친 뒤 아이의 모습을 알려 주세요.</small>
+            </span>
+          </div>
+          <div class="observation-choices" role="group" aria-labelledby="parent-observation-title">
+            <button type="button" data-observation="independent"><span aria-hidden="true">★</span><strong>혼자 했어요</strong><small>다음에는 한 단계 도전</small></button>
+            <button type="button" data-observation="together"><span aria-hidden="true">♡</span><strong>함께 했어요</strong><small>현재 단계를 이어가기</small></button>
+            <button type="button" data-observation="hard"><span aria-hidden="true">☁</span><strong>아직 어려워요</strong><small>그림과 단서를 줄이기</small></button>
+          </div>
+          <p class="observation-status" id="observation-status" role="status">보호자의 관찰은 다음 놀이 난이도에 바로 반영돼요.</p>
+        </section>
+
         <section class="child-profile-settings" aria-labelledby="child-profile-title">
           <div>
             <span class="profile-settings-icon" aria-hidden="true">☺</span>
@@ -598,6 +614,6 @@
     <script src="./extra-games.js?v=5"></script>
     <script src="./tts-manifest.js?v=4"></script>
     <script src="./interaction-engine.js?v=26"></script>
-    <script src="./app.js?v=29"></script>
+    <script src="./app.js?v=31"></script>
   </body>
 </html>
