@@ -582,6 +582,8 @@
   ]);
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
+  const APP_VERSION = "1.0.0";
+  const APP_BUILD = "2026.07.19.2";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
   const CATEGORY_NAMES = Object.freeze({
@@ -773,6 +775,70 @@
     stopBgm();
     stopVoice();
     window.location.replace(`${window.location.pathname}${window.location.search}`);
+  }
+
+  function supportDiagnosticsText() {
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+    const serviceWorker = "serviceWorker" in navigator
+      ? navigator.serviceWorker.controller ? "오프라인 제어 중" : "설치 준비 중"
+      : "지원 안 함";
+    let storage = "사용 가능";
+    try {
+      const key = "mongle-diagnostics-check";
+      localStorage.setItem(key, "1");
+      localStorage.removeItem(key);
+    } catch {
+      storage = "사용 제한됨";
+    }
+    return [
+      "몽글 놀이터 · 문제 해결 정보",
+      `버전: ${APP_VERSION} · 빌드 ${APP_BUILD}`,
+      `접속 상태: ${navigator.onLine ? "온라인" : "오프라인"}`,
+      `실행 방식: ${standalone ? "홈 화면 앱" : "브라우저"}`,
+      `오프라인 상태: ${serviceWorker}`,
+      `콘텐츠: ${Object.keys(GAMES).length}개 놀이`,
+      `화면: ${window.innerWidth} × ${window.innerHeight}`,
+      `말소리: ${soundEnabled ? "켬" : "끔"}`,
+      `배경음악: ${musicEnabled ? "켬" : "끔"}`,
+      `로컬 저장: ${storage}`,
+      "개인정보: 애칭·진도·관찰 기록 미포함",
+    ].join("\n");
+  }
+
+  async function copySupportDiagnostics() {
+    const status = document.querySelector("#support-status");
+    try {
+      await navigator.clipboard.writeText(supportDiagnosticsText());
+      status.textContent = "문제 해결 정보를 복사했어요. 판매처 문의에 함께 붙여 주세요.";
+      showToast("개인정보 없는 문제 해결 정보를 복사했어요.");
+    } catch {
+      status.textContent = "복사하지 못했어요. 브라우저의 클립보드 권한을 확인해 주세요.";
+      showToast("문제 해결 정보를 복사하지 못했어요.");
+    }
+  }
+
+  function runAudioCheck() {
+    const button = document.querySelector("#test-parent-audio");
+    const status = document.querySelector("#support-status");
+    if (!soundEnabled) {
+      soundEnabled = true;
+      saveSoundPreference();
+      updateSoundButton();
+    }
+    button.disabled = true;
+    status.textContent = "효과음 뒤에 F1 음성이 들리는지 확인해 주세요.";
+    playChime("success");
+    const started = speak("빨간색 과일을 찾아볼까?", {
+      onended: () => {
+        button.disabled = false;
+        status.textContent = "소리 확인을 마쳤어요. 들리지 않으면 기기 음량과 무음 모드를 확인해 주세요.";
+      },
+    });
+    if (!started) {
+      button.disabled = false;
+      status.textContent = "음성을 시작하지 못했어요. 기기 음량·무음 모드와 브라우저 소리 권한을 확인해 주세요.";
+    }
+    window.setTimeout(() => { button.disabled = false; }, 6000);
   }
 
   function normalizeDailyProgress(saved) {
@@ -3212,6 +3278,8 @@
     showToast("오늘의 놀이 기록을 지웠어요.");
   });
   document.querySelector("#erase-all-data").addEventListener("click", eraseAllLocalData);
+  document.querySelector("#test-parent-audio").addEventListener("click", runAudioCheck);
+  document.querySelector("#copy-support-diagnostics").addEventListener("click", copySupportDiagnostics);
 
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
