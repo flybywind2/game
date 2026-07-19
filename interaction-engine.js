@@ -44,8 +44,8 @@
       instruction: "맞는 도형을 찾고 굵은 안내선을 손가락으로 따라 그려요.",
     },
     order: {
-      label: "크기 차례",
-      instruction: "작은 것부터 큰 것까지 차례로 놓아요.",
+      label: "크기 비교",
+      instruction: "그림들의 실제 크기를 생각하고 알맞은 그림을 자리에 놓아요.",
     },
   });
 
@@ -1064,71 +1064,64 @@
 
   function renderOrder(context) {
     const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
-    const base = correctOption(round);
-    const sizeLabels = ["작게", "중간", "크게"];
-    const slots = document.createElement("div");
-    slots.className = "sequence-slots size-slots";
-    const targets = sizeLabels.map((label, index) => {
-      const target = document.createElement("button");
-      target.type = "button";
-      target.className = "sequence-slot size-slot size-" + (index + 1);
-      target.dataset.activityDrop = String(index);
-      target.innerHTML = "<span class=\"slot-number\">" + (index + 1) + "</span><small>" + label + "</small>";
-      target.setAttribute("aria-label", label + " 자리");
-      slots.appendChild(target);
-      return target;
-    });
+    const correct = correctOption(round);
     const tray = document.createElement("div");
     tray.className = "activity-tray size-tray";
     const sources = shuffled(
-      sizeLabels.map((label, index) => ({ label, size: index })),
+      round.options.map((option, index) => ({ option, index })),
       seed,
     ).map((item) => {
-      const token = createToken(base, "activity-token size-token size-" + (item.size + 1));
-      token.dataset.size = String(item.size);
-      token.dataset.label = item.label + " " + optionName(base);
-      token.setAttribute("aria-label", token.dataset.label);
+      const token = createToken(item.option, "activity-token size-token");
+      token.dataset.optionIndex = String(item.index);
+      token.dataset.label = optionName(item.option);
       tray.appendChild(token);
       return token;
     });
-    let placed = 0;
+    const correctSource = sources.find(
+      (source) => round.options[Number(source.dataset.optionIndex)] === correct,
+    );
+    const target = document.createElement("button");
+    target.type = "button";
+    target.className = "single-drop-target size-choice-target";
+    target.dataset.activityDrop = "answer";
+    target.setAttribute("aria-label", "알맞은 크기의 그림을 놓는 자리");
+    target.innerHTML =
+      "<span aria-hidden=\"true\">📏</span>" +
+      "<strong>알맞은 그림 놓기</strong>" +
+      "<small>그림을 끌거나, 그림과 이곳을 차례로 눌러요</small>";
+
     setupPickAndDrop(
       controller,
       sources,
-      targets,
-      (source, target) => {
-        if (source.dataset.size !== target.dataset.activityDrop) {
-          onMistake(source, targets[Number(source.dataset.size)]);
+      [target],
+      (source) => {
+        const option = round.options[Number(source.dataset.optionIndex)];
+        if (!option?.correct) {
+          onMistake(source, correctSource);
           return false;
         }
         source.disabled = true;
         source.classList.add("is-placed");
-        const visual = createVisual(base, "sequence-slot-visual size-" + (Number(source.dataset.size) + 1));
         target.replaceChildren(
-          Object.assign(document.createElement("span"), {
-            className: "slot-number",
-            textContent: String(Number(source.dataset.size) + 1),
+          createVisual(option, "size-choice-result"),
+          Object.assign(document.createElement("strong"), {
+            textContent: optionName(option),
           }),
-          visual,
         );
         target.classList.add("is-filled");
-        target.setAttribute("aria-label", sizeLabels[Number(source.dataset.size)] + " " + optionName(base) + " 놓음");
+        target.setAttribute("aria-label", optionName(option) + " 놓음");
         target.disabled = true;
-        placed += 1;
         onProgress("prompt");
-        announce(sizeLabels[Number(source.dataset.size)] + " 그림을 놓았어요.");
-        if (placed === 3) onComplete(target);
+        announce(optionName(option) + " 그림을 놓았어요.");
+        onComplete(target);
         return true;
       },
       announce,
     );
-    stage.append(slots, tray);
+    stage.append(tray, target);
     return {
-      hint: () => {
-        const source = sources.find((item) => !item.disabled);
-        if (source) pulse([source, targets[Number(source.dataset.size)]]);
-      },
-      replay: () => pulse(sources.filter((source) => !source.disabled), "is-replay"),
+      hint: () => pulse([correctSource, target].filter(Boolean)),
+      replay: () => pulse([...sources.filter((source) => !source.disabled), target], "is-replay"),
     };
   }
 

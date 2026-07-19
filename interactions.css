@@ -1183,6 +1183,12 @@ button.pattern-cell {
     display: none;
   }
 
+  .size-tray .activity-token-label {
+    display: block;
+    font-size: 12px;
+    white-space: normal;
+  }
+
   .trace-point {
     width: 44px;
     height: 44px;
