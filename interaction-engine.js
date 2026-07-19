@@ -1048,12 +1048,31 @@
     extra086: ["식탁 준비를 돕는 행동", "어린이가 하면 위험해요"],
   });
 
+  const ROUND_SORT_CONFIG = Object.freeze({
+    words: [
+      ["먹을 수 있어요", "먹지 않아요"],
+      ["타고 움직여요", "타는 것이 아니에요"],
+      ["머리에 써요", "머리에 쓰지 않아요"],
+    ],
+    extra029: [
+      ["과일", "과일이 아니에요"],
+      ["동그라미 모양", "다른 모양"],
+      ["파란색", "다른 색"],
+    ],
+    extra046: [
+      ["낮과 어울려요", "밤과 어울려요"],
+      ["밤과 어울려요", "낮과 어울려요"],
+      ["밤과 어울려요", "낮과 어울려요"],
+    ],
+  });
+
   function renderSort(context) {
     const { controller, stage, game, gameKey, round, roundIndex, seed, onComplete, onMistake, onProgress, announce } = context;
     const tray = document.createElement("div");
     tray.className = "activity-tray sort-tray";
     const deepLabels = DEEP_SORT_CONFIG[gameKey];
-    const labels = deepLabels || ["질문에 맞아요", "다른 그림이에요"];
+    const roundLabels = ROUND_SORT_CONFIG[gameKey]?.[roundIndex];
+    const labels = deepLabels || roundLabels || ["질문에 맞아요", "다른 그림이에요"];
     const bins = document.createElement("div");
     bins.className = "sort-bins";
     const targets = labels.map((label, index) => {
@@ -1131,7 +1150,7 @@
     stage.append(task, counter, tray, bins);
     return {
       requiredActions: items.length,
-      prompt: deepLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
+      prompt: deepLabels || roundLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
       helper: "그림 하나를 고른 뒤 알맞은 바구니를 눌러요.",
       hint: () => {
         const source = sources.find((item) => !item.disabled);
