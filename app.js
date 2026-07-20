@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.20.03";
+  const APP_BUILD = "2026.07.20.04";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -1601,14 +1601,14 @@
 
   function ensureBgm() {
     if (bgmAudio) return bgmAudio;
-    bgmAudio = new Audio("./audio/music/mongle-meadow.mp3?v=2");
+    bgmAudio = new Audio("./audio/music/mongle-meadow.mp3?v=3");
     bgmAudio.loop = true;
     bgmAudio.preload = "auto";
     bgmAudio.volume = musicVolume;
     return bgmAudio;
   }
 
-  const BGM_BAR_SECONDS = (60 / 82) * 4;
+  const BGM_BAR_SECONDS = (60 / 104) * 4;
   const BGM_PLANS = Object.freeze({
     look: { label: "반짝 오르골", bars: [0, 2, 4, 6] },
     number: { label: "통통 마림바", bars: [8, 10, 12, 14] },

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "mongle-premium-v63";
+const CACHE_VERSION = "mongle-premium-v64";
 const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
 const APP_SHELL = [
   "./",
@@ -12,7 +12,7 @@ const APP_SHELL = [
   "./extra-games.js?v=7",
   "./tts-manifest.js?v=5",
   "./interaction-engine.js?v=38",
-  "./app.js?v=60",
+  "./app.js?v=61",
   "./assets/generated/favicon.png",
   "./assets/generated/app-icon-192.png",
   "./assets/generated/app-icon-512.png",
@@ -31,7 +31,7 @@ const APP_SHELL = [
   "./assets/generated/story/chapter-08-body-mission.webp",
   "./assets/generated/story/chapter-09-feelings.webp",
   "./assets/generated/story/chapter-10-bedtime.webp",
-  "./audio/music/mongle-meadow.mp3?v=2",
+  "./audio/music/mongle-meadow.mp3?v=3",
   "./audio/tts/475d88a95a439ca6.mp3"
 ];
 
