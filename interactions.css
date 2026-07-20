@@ -1430,6 +1430,25 @@ button.pattern-cell {
   transform: scale(1.08);
 }
 
+.size-tray.is-real-world-order .size-token .activity-visual {
+  transform: none;
+}
+
+.size-slot.is-locked {
+  border-color: #ded6cc;
+  background: rgba(244, 239, 232, 0.72);
+  color: #a59787;
+  opacity: 0.58;
+  cursor: default;
+}
+
+.size-slot.is-unlocked:not(.is-filled) {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  color: var(--coral-dark);
+  box-shadow: 0 0 0 5px rgba(242, 108, 98, 0.1);
+}
+
 .sequence-storyboard {
   position: relative;
   gap: 14px;

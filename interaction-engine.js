@@ -2535,9 +2535,11 @@
   function renderOrder(context) {
     const { controller, stage, round, gameKey, seed, onComplete, onMistake, onProgress, announce } = context;
     const ordered = sizeOrderOptions(gameKey, round);
+    const realWorldOrder = gameKey !== "extra014";
     const sizeLabels = ordered.length === 2 ? ["더 작게", "더 크게"] : ["작게", "중간", "크게"];
     const tray = document.createElement("div");
     tray.className = "activity-tray size-tray";
+    if (realWorldOrder) tray.classList.add("is-real-world-order");
     tray.style.gridTemplateColumns = "repeat(" + ordered.length + ", minmax(0, 1fr))";
     const sourceItems = shuffled(ordered.map((option, rank) => ({ option, rank })), seed);
     const sources = sourceItems.map((item) => {
@@ -2558,7 +2560,9 @@
       target.className = "sequence-slot size-slot size-" + (rank + 1);
       target.dataset.activityDrop = String(rank);
       target.innerHTML = "<span class=\"slot-number\">" + (rank + 1) + "</span><small>" + sizeLabels[rank] + "</small>";
-      target.setAttribute("aria-label", sizeLabels[rank] + " 자리");
+      target.disabled = rank !== 0;
+      target.classList.add(rank === 0 ? "is-unlocked" : "is-locked");
+      target.setAttribute("aria-label", sizeLabels[rank] + (rank === 0 ? " 자리, 지금 놓을 차례" : " 자리, 앞 자리를 먼저 놓아요"));
       slots.appendChild(target);
       return target;
     });
@@ -2569,8 +2573,9 @@
       sources,
       targets,
       (source, target) => {
-        if (source.dataset.rank !== target.dataset.activityDrop) {
-          onMistake(source, targets[Number(source.dataset.rank)]);
+        const activeRank = placed;
+        if (source.dataset.rank !== String(activeRank) || target.dataset.activityDrop !== String(activeRank)) {
+          onMistake(source, [sources.find((item) => item.dataset.rank === String(activeRank)), targets[activeRank]]);
           return false;
         }
         const rank = Number(source.dataset.rank);
@@ -2582,12 +2587,21 @@
           createVisual(option, "sequence-slot-visual size-" + (rank + 1)),
         );
         target.classList.add("is-filled");
+        target.classList.remove("is-unlocked");
         target.setAttribute("aria-label", sizeLabels[rank] + " " + optionName(option) + " 놓음");
         target.disabled = true;
         placed += 1;
         onProgress("prompt");
         announce(optionName(option) + "를 " + sizeLabels[rank] + " 자리에 놓았어요.");
         if (placed === ordered.length) onComplete(target);
+        else {
+          const nextTarget = targets[placed];
+          nextTarget.disabled = false;
+          nextTarget.classList.remove("is-locked");
+          nextTarget.classList.add("is-unlocked");
+          nextTarget.setAttribute("aria-label", sizeLabels[placed] + " 자리, 지금 놓을 차례");
+          announce("이제 " + sizeLabels[placed] + " 그림을 " + (placed + 1) + "번 자리에 놓아요.");
+        }
         return true;
       },
       announce,
@@ -2602,8 +2616,9 @@
         text: "가장 작은 그림을 누르고, 첫 자리를 눌러요",
       },
       hint: () => {
-        const source = sources.find((item) => !item.disabled);
-        if (source) pulse([source, targets[Number(source.dataset.rank)]]);
+        const target = targets.find((item) => !item.disabled);
+        const source = sources.find((item) => !item.disabled && item.dataset.rank === target?.dataset.activityDrop);
+        if (source && target) pulse([source, target]);
       },
       replay: () => pulse(targets.filter((target) => !target.disabled), "is-replay"),
     };
