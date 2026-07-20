@@ -2524,8 +2524,8 @@
     if (gameKey === "extra012" || gameKey === "extra013") {
       const actual = round.options.filter((option) => !/같/.test(optionName(option)) && option.visual !== "〓");
       return actual.sort((left, right) => {
-        if (gameKey === "extra012") return Number(left.correct) - Number(right.correct);
-        return Number(right.correct) - Number(left.correct);
+        if (gameKey === "extra012") return Number(Boolean(left.correct)) - Number(Boolean(right.correct));
+        return Number(Boolean(right.correct)) - Number(Boolean(left.correct));
       });
     }
     return [...round.options];
