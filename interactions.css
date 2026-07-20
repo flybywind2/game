@@ -1408,6 +1408,13 @@ button.pattern-cell {
   font-size: clamp(48px, 8vw, 68px);
 }
 
+.sequence-tray .activity-token.is-multi-symbol .activity-visual {
+  max-width: 100%;
+  font-size: clamp(24px, 7.5vw, 38px);
+  letter-spacing: -3px;
+  white-space: nowrap;
+}
+
 .size-tray .size-token.size-1 .activity-visual,
 .sequence-slot-visual.size-1 {
   transform: scale(0.62);

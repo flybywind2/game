@@ -2387,6 +2387,7 @@
     tray.style.gridTemplateColumns = "repeat(" + Math.min(4, sourceItems.length) + ", minmax(0, 1fr))";
     const sources = shuffled(sourceItems, seed).map((item) => {
       const token = createToken(item.option);
+      if (visualTokens(item.option.visual).length > 1) token.classList.add("is-multi-symbol");
       token.dataset.step = String(item.step);
       token.dataset.label = optionName(item.option);
       tray.appendChild(token);
