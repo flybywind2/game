@@ -219,7 +219,14 @@
     "extra057",
     "extra059",
     "extra060",
+    "extra065",
     "extra066",
+    "extra070",
+    "extra071",
+    "extra073",
+    "extra081",
+    "extra083",
+    "extra086",
   ]);
 
   const RELATION_JOURNEY_KEYS = new Set([
@@ -1534,13 +1541,20 @@
     const completed = rawSequence.length
       ? rawSequence.map((item) => item === "❓" ? cleanVisual(correct.visual) : cleanVisual(item))
       : [cleanVisual(correct.visual), "●", cleanVisual(correct.visual), "●"];
+    const missingVisual = completed[missingIndex];
     const knownIndex = completed.findIndex((visual, index) =>
+      index !== missingIndex &&
+      visual !== missingVisual &&
+      round.options.some((option) => cleanVisual(option.visual) === visual),
+    );
+    const fallbackKnownIndex = completed.findIndex((visual, index) =>
       index !== missingIndex && round.options.some((option) => cleanVisual(option.visual) === visual),
     );
-    const targetBlankCount = Math.min(completed.length, difficulty === "support" ? 1 : difficulty === "challenge" ? 3 : 2);
+    const requestedBlankCount = difficulty === "support" ? 1 : 2;
+    const targetBlankCount = Math.min(requestedBlankCount, Math.max(1, completed.length - 2));
     const startingIndexes = difficulty === "support"
       ? [missingIndex]
-      : [knownIndex >= 0 ? knownIndex : 0, missingIndex];
+      : [knownIndex >= 0 ? knownIndex : fallbackKnownIndex >= 0 ? fallbackKnownIndex : 0, missingIndex];
     const hiddenIndexes = [...new Set(startingIndexes)].slice(0, targetBlankCount);
     while (hiddenIndexes.length < targetBlankCount && hiddenIndexes.length < completed.length) {
       const next = completed.findIndex((_, index) => !hiddenIndexes.includes(index));
@@ -1559,10 +1573,6 @@
       .filter((option) => !usedVisuals.has(cleanVisual(option.visual)))
       .slice(0, 2)
       .map((option) => ({ option, targetIndex: "extra" }));
-    while (distractors.length < 2) {
-      const fallback = round.options[distractors.length % round.options.length];
-      distractors.push({ option: fallback, targetIndex: "extra" });
-    }
 
     const track = document.createElement("div");
     track.className = "pattern-track pattern-two-blanks";
@@ -3136,7 +3146,7 @@
     controller.later(() => {
       resizeCanvas();
       const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      traceBoard.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "start" });
+      traceBoard.closest(".game-shell")?.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" });
       controller.later(() => canvas.focus({ preventScroll: true }), reducedMotion ? 0 : 320);
     }, 0);
     announce("좋아요. 이제 노란 시작점부터 굵은 선을 따라 직접 그려요.");
@@ -3255,6 +3265,7 @@
         });
         target.hidden = true;
         traceBoard.hidden = false;
+        stage.classList.add("is-trace-active");
         const kind = traceKind(option, gameKey);
         if (gameKey === "extra050") {
           setupActionPractice({ controller, traceBoard, option, onComplete, onProgress, announce });
@@ -3378,7 +3389,7 @@
     promptVisual.setAttribute("aria-hidden", "true");
     promptVisual.textContent = cleanVisual(round.scene?.[0] || "🎨");
     const promptText = document.createElement("strong");
-    promptText.textContent = roundIndex === 2 ? "마음대로 그려요" : "보고 떠오르는 그림을 그려요";
+    promptText.textContent = round.prompt || (roundIndex === 2 ? "마음대로 그려요" : "보고 떠오르는 그림을 그려요");
     promptCard.append(promptVisual, promptText);
 
     const toolbar = document.createElement("div");
@@ -3457,19 +3468,23 @@
     const undo = document.createElement("button");
     undo.type = "button";
     undo.className = "drawing-tool-button";
-    undo.textContent = "↶ 되돌리기";
+    undo.textContent = "↶ 취소";
+    undo.setAttribute("aria-label", "마지막에 그린 선 되돌리기");
     const clear = document.createElement("button");
     clear.type = "button";
     clear.className = "drawing-tool-button";
-    clear.textContent = "모두 지우기";
+    clear.textContent = "싹 지우기";
+    clear.setAttribute("aria-label", "그림판 모두 지우기");
     const stamp = document.createElement("button");
     stamp.type = "button";
     stamp.className = "drawing-tool-button";
-    stamp.textContent = "● 점 도장";
+    stamp.textContent = "● 점 찍기";
+    stamp.setAttribute("aria-label", "그림판에 점 도장 찍기");
     const finish = document.createElement("button");
     finish.type = "button";
     finish.className = "activity-confirm drawing-finish";
-    finish.textContent = "그림 완성!";
+    finish.textContent = "✓ 완성!";
+    finish.setAttribute("aria-label", "그림 완성하기");
     actions.append(undo, clear, stamp, finish);
 
     board.append(promptCard, toolbar, shell, status, actions);

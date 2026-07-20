@@ -1410,11 +1410,11 @@ body.is-keyboard-nav .daily-plan-item:focus {
 }
 
 .game-shell::after {
-  width: 400px;
-  height: 400px;
-  right: -260px;
-  bottom: -230px;
-  border: 70px solid rgba(98, 201, 166, 0.11);
+  width: 180px;
+  height: 180px;
+  right: 0;
+  bottom: 0;
+  border: 52px solid rgba(98, 201, 166, 0.11);
 }
 
 @keyframes shell-in {
