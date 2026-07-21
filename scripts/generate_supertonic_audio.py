@@ -56,6 +56,10 @@ GAME_TITLE_RE = re.compile(
     rf"(?m)^    (?P<key>[A-Za-z_$][\w$]*)\s*:\s*\{{\s*\n"
     rf"      title\s*:\s*(?P<literal>{JS_STRING_PATTERN})\s*,"
 )
+STORY_BLOCK_RE = re.compile(
+    r"const STORY_CHAPTERS\s*=\s*Object\.freeze\(\[(?P<body>.*?)\]\);",
+    re.DOTALL,
+)
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
@@ -173,6 +177,35 @@ def extract_round_phrases(source: str, app_path: Path) -> list[str]:
     return spoken
 
 
+def extract_story_phrases(source: str, app_path: Path) -> list[str]:
+    """Build the exact narration spoken on each premium story intro."""
+    block_match = STORY_BLOCK_RE.search(source)
+    if not block_match:
+        raise RuntimeError(f"Could not find STORY_CHAPTERS in {app_path}.")
+
+    phrases: list[str] = []
+    for line in block_match.group("body").splitlines():
+        if "{ key:" not in line:
+            continue
+
+        values: dict[str, str] = {}
+        for name in ("title", "intro", "mission"):
+            match = re.search(rf"\b{name}\s*:\s*(?P<literal>{JS_STRING_PATTERN})", line)
+            if not match:
+                raise RuntimeError(f"Story chapter is missing {name!r} in {app_path}: {line.strip()}")
+            values[name] = decode_js_string(match.group("literal"))
+
+        chapter_number = len(phrases) + 1
+        phrases.append(
+            f"{chapter_number}장. {values['title']}. {values['intro']} "
+            f"오늘의 미션. {values['mission']}"
+        )
+
+    if not phrases:
+        raise RuntimeError(f"No premium story chapters found in {app_path}.")
+    return phrases
+
+
 
 
 def extract_extra_game_phrases(
@@ -224,6 +257,7 @@ def extract_phrases(
         decode_js_string(match.group("literal")) for match in GAME_TITLE_RE.finditer(source)
     )
     core_round_phrases = extract_round_phrases(source, app_path)
+    story_phrases = extract_story_phrases(source, app_path)
     extra_round_phrases, extra_titles = extract_extra_game_phrases(extra_paths)
     game_titles = ordered_unique([*core_titles, *extra_titles])
     round_phrases = [*core_round_phrases, *extra_round_phrases]
@@ -238,7 +272,7 @@ def extract_phrases(
         f"우와, 다 해냈어! {title} 놀이 끝!" for title in game_titles
     ]
     phrases = ordered_unique(
-        [*round_phrases, *SHARED_PHRASES, *completion_phrases]
+        [*round_phrases, *story_phrases, *SHARED_PHRASES, *completion_phrases]
     )
     return phrases, game_titles
 

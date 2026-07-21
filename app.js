@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.20.05";
+  const APP_BUILD = "2026.07.21.01";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -1787,6 +1787,19 @@
     window.history.replaceState(null, "", url);
   }
 
+  function storyNarration(chapter) {
+    if (!chapter) return "";
+    return `${chapter.index + 1}장. ${chapter.title}. ${chapter.intro} 오늘의 미션. ${chapter.mission}`;
+  }
+
+  function storyIntroVisible() {
+    return Boolean(activeStoryMode && playMain.querySelector(".story-intro-card"));
+  }
+
+  function speakStoryIntro(chapter = STORY_BY_KEY[activeGameKey]) {
+    return speak(storyNarration(chapter));
+  }
+
   function renderStoryIntro(key) {
     const chapter = STORY_BY_KEY[key];
     if (!chapter) {
@@ -1797,7 +1810,8 @@
     activeActivity = null;
     gameName.textContent = `${chapter.index + 1}장 · ${chapter.title}`;
     progressBar.innerHTML = "";
-    replayButton.disabled = true;
+    replayButton.disabled = false;
+    replayButton.setAttribute("aria-label", "이야기를 다시 듣기");
     const art = chapter.art || CATEGORY_ART[gameCategory(key)];
     playMain.innerHTML = `
       <div class="story-intro-card">
@@ -1815,11 +1829,13 @@
       </div>`;
     const begin = playMain.querySelector(".story-begin");
     begin.addEventListener("click", () => {
+      stopVoice();
       restorePlayTemplate();
       replayButton.disabled = false;
       renderRound();
     });
     playMain.querySelector(".story-catalog").addEventListener("click", closeGame);
+    speakStoryIntro(chapter);
     window.setTimeout(() => playMain.querySelector(".story-intro-copy h2")?.focus({ preventScroll: true }), 80);
   }
 
@@ -1959,6 +1975,7 @@
     roundSettled = false;
     wrongAttempts = 0;
     replayButton.disabled = false;
+    replayButton.setAttribute("aria-label", "문제를 다시 듣기");
     guideCharacter.classList.remove("celebrate");
     gameName.textContent = game.title;
     promptHelper.textContent = round.helper;
@@ -3535,6 +3552,11 @@
   }
 
   replayButton.addEventListener("click", () => {
+    if (storyIntroVisible()) {
+      playChime("prompt");
+      speakStoryIntro();
+      return;
+    }
     const round = currentRound();
     if (round) {
       markRoundInteraction();
@@ -3553,7 +3575,10 @@
     showToast(soundEnabled ? "F1 말소리를 켰어요." : "말소리와 효과음을 껐어요.");
     if (soundEnabled) {
       playChime("start");
-      speak("소리를 켰어요.");
+      const replayStory = storyIntroVisible();
+      speak("소리를 켰어요.", {
+        onended: replayStory ? () => speakStoryIntro() : undefined,
+      });
     }
   });
 
