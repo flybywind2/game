@@ -846,8 +846,8 @@
 
 .story-begin {
   border: 0;
-  background: var(--coral);
-  box-shadow: 0 5px 0 #d55d49;
+  background: #c43f2a;
+  box-shadow: 0 5px 0 #96301c;
   color: white;
 }
 

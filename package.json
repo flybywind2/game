@@ -7,13 +7,17 @@
   "scripts": {
     "build": "node scripts/build_extra_games.mjs",
     "collect:voice-lines": "node scripts/collect_activity_phrases.mjs",
+    "lock:cache": "node scripts/lock_cache.mjs",
     "serve": "node tests/serve.mjs",
     "test": "node tests/run-all.mjs",
     "test:data": "node tests/check-data.mjs",
     "test:games": "node tests/play-all.mjs",
     "test:release": "node tests/check-release.mjs",
     "test:voice": "node tests/check-voice.mjs",
+    "test:touch": "node tests/check-touch.mjs",
     "test:a11y": "node tests/check-a11y.mjs",
+    "test:perf": "node tests/check-perf.mjs",
+    "test:offline": "node tests/check-offline.mjs",
     "test:live": "node tests/check-live.mjs"
   },
   "repository": {

@@ -79,6 +79,64 @@ for (const path of ["privacy.html", "terms.html", "support.html"]) {
   });
 }
 
+// Screens that only appear after interaction were previously never scanned.
+await scan("story intro", async () => {
+  await page.goto(base, { waitUntil: "load" });
+  await page.waitForTimeout(700);
+  await page.evaluate(() => document.querySelector("#story-continue")?.click());
+  await page.waitForTimeout(900);
+});
+
+await scan("first-run welcome", async () => {
+  await page.evaluate(() => window.localStorage.clear());
+  await page.goto(base, { waitUntil: "load" });
+  await page.waitForTimeout(1000);
+});
+
+await scan("welcome step 2", async () => {
+  await page.evaluate(() => document.querySelector("#welcome-next")?.click());
+  await page.waitForTimeout(500);
+});
+
+await scan("parent gate", async () => {
+  await page.evaluate(() => window.localStorage.setItem("mongle-welcome-v1", "done"));
+  await page.goto(base, { waitUntil: "load" });
+  await page.waitForTimeout(700);
+  await page.evaluate(() => document.querySelector("#parent-open")?.click());
+  await page.waitForTimeout(500);
+});
+
+await scan("parent dashboard", async () => {
+  // Answer the gate question correctly to reach the guardian screen.
+  await page.evaluate(() => {
+    const question = document.querySelector("#parent-gate-question")?.textContent || "";
+    const numbers = [...question.matchAll(/(\d+)/g)].map((match) => Number(match[1]));
+    const answer = numbers.length >= 2 ? numbers[0] + numbers[1] : null;
+    const choices = [...document.querySelectorAll("#parent-gate-choices button")];
+    const target = choices.find((button) => Number(button.textContent.trim()) === answer) || choices[0];
+    target?.click();
+  });
+  await page.waitForTimeout(800);
+});
+
+await scan("game completion", async () => {
+  await page.evaluate(() => {
+    document.querySelector("#parent-close")?.click();
+    window.location.hash = "#game/colors";
+  });
+  await page.waitForTimeout(400);
+  for (let round = 0; round < 3; round += 1) {
+    const clicked = await page.evaluate(() => {
+      const target = document.querySelector('#answer-grid [data-target="true"]:not([disabled])');
+      if (!target) return false;
+      target.click();
+      return true;
+    });
+    if (!clicked) break;
+    await page.waitForTimeout(1700);
+  }
+});
+
 await browser.close();
 server.close();
 

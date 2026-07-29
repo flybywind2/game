@@ -909,10 +909,12 @@ body.is-keyboard-nav .count-piece:focus {
   }
 
   .quantity-piece {
-    min-width: 38px;
+    /* 44px is the minimum comfortable target for a 40-month-old. Three groups
+       share the stage, so two pieces per row still fit inside a 105px group. */
+    min-width: 44px;
     min-height: 46px;
     border-radius: 12px;
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .quantity-select {
@@ -954,10 +956,11 @@ body.is-keyboard-nav .count-piece:focus {
   }
 
   .math-piece {
-    width: 43px;
+    /* Keep the counter at the 44px minimum touch target for small hands. */
+    width: 44px;
     height: 47px;
     border-radius: 13px;
-    font-size: 29px;
+    font-size: 28px;
   }
 
   .math-pieces,

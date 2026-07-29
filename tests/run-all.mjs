@@ -6,7 +6,10 @@ const steps = [
   ["출시 점검", "tests/check-release.mjs"],
   ["브라우저 놀이 점검", "tests/play-all.mjs"],
   ["F1 음성 점검", "tests/check-voice.mjs"],
+  ["터치 영역 점검", "tests/check-touch.mjs"],
   ["접근성 점검", "tests/check-a11y.mjs"],
+  ["오프라인 점검", "tests/check-offline.mjs"],
+  ["첫 로딩 용량 점검", "tests/check-perf.mjs"],
 ];
 
 function run(script) {

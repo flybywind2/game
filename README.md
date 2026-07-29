@@ -33,7 +33,10 @@ npm test
 | `npm run test:release` | 필수 페이지·라이선스·PWA 매니페스트, 서비스워커 프리캐시 경로와 버전, SEO 메타와 사이트맵 |
 | `npm run test:games` | 실제 브라우저에서 105개 놀이 전부 열림, 콘솔 오류 0건, 한 게임 3라운드 완주와 진행 기록 저장, 정책 페이지 응답 |
 | `npm run test:voice` | 105개 놀이를 3라운드까지 실제로 진행하며 모든 말소리가 F1 음원으로 재생되는지 확인, 기기 음성 대체 0건 |
-| `npm run test:a11y` | 홈·정책 페이지와 16가지 놀이 방식에 axe-core WCAG 2.1 A/AA 검사, 심각 위반 0건 |
+| `npm run test:touch` | 105개 놀이의 모든 누를 거리를 360px 화면에서 측정, 44px 미만 또는 화면 밖 대상 0건 |
+| `npm run test:a11y` | 홈·정책·이야기 인트로·첫 사용 안내·보호자 공간·완주 화면과 16가지 놀이 방식에 axe-core WCAG 2.1 A/AA 검사, 심각 위반 0건 |
+| `npm run test:offline` | 서비스워커 설치 후 네트워크를 끊고 홈·놀이·정책 페이지가 실제로 동작하는지 확인 |
+| `npm run test:perf` | 첫 방문 전송량과 이미지 용량 예산, 요청 수, DOMContentLoaded 시간 |
 
 배포 후에는 실제 주소를 직접 점검합니다.
 
@@ -42,6 +45,12 @@ npm run test:live
 ```
 
 접근성은 자동 검사로 심각·치명 위반이 없음을 확인한 상태입니다. 완전한 WCAG 준수 판정에는 보조기기 실사용 테스트와 전문가 검토가 함께 필요합니다.
+
+`css`/`js`처럼 `?v=` 주소를 쓰는 파일은 번호만 올리면 되지만, 이미지처럼 주소가 고정된 프리캐시 파일을 바꿀 때는 `sw.js`의 `CACHE_VERSION`을 올린 뒤 아래 명령으로 기준을 다시 기록해야 합니다. 잊으면 이미 설치한 사용자에게 예전 파일이 계속 보이고, `npm run test:release`가 이를 잡아냅니다.
+
+```bash
+npm run lock:cache
+```
 
 ## 구성
 
@@ -140,6 +149,11 @@ marimba, and starlight-bell sections before returning to the start.
 
 프로젝트에서 사용하는 최적화 파일은 `assets/generated/mongle-hero.webp`, `game-look.webp`, `game-number.webp`, `game-word.webp`, `game-heart.webp`, `favicon.png`입니다. 같은 폴더의 `*-source.png`는 이미지 생성 도구가 만든 원본입니다.
 
+이야기 삽화 10장은 화면에 표시되는 최대 크기(2배 화면 기준 약 684px)에 맞춰 720x540으로 저장합니다. 서비스워커가 첫 방문에 10장을 모두 내려받기 때문에 원본 960x720을 그대로 두면 불필요한 전송이 생깁니다. 새 삽화를 넣은 뒤 아래 명령으로 크기를 맞추고 `npm run test:perf`로 예산을 확인하세요.
+
+```bash
+python scripts/optimize_story_art.py
+```
 프롬프트 세트는 따뜻한 크림·민트·코랄 팔레트, 둥근 3D 클레이 질감, 40개월 아이에게 안전한 큰 형태, 글자·로고·워터마크 없음으로 통일했습니다. 히어로는 블록을 쌓는 갈색 몽글이 곰, 분류 이미지는 관찰·수·말·마음/생활 놀이 장면입니다.
 
 음성 안내는 [Supertonic 3](https://github.com/supertone-inc/supertonic)의 F1 음색으로 생성했습니다. 모델 조건은 [Supertonic 3 OpenRAIL-M 라이선스](https://huggingface.co/Supertone/supertonic-3/blob/main/LICENSE)를 따릅니다.

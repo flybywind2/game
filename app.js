@@ -2465,7 +2465,11 @@
         </div>`;
       weeks.appendChild(details);
     });
-    document.querySelector(".curriculum-overall").setAttribute("aria-label", `4주 활용 로드맵 20회 중 ${completed}회 완료`);
+    const overallTrack = document.querySelector(".curriculum-overall");
+    overallTrack.setAttribute("aria-valuemin", "0");
+    overallTrack.setAttribute("aria-valuemax", String(allKeys.length));
+    overallTrack.setAttribute("aria-valuenow", String(completed));
+    overallTrack.setAttribute("aria-label", `4주 활용 로드맵 ${allKeys.length}회 중 ${completed}회 완료`);
   }
 
   function renderWeeklyReport() {
@@ -3005,7 +3009,7 @@
       skill.className = "growth-skill";
       skill.innerHTML = `
         <span><strong>${label}</strong><b>${accuracy.attempts ? `${accuracy.percent}%` : "관찰 전"}</b></span>
-        <div class="growth-skill-track" aria-label="${label} 정답 경험 ${accuracy.percent}%"><i style="width:${accuracy.percent}%"></i></div>
+        <div class="growth-skill-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${accuracy.percent}" aria-label="${label} 정답 경험 ${accuracy.percent}%"><i style="width:${accuracy.percent}%"></i></div>
         <small>${progress.completed}/${progress.total}개 놀이 · ${accuracy.attempts}번 시도</small>`;
       growthList.appendChild(skill);
     });

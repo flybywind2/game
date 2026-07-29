@@ -41,8 +41,8 @@
     <link rel="stylesheet" href="./styles.css?v=11" />
     <link rel="stylesheet" href="./enhancements.css?v=1" />
     <link rel="stylesheet" href="./catalog.css?v=1" />
-    <link rel="stylesheet" href="./interactions.css?v=33" />
-    <link rel="stylesheet" href="./premium.css?v=22" />
+    <link rel="stylesheet" href="./interactions.css?v=34" />
+    <link rel="stylesheet" href="./premium.css?v=23" />
   </head>
   <body>
     <a class="skip-link" href="#games">놀이 목록으로 바로 가기</a>
@@ -463,7 +463,7 @@
           <div class="play-progress-wrap">
             <span class="play-game-name" id="play-game-name">놀이 이름</span>
             <span class="play-time-chip" id="play-time-chip">잎 10분 놀이 약속</span>
-            <div class="play-progress" id="play-progress" aria-label="놀이 진행률"></div>
+            <div class="play-progress" id="play-progress" role="progressbar" aria-label="놀이 진행률"></div>
           </div>
           <div class="play-audio-actions">
             <button class="round-button game-music-button" id="game-music-toggle" type="button" aria-pressed="true" aria-label="배경음악 끄기">♫</button>
@@ -606,7 +606,7 @@
             </div>
             <span class="curriculum-total"><strong id="curriculum-completed">0</strong><small>/ 20회</small></span>
           </header>
-          <div class="curriculum-overall" aria-label="4주 활용 로드맵 진행률"><i id="curriculum-overall-bar"></i></div>
+          <div class="curriculum-overall" role="progressbar" aria-valuemin="0" aria-valuemax="20" aria-valuenow="0" aria-label="4주 활용 로드맵 진행률"><i id="curriculum-overall-bar"></i></div>
           <button class="curriculum-export" id="save-curriculum-guide" type="button">
             <span aria-hidden="true">▣</span><span><strong>4주 가족 계획표 저장·공유</strong><small>20회 놀이와 대화법을 인쇄 가능한 한 장으로 만들어요.</small></span><b aria-hidden="true">↓</b>
           </button>
@@ -817,6 +817,6 @@
     <script src="./extra-games.js?v=7"></script>
     <script src="./tts-manifest.js?v=7"></script>
     <script src="./interaction-engine.js?v=40"></script>
-    <script src="./app.js?v=64"></script>
+    <script src="./app.js?v=65"></script>
   </body>
 </html>
