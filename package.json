@@ -18,6 +18,7 @@
     "test:release": "node tests/check-release.mjs",
     "test:voice": "node tests/check-voice.mjs",
     "test:touch": "node tests/check-touch.mjs",
+    "test:landscape": "node tests/check-landscape.mjs",
     "test:keyboard": "node tests/check-keyboard.mjs",
     "test:a11y": "node tests/check-a11y.mjs",
     "test:perf": "node tests/check-perf.mjs",

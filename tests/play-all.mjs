@@ -13,7 +13,13 @@ page.on("console", (msg) => {
   if (msg.type() === "error") problems.push(`console: ${msg.text()}`);
 });
 page.on("requestfailed", (req) => {
-  problems.push(`requestfailed: ${req.url()}`);
+  // Voice clips are aborted on purpose when a round ends or the game closes, so a
+  // cancelled audio request is normal and must not fail the run. A genuinely missing
+  // file is covered by check-data.mjs and check-release.mjs instead.
+  const errorText = req.failure()?.errorText || "";
+  const aborted = errorText.includes("ABORTED") || errorText.includes("net::ERR_ABORTED");
+  if (aborted && req.url().includes("/audio/")) return;
+  problems.push(`requestfailed: ${req.url()} ${errorText}`);
 });
 
 await page.addInitScript(() => {

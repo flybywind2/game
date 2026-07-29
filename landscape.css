@@ -1,0 +1,207 @@
+/* Compact play layout for wide, short screens.
+
+   A child holding a phone or tablet sideways gets far less height than width. The
+   portrait layout spends most of it on the mascot and a large prompt, which pushed
+   the answers below the fold: a toddler saw no way to play without scrolling. This
+   was measured on 720x360, 915x412, 800x480 and 1024x600.
+
+   The mascot shrinks, the prompt and hint tighten, and the activity is capped to the
+   remaining height so its controls stay on screen. Portrait layouts are untouched.
+   The upper bound is generous because even a 600px-tall tablet was affected. */
+@media (orientation: landscape) and (max-height: 700px) {
+  /* The dialog itself must not grow past the viewport. */
+  .game-shell-inner {
+    max-height: 100dvh;
+  }
+
+  .play-main {
+    padding: 10px 16px 16px;
+  }
+
+  /* The mascot is decoration, so it yields first. */
+  .guide-character {
+    width: 34px;
+    height: 32px;
+    margin-bottom: 4px;
+  }
+
+  .guide-character::before,
+  .guide-character::after {
+    display: none;
+  }
+
+  .prompt-helper {
+    margin: 0 0 2px;
+    font-size: 11px;
+  }
+
+  .play-prompt {
+    font-size: clamp(18px, 2.4vw, 27px);
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+  }
+
+  .interaction-hint {
+    margin: 4px 0 6px;
+    padding: 4px 10px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .play-header {
+    padding-block: 4px;
+  }
+
+  /* Make the play screen one viewport-tall column: fixed header, then an activity
+     area that takes exactly the space that is left. This is what keeps the controls
+     on screen instead of tuning individual heights per device. */
+  .game-shell-inner {
+    display: flex;
+    flex-direction: column;
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .play-main {
+    flex: 1 1 auto;
+    min-height: 0;
+    justify-content: flex-start;
+  }
+
+  .activity-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+    width: 100%;
+  }
+}
+
+/* Very short landscape screens, such as a phone held sideways at 360px tall.
+   Here the mascot and helper line are dropped entirely so the activity gets the
+   height it needs; the prompt and hint still carry the instruction. */
+@media (orientation: landscape) and (max-height: 460px) {
+  .play-main {
+    padding: 6px 14px 10px;
+  }
+
+  .guide-character,
+  .prompt-helper {
+    display: none;
+  }
+
+  .play-prompt {
+    font-size: clamp(16px, 2.1vw, 21px);
+  }
+
+  .interaction-hint {
+    margin: 3px 0 4px;
+    padding: 3px 9px;
+    font-size: 10px;
+  }
+
+  .activity-stage {
+    max-height: none;
+  }
+
+  .activity-stage .activity-token,
+  .activity-stage .spot-tile,
+  .activity-stage .count-piece,
+  .activity-stage .memory-card,
+  .activity-stage .answer-button,
+  .activity-stage .quantity-piece,
+  .activity-stage .compare-piece,
+  .activity-stage .math-piece,
+  .activity-stage .sequence-slot,
+  .activity-stage .pattern-cell,
+  .activity-stage .connect-source,
+  .activity-stage .connect-target,
+  .activity-stage .sort-basket,
+  .activity-stage .quantity-select {
+    max-height: 54px;
+  }
+
+  .question-scene {
+    margin: 4px 0;
+    font-size: 22px;
+  }
+
+  /* Cap the activity to the space that is left so its controls stay on screen
+     instead of running past the bottom edge. The rows are what actually drive the
+     height, so the tiles are capped too, not just the container. */
+  .activity-stage {
+    margin-top: 2px;
+    /* The base rule sets min-height: 280px, which wins over max-height and is what
+       pushed the controls off a short screen. Release it here. */
+    min-height: 0;
+    max-height: calc(100dvh - 160px);
+    overflow-y: auto;
+    align-content: start;
+    gap: 8px;
+  }
+
+  /* Inner boards carry their own tall minimums for the portrait layout. */
+  .activity-stage > *,
+  .count-board,
+  .quantity-board,
+  .compare-groups,
+  .connect-board,
+  .connect-spotlight,
+  .memory-board,
+  .spot-board,
+  .sort-board,
+  .sequence-slots,
+  .pattern-board,
+  .order-board,
+  .math-board,
+  .activity-tray {
+    min-height: 0;
+  }
+
+  .activity-stage .activity-token,
+  .activity-stage .spot-tile,
+  .activity-stage .count-piece,
+  .activity-stage .memory-card,
+  .activity-stage .answer-button,
+  .activity-stage .quantity-piece,
+  .activity-stage .compare-piece,
+  .activity-stage .math-piece,
+  .activity-stage .sequence-slot,
+  .activity-stage .pattern-cell,
+  .activity-stage .connect-source,
+  .activity-stage .connect-target,
+  .activity-stage .sort-basket,
+  .activity-stage .quantity-select {
+    min-height: 46px;
+    max-height: 62px;
+    padding-block: 4px;
+  }
+
+  .activity-stage .activity-visual,
+  .activity-stage .spot-tile,
+  .activity-stage .count-piece {
+    font-size: 24px;
+  }
+
+  .activity-stage .activity-token-label,
+  .activity-stage .answer-label {
+    font-size: 11px;
+  }
+
+  .quantity-group,
+  .compare-group {
+    min-height: 0;
+  }
+
+  .answer-grid {
+    gap: 8px;
+  }
+
+  .feedback {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+
+  .story-intro-card img {
+    max-height: 120px;
+  }
+}

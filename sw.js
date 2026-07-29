@@ -1,4 +1,4 @@
-const CACHE_VERSION = "mongle-premium-v71";
+const CACHE_VERSION = "mongle-premium-v72";
 const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
 const APP_SHELL = [
   "./",
@@ -13,6 +13,7 @@ const APP_SHELL = [
   "./catalog.css?v=1",
   "./interactions.css?v=34",
   "./premium.css?v=23",
+  "./landscape.css?v=1",
   "./page.css?v=1",
   "./extra-games.js?v=7",
   "./tts-manifest.js?v=7",
