@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /audio/tts/
+
+Sitemap: https://flybywind2.github.io/game/sitemap.xml

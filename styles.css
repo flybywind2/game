@@ -5,22 +5,23 @@
   --ink: #473a32;
   --ink-soft: #75665d;
   --coral: #ff8067;
-  --coral-dark: #e9654e;
+  /* Text-safe shades: verified >= 4.5:1 on white, cream and the soft tints. */
+  --coral-dark: #c43f2a;
   --coral-soft: #ffe2d9;
   --mint: #62c9a6;
-  --mint-dark: #3aa27f;
+  --mint-dark: #27795d;
   --mint-soft: #dcf6ec;
   --yellow: #ffd45d;
   --yellow-dark: #c98d14;
   --yellow-soft: #fff2bd;
   --blue: #75bdf1;
-  --blue-dark: #498fc5;
+  --blue-dark: #316c9b;
   --blue-soft: #deeffd;
   --purple: #a48ce7;
-  --purple-dark: #7b62c3;
+  --purple-dark: #5f45a8;
   --purple-soft: #ece5ff;
   --pink: #f497b7;
-  --pink-dark: #d4678f;
+  --pink-dark: #b0426a;
   --pink-soft: #ffe3ed;
   --border: #eadfce;
   --shadow: 0 8px 0 rgba(83, 65, 52, 0.08);
@@ -329,7 +330,7 @@ img {
 
 .hero h1 span {
   position: relative;
-  color: var(--coral);
+  color: var(--coral-dark);
   white-space: nowrap;
 }
 
@@ -404,8 +405,8 @@ img {
   align-items: center;
   gap: 14px;
   padding: 0 14px 0 24px;
-  background: var(--coral);
-  box-shadow: 0 7px 0 #d95c45;
+  background: #c43f2a;
+  box-shadow: 0 7px 0 #96301c;
   color: white;
   font-size: 16px;
 }
@@ -413,7 +414,7 @@ img {
 .primary-button:hover,
 .primary-button:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 9px 0 #d95c45;
+  box-shadow: 0 9px 0 #96301c;
 }
 
 .primary-button:active,
@@ -1275,7 +1276,7 @@ body.is-keyboard-nav .daily-plan-item:focus {
   height: 112px;
   border-radius: 48% 52% 45% 55%;
   background: var(--blue-soft);
-  color: #5d87a7;
+  color: #2b6089;
 }
 
 .moon {
@@ -1356,6 +1357,30 @@ body.is-keyboard-nav .daily-plan-item:focus {
   margin: 5px 0 0;
   color: #cfc1b7;
   font-size: 12px;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  color: #f2e7dc;
+  font-size: 12px;
+  text-decoration: underline;
+  text-decoration-color: rgba(242, 231, 220, 0.45);
+  text-underline-offset: 3px;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+  color: #fff;
+  text-decoration-color: #fff;
 }
 
 .parent-link {

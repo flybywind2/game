@@ -594,7 +594,7 @@
   const USABILITY_GAMES = Object.freeze(["colors", "matching", "extra075"]);
   const USABILITY_EXTRA_CHOICES = Object.freeze(["extra089", "extra030", "extra057"]);
   const APP_VERSION = "1.0.0";
-  const APP_BUILD = "2026.07.21.01";
+  const APP_BUILD = "2026.07.29.01";
   const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
   const GAME_HASH_PREFIX = "#game/";
   const DEFAULT_TITLE = document.title;
@@ -1503,6 +1503,7 @@
     preview.innerHTML = "";
     learnerProfile.stickers.slice(-5).reverse().forEach((key) => {
       const sticker = document.createElement("span");
+      sticker.setAttribute("role", "listitem");
       sticker.textContent = GAMES[key]?.icon || "★";
       sticker.title = GAMES[key]?.title || "몽글 스티커";
       sticker.setAttribute("aria-label", `${GAMES[key]?.title || "몽글"} 스티커`);
@@ -1872,7 +1873,7 @@
     shell.scrollTop = 0;
     shell.scrollLeft = 0;
     document.body.style.overflow = "hidden";
-    document.title = GAMES[key].title + " | 몽글몽글 배움 놀이터";
+    document.title = GAMES[key].title + " | 몽글 놀이터";
     if (activeStoryMode) renderStoryIntro(key);
     else renderRound();
     document.querySelector("#game-close").focus({ preventScroll: true });
@@ -2027,6 +2028,7 @@
     }
 
     sceneElement.hidden = false;
+    sceneElement.setAttribute("role", "img");
     items.forEach((item, index) => {
       const span = document.createElement("span");
       span.className = "scene-item";

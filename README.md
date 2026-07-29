@@ -1,19 +1,40 @@
 # 몽글 놀이터
 
-판매 전 실제 아이 검증은 [BETA_TEST_GUIDE.md](./BETA_TEST_GUIDE.md)의 동일한 10분 절차와 통과 기준으로 진행합니다.
-
 40개월 아이가 색깔, 모양, 수, 말, 동물, 자연, 감정, 생활 습관과 안전을 찾기·세기·짝맞추기·분류·순서·패턴·배치 놀이로 익히는 정적 웹사이트입니다.
+
+- 배포 주소: <https://flybywind2.github.io/game/>
+- 출시 버전: 1.0.0
+- 판매 전 실제 아이 검증은 [BETA_TEST_GUIDE.md](./BETA_TEST_GUIDE.md)의 10분 절차와 통과 기준으로 진행합니다.
 
 ## 실행
 
-웹사이트 실행에는 별도 설치나 빌드가 필요하지 않습니다.
+실행에 빌드가 필요하지 않습니다. 저장소를 받은 뒤 정적 서버로 엽니다.
 
 ```bash
-cd /home/ubuntu/project/toddler-learning-games
-python3 -m http.server 4173
+npm install
+npm run serve
 ```
 
-브라우저에서 `http://127.0.0.1:4173`을 엽니다. 현재 Tailscale에서는 `https://free-a1-4ocpu-24gb.tail72928b.ts.net/mongle/` 경로로 제공됩니다.
+브라우저에서 `http://127.0.0.1:4173`을 엽니다. Node 없이 확인하려면 `python3 -m http.server 4173`도 사용할 수 있습니다.
+
+## 출시 검사
+
+배포 전에 아래 검사를 모두 통과해야 합니다. `main`에 푸시하면 GitHub Actions가 같은 검사를 실행한 뒤 Pages로 배포합니다.
+
+```bash
+npm install
+npx playwright install chromium
+npm test
+```
+
+| 명령 | 확인 내용 |
+|---|---|
+| `npm run test:data` | 93개 추가 게임의 3라운드·3선택지·정답 1개, 생성 번들과 JSON 원본 일치, 음성 파일 748개 존재 |
+| `npm run test:release` | 필수 페이지·라이선스·PWA 매니페스트, 서비스워커 프리캐시 경로와 버전, SEO 메타와 사이트맵 |
+| `npm run test:games` | 실제 브라우저에서 105개 놀이 전부 열림, 콘솔 오류 0건, 한 게임 3라운드 완주와 진행 기록 저장, 정책 페이지 응답 |
+| `npm run test:a11y` | 홈·정책 페이지와 16가지 놀이 방식에 axe-core WCAG 2.1 A/AA 검사, 심각 위반 0건 |
+
+접근성은 자동 검사로 심각·치명 위반이 없음을 확인한 상태입니다. 완전한 WCAG 준수 판정에는 보조기기 실사용 테스트와 전문가 검토가 함께 필요합니다.
 
 ## 구성
 
@@ -50,21 +71,35 @@ python3 -m http.server 4173
 
 진행 기록과 소리 설정은 브라우저 `localStorage`에만 보관됩니다. 사이트는 실행 중 외부 음성 API에 문장을 전송하지 않습니다.
 
+## 배포
+
+`main` 브랜치에 푸시하면 [.github/workflows/deploy.yml](./.github/workflows/deploy.yml)이 출시 검사를 실행하고, 통과한 경우에만 GitHub Pages로 배포합니다. 검사가 실패하면 배포 단계는 실행되지 않습니다.
+
+정적 파일과 서비스워커를 함께 배포하므로, `css`/`js` 파일을 수정하면 `index.html`과 `sw.js`의 `?v=` 값을 함께 올려야 기존 사용자에게 새 버전이 전달됩니다. `npm run test:release`가 이 불일치를 검사합니다.
+
+## 정책 문서
+
+- [개인정보 처리방침](./privacy.html)
+- [이용약관](./terms.html)
+- [문의와 도움말](./support.html)
+- [라이선스](./LICENSE)
+
 ## 게임 데이터 빌드
 
 추가 게임의 원본 JSON은 `data/extra-games-a.json`, `data/extra-games-b.json`, `data/extra-games-c.json`입니다. 수정 후 브라우저용 파일을 다시 만듭니다.
 
 ```bash
-node scripts/build_extra_games.mjs
+npm run build
 ```
+
+`data/*.json`만 수정하고 번들을 다시 만들지 않으면 `npm run test:data`가 실패합니다.
 
 ## 음원 다시 만들기
 
 Supertonic 가상환경이 준비된 상태에서 앱과 추가 게임 JSON의 실제 재생 문구를 자동 추출해 F1 음원과 manifest를 갱신합니다. 이미 유효한 MP3는 재사용됩니다.
 
 ```bash
-cd /home/ubuntu/project/toddler-learning-games
-/home/ubuntu/project/.venv-supertonic/bin/python scripts/generate_supertonic_audio.py
+.venv-supertonic/bin/python scripts/generate_supertonic_audio.py
 ```
 
 배경음악은 외부 곡을 사용하지 않고 저장소의 합성 스크립트로 만든 약 55초 루프입니다.

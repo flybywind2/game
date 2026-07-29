@@ -1183,6 +1183,8 @@
     board.style.gridTemplateColumns = "repeat(" + (total === 6 ? 3 : total) + ", minmax(0, 1fr))";
     const basket = document.createElement("div");
     basket.className = "count-basket";
+    // A generic div ignores aria-label, so give it a role that supports naming.
+    basket.setAttribute("role", "img");
     basket.setAttribute("aria-label", target + "개를 담는 바구니");
     const selected = new Set();
 
