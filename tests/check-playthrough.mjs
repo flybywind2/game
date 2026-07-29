@@ -10,7 +10,9 @@ import { chromium } from "playwright";
 import { startStaticServer } from "./static-server.mjs";
 import { SOLVER, waitForRound, waitForAdvance, roundState } from "./auto-player.mjs";
 
-const UNSCRIPTABLE_MODES = new Set(["trace", "draw", "add", "subtract", "countCompare"]);
+// Only freehand drawing and finger tracing cannot be scripted; every other mode is
+// played to completion.
+const UNSCRIPTABLE_MODES = new Set(["trace", "draw"]);
 
 // A full sweep of all 105 games takes about 15 minutes, too slow for every push.
 // By default cover one game per interaction mode, which catches answer-logic and

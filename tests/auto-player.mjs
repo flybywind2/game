@@ -266,8 +266,60 @@ export const SOLVER = async (page) => {
         await tap(select, 280);
         return { ok: true, mode, taps };
       }
-      case "compare":
+      case "add":
+      case "subtract": {
+        // Two phases. First move or take out every picture the activity asks for, then
+        // recount what landed in the basket by tapping each gathered item. The counter
+        // switches from "모음" to "다시 세기" between the phases.
+        for (let guard = 0; guard < 24; guard += 1) {
+          const piece = stage.querySelector(".math-piece:not([disabled])");
+          if (!piece) break;
+          await tap(piece, 90);
+        }
+        for (let guard = 0; guard < 24; guard += 1) {
+          const confirm = stage.querySelector(".math-confirm:not([disabled]), .activity-confirm:not([disabled])");
+          if (confirm) {
+            await tap(confirm, 280);
+            return { ok: true, mode, taps };
+          }
+          // Recount phase: tap the gathered pictures that have not been counted yet.
+          const gathered = [...stage.querySelectorAll(
+            ".math-result-items button, .math-taken-items button, .math-result-piece, .math-result-items > *",
+          )].filter((item) => !item.disabled && !item.classList.contains("is-counted"));
+          if (!gathered.length) break;
+          await tap(gathered[0], 90);
+        }
+        const confirmLate = stage.querySelector(".math-confirm:not([disabled]), .activity-confirm:not([disabled])");
+        if (!confirmLate) return { ok: false, mode, taps, reason: `${mode} confirm never enabled` };
+        await tap(confirmLate, 280);
+        return { ok: true, mode, taps };
+      }
       case "countCompare": {
+        // Count every group, then choose the group the prompt asks for: the largest for
+        // "더 많은", the smallest for "더 적은".
+        const groups = [...stage.querySelectorAll(".count-compare-group")];
+        for (const group of groups) {
+          for (const piece of [...group.querySelectorAll(".compare-piece:not([disabled])")]) {
+            await tap(piece, 55);
+          }
+        }
+        await sleep(240);
+        const promptText = document.querySelector("#play-prompt")?.textContent || "";
+        // Prompts vary: "더 적은", "가장 적게", "가장 적은" all mean the smallest group.
+        const wantSmallest = /적은|적게/.test(promptText);
+        const counted = groups
+          .map((group) => ({
+            group,
+            count: group.querySelectorAll(".compare-piece").length,
+            select: group.querySelector(".count-compare-select:not([disabled])"),
+          }))
+          .filter((entry) => entry.select);
+        if (!counted.length) return { ok: false, mode, taps, reason: "no group selector became enabled" };
+        counted.sort((a, b) => (wantSmallest ? a.count - b.count : b.count - a.count));
+        await tap(counted[0].select, 280);
+        return { ok: true, mode, taps };
+      }
+      case "compare": {
         // Count every picture in every group, which unlocks the answer choices.
         for (const piece of [...stage.querySelectorAll(".compare-piece, .quantity-piece")]) {
           if (!piece.disabled) await tap(piece, 55);
