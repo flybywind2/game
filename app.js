@@ -709,6 +709,10 @@
   let activeVoiceAudio = null;
   let voicePlayToken = 0;
   let speechWarningShown = false;
+  // Set when a browser blocks autoplay before the first tap, so the question can be
+  // spoken with the real F1 voice as soon as the child interacts.
+  let pendingVoiceText = null;
+  let pendingVoiceCallback = null;
   let musicEnabled = loadMusicPreference();
   let musicVolume = loadMusicVolume();
   let bgmAudio = null;
@@ -1672,6 +1676,8 @@
 
   function stopVoice() {
     voicePlayToken += 1;
+    pendingVoiceText = null;
+    pendingVoiceCallback = null;
     if (activeVoiceAudio) {
       activeVoiceAudio.pause();
       activeVoiceAudio.removeAttribute("src");
@@ -1745,11 +1751,20 @@
     };
     audio.onended = finish;
     let failed = false;
-    audio.onerror = () => {
+    // `blocked` marks the browser's autoplay policy rather than a broken file: the
+    // audio is fine and will play as soon as the child taps something. Warning about
+    // a missing voice there would be wrong, and switching to the device voice for the
+    // rest of the session would replace F1 narration with a different voice.
+    const handleFailure = ({ blocked = false } = {}) => {
       if (failed || token !== voicePlayToken) return;
       failed = true;
       activeVoiceAudio = null;
       setBgmDucked(false);
+      if (blocked) {
+        pendingVoiceText = text;
+        pendingVoiceCallback = onended;
+        return;
+      }
       if (!speechWarningShown) {
         speechWarningShown = true;
         showToast("F1 음성을 불러오지 못해 기기 음성으로 읽어드려요.");
@@ -1757,7 +1772,10 @@
       const fallbackStarted = speakWithBrowser(text, onended);
       if (!fallbackStarted) window.setTimeout(() => onended?.(), 0);
     };
-    audio.play().catch(() => audio.onerror?.());
+    audio.onerror = () => handleFailure();
+    audio.play().catch((error) => {
+      handleFailure({ blocked: error?.name === "NotAllowedError" });
+    });
     return true;
   }
 
@@ -3866,6 +3884,22 @@
   document.addEventListener("pointerdown", () => {
     document.body.classList.remove("is-keyboard-nav");
   }, { passive: true });
+
+  // Browsers block audio until the page has been interacted with. If the question was
+  // blocked on the way in, speak it with the real F1 voice on the first touch or key
+  // press instead of silently falling back to the device voice.
+  function flushPendingVoice() {
+    if (!pendingVoiceText) return;
+    const text = pendingVoiceText;
+    const callback = pendingVoiceCallback;
+    pendingVoiceText = null;
+    pendingVoiceCallback = null;
+    speak(text, { onended: callback });
+  }
+
+  ["pointerdown", "keydown", "touchstart"].forEach((eventName) => {
+    document.addEventListener(eventName, flushPendingVoice, { passive: true });
+  });
 
   updateTodayCard();
   updatePremiumDashboard();
