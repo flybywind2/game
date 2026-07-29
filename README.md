@@ -39,6 +39,8 @@ npm test
 | `npm run test:landscape` | 가로로 든 화면(720x360 ~ 1024x600)에서 질문이 보이고 누를 거리가 화면 밖으로 잘리지 않는지 확인 |
 | `npm run test:keyboard` | 키보드만으로 놀이 열기·정답 입력·Escape 종료, 놀이 화면에서 Tab이 밖으로 나가지 않는지, 보호자 창이 배경 버튼으로 새지 않는지 확인 |
 | `npm run test:a11y` | 홈·정책·이야기 인트로·첫 사용 안내·보호자 공간·완주 화면과 16가지 놀이 방식에 axe-core WCAG 2.1 A/AA 검사, 심각 위반 0건 |
+| `npm run test:copy` | 홈·보호자 화면과 105개 놀이의 한국어 문구에서 오탈자와 값 렌더링 실패를 검사 |
+| `npm run test:privacy` | 외부 서버 전송 0건, 보호자 삭제 후 기록 0건, 백업 복원 시 진도 유지 확인 |
 | `npm run test:offline` | 서비스워커 설치 후 네트워크를 끊고 홈·놀이·정책 페이지가 실제로 동작하는지 확인 |
 | `npm run test:perf` | 첫 방문 전송량과 이미지 용량 예산, 요청 수, DOMContentLoaded 시간 |
 

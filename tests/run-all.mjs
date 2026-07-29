@@ -14,6 +14,7 @@ const steps = [
   ["키보드 조작 점검", "tests/check-keyboard.mjs"],
   ["접근성 점검", "tests/check-a11y.mjs"],
   ["오프라인 점검", "tests/check-offline.mjs"],
+  ["개인정보 약속 점검", "tests/check-privacy.mjs"],
   ["첫 로딩 용량 점검", "tests/check-perf.mjs"],
 ];
 

@@ -24,6 +24,7 @@
     "test:a11y": "node tests/check-a11y.mjs",
     "test:perf": "node tests/check-perf.mjs",
     "test:offline": "node tests/check-offline.mjs",
+    "test:privacy": "node tests/check-privacy.mjs",
     "test:live": "node tests/check-live.mjs"
   },
   "repository": {
