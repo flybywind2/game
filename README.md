@@ -43,6 +43,7 @@ npm test
 | `npm run test:copy` | 홈·보호자 화면과 105개 놀이의 한국어 문구에서 오탈자와 값 렌더링 실패를 검사 |
 | `npm run test:privacy` | 외부 서버 전송 0건, 보호자 삭제 후 기록 0건, 백업 복원 시 진도 유지 확인 |
 | `npm run test:offline` | 서비스워커 설치 후 네트워크를 끊고 홈·놀이·정책 페이지가 실제로 동작하는지 확인 |
+| `npm run test:exports` | 성장 리포트·4주 계획표 PNG와 백업 JSON이 실제로 저장되고 내용이 담기는지 확인 |
 | `npm run test:resilience` | 기록이 깨졌거나 시크릿 모드처럼 저장이 막혔거나 저장 공간이 꽉 찬 상황에서도 놀이가 되는지 확인 |
 | `npm run test:perf` | 첫 방문 전송량과 이미지 용량 예산, 요청 수, DOMContentLoaded 시간 |
 

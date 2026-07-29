@@ -16,6 +16,7 @@ const steps = [
   ["접근성 점검", "tests/check-a11y.mjs"],
   ["오프라인 점검", "tests/check-offline.mjs"],
   ["개인정보 약속 점검", "tests/check-privacy.mjs"],
+  ["보호자 내보내기 점검", "tests/check-exports.mjs"],
   ["장애 상황 점검", "tests/check-resilience.mjs"],
   ["첫 로딩 용량 점검", "tests/check-perf.mjs"],
 ];
