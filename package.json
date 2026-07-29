@@ -27,6 +27,7 @@
     "test:offline": "node tests/check-offline.mjs",
     "test:privacy": "node tests/check-privacy.mjs",
     "test:exports": "node tests/check-exports.mjs",
+    "test:observation": "node tests/check-observation.mjs",
     "test:resilience": "node tests/check-resilience.mjs",
     "test:live": "node tests/check-live.mjs"
   },
