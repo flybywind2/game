@@ -1,0 +1,26 @@
+name: Weekly full playthrough
+
+# The per-push suite plays one game per interaction mode to stay fast. This sweeps all
+# 105 games to completion, which takes about 25 minutes, so it runs on a schedule and
+# on demand instead of blocking every push.
+on:
+  schedule:
+    - cron: '0 18 * * 0'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Play every game to completion
+        run: npm run test:playthrough:all

@@ -47,6 +47,11 @@ npm test
 | `npm run test:resilience` | 기록이 깨졌거나 시크릿 모드처럼 저장이 막혔거나 저장 공간이 꽉 찬 상황에서도 놀이가 되는지 확인 |
 | `npm run test:perf` | 첫 방문 전송량과 이미지 용량 예산, 요청 수, DOMContentLoaded 시간 |
 
+105종 전체를 끝까지 완주하는 검사는 약 25분이 걸리므로 매주 일요일과 필요할 때만 GitHub Actions에서 실행합니다.
+
+```bash
+npm run test:playthrough:all
+```
 배포 후에는 실제 주소를 직접 점검합니다.
 
 ```bash
