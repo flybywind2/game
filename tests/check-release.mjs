@@ -84,22 +84,12 @@ for (const entry of shellEntries) {
 const indexHtml = await readFile("index.html", "utf8");
 
 // Precached files without a ?v= query are served from the old cache until the
-// cache name changes, so their content is pinned to CACHE_VERSION. This records a
-// fingerprint of those files and fails when they change without a version bump.
+// cache name changes, so their content is pinned to CACHE_VERSION. Compare a
+// line-ending-normalised fingerprint against tests/cache-lock.json.
 const cacheVersion = sw.match(/CACHE_VERSION\s*=\s*"([^"]+)"/)?.[1] || "";
 if (!cacheVersion) fail("service worker has no CACHE_VERSION");
-const unversionedShell = shellEntries
-  .filter((entry) => !entry.includes("?v=") && entry !== "./")
-  .map((entry) => entry.replace("./", ""))
-  .filter((relative) => existsSync(relative))
-  .sort();
-const { createHash } = await import("node:crypto");
-const fingerprint = createHash("sha256");
-for (const relative of unversionedShell) {
-  fingerprint.update(relative);
-  fingerprint.update(await readFile(relative));
-}
-const shellDigest = fingerprint.digest("hex").slice(0, 16);
+const { shellFingerprint } = await import("./shell-fingerprint.mjs");
+const { digest: shellDigest, fileCount: shellFileCount } = await shellFingerprint(sw);
 const lockPath = "tests/cache-lock.json";
 let lock = null;
 try {
@@ -108,7 +98,7 @@ try {
   lock = null;
 }
 if (!lock) {
-  fail(`${lockPath} is missing; run \`npm run lock:cache\` to record the current shell`);
+  fail(`${lockPath} is missing; run \`npm run lock:cache\``);
 } else if (lock.digest !== shellDigest && lock.cacheVersion === cacheVersion) {
   fail(
     `precached assets changed but CACHE_VERSION is still ${cacheVersion}; ` +
@@ -118,6 +108,8 @@ if (!lock) {
   fail(`${lockPath} is stale for ${cacheVersion}; run \`npm run lock:cache\``);
 }
 
+// A ?v= asset loaded by index.html must be precached at the same version, or an
+// installed user keeps the old file while the page asks for the new one.
 const versionedInIndex = [...indexHtml.matchAll(/"?\.\/([A-Za-z0-9_\-.]+\.(?:css|js))\?v=(\d+)"?/g)]
   .map((match) => `./${match[1]}?v=${match[2]}`);
 for (const asset of versionedInIndex) {

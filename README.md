@@ -33,6 +33,8 @@ npm test
 | `npm run test:release` | 필수 페이지·라이선스·PWA 매니페스트, 서비스워커 프리캐시 경로와 버전, SEO 메타와 사이트맵 |
 | `npm run test:games` | 실제 브라우저에서 105개 놀이 전부 열림, 콘솔 오류 0건, 한 게임 3라운드 완주와 진행 기록 저장, 정책 페이지 응답 |
 | `npm run test:voice` | 105개 놀이를 3라운드까지 실제로 진행하며 모든 말소리가 F1 음원으로 재생되는지 확인, 기기 음성 대체 0건 |
+| `npm run test:core` | `app.js` 안의 핵심 12종 게임의 문구·진행 표시·모드별 조작 요소 검증 |
+| `npm run test:playthrough` | 16가지 놀이 방식마다 한 게임을 실제로 정답을 눌러 3라운드 끝까지 완주하고, 완주 화면·진도 저장·스티커 지급까지 확인 (`npm run test:playthrough:all`로 105종 전체) |
 | `npm run test:touch` | 105개 놀이의 모든 누를 거리를 360px 화면에서 측정, 44px 미만 또는 화면 밖 대상 0건 |
 | `npm run test:a11y` | 홈·정책·이야기 인트로·첫 사용 안내·보호자 공간·완주 화면과 16가지 놀이 방식에 axe-core WCAG 2.1 A/AA 검사, 심각 위반 0건 |
 | `npm run test:offline` | 서비스워커 설치 후 네트워크를 끊고 홈·놀이·정책 페이지가 실제로 동작하는지 확인 |
