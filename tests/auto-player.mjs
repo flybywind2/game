@@ -112,21 +112,46 @@ export const SOLVER = async (page) => {
         return { ok: true, mode, taps };
       }
       case "drag": {
-        const done = await pickAndDrop("[data-match]:not([disabled])", "data-match", "data-activity-drop");
-        return { ok: done, mode, taps };
+        // Some relation games reveal one destination at a time, so pair against
+        // whichever slot is currently open rather than assuming a matching id exists.
+        for (let guard = 0; guard < 24; guard += 1) {
+          const slots = [...stage.querySelectorAll("[data-activity-drop]:not([disabled])")];
+          if (!slots.length) return { ok: true, mode, taps };
+          const sources = [...stage.querySelectorAll("[data-match]:not([disabled])")];
+          if (!sources.length) return { ok: true, mode, taps };
+          // Prefer the source whose match id equals an open slot; otherwise, when a
+          // single slot is open, the correct source is the one it expects.
+          const paired = sources.find((source) =>
+            slots.some((slot) => slot.dataset.activityDrop === source.dataset.match),
+          );
+          const slot = paired
+            ? slots.find((item) => item.dataset.activityDrop === paired.dataset.match)
+            : slots[0];
+          const source = paired || sources.find((item) => item.dataset.match === String(taps / 2)) || sources[0];
+          await tap(source);
+          await tap(slot, 240);
+          const settled = stage.querySelector(".feedback-retry, .is-wrong");
+          if (settled) return { ok: false, mode, taps, reason: "a pairing was rejected" };
+        }
+        return { ok: false, mode, taps, reason: "drag did not finish" };
       }
       case "sequence": {
-        // Tokens carry their position in data-step; slots are numbered the same way.
-        const tokens = [...stage.querySelectorAll("[data-step]")].sort(
-          (a, b) => Number(a.dataset.step) - Number(b.dataset.step),
+        // Tokens carry their position in data-step. Harder rounds add distractor
+        // tokens whose step has no slot, so place only the steps that have one and
+        // stop once every slot is filled.
+        const slotIds = new Set(
+          [...stage.querySelectorAll("[data-activity-drop]")].map((slot) => slot.dataset.activityDrop),
         );
-        if (!tokens.length) return { ok: false, mode, taps, reason: "no sequence tokens" };
+        const tokens = [...stage.querySelectorAll("[data-step]")]
+          .filter((token) => slotIds.has(token.dataset.step))
+          .sort((a, b) => Number(a.dataset.step) - Number(b.dataset.step));
+        if (!tokens.length) return { ok: false, mode, taps, reason: "no placeable sequence tokens" };
         for (const token of tokens) {
           if (token.disabled) continue;
           const slot = stage.querySelector(
             `[data-activity-drop="${token.dataset.step}"]:not([disabled])`,
           );
-          if (!slot) return { ok: false, mode, taps, reason: "no slot for this step" };
+          if (!slot) continue;
           await tap(token);
           await tap(slot, 240);
         }
@@ -200,23 +225,32 @@ export const SOLVER = async (page) => {
         await sleep(240);
         const promptText = document.querySelector("#play-prompt")?.textContent || "";
         const WORDS = { 한: 1, 하나: 1, 두: 2, 둘: 2, 세: 3, 셋: 3, 네: 4, 넷: 4, 다섯: 5, 여섯: 6 };
-        const digit = promptText.match(/(\d+)\s*(개|마리|장|송이|권)/);
+        const UNITS = "개|마리|장|송이|권|대|명|알";
+        const digit = promptText.match(new RegExp(`(\\d+)\\s*(?:${UNITS})`));
         let wanted = digit ? Number(digit[1]) : null;
         if (wanted === null) {
           for (const [word, value] of Object.entries(WORDS)) {
-            if (new RegExp(`${word}\\s*(개|마리|장|송이|권)`).test(promptText)) {
+            if (new RegExp(`${word}\\s*(?:${UNITS})`).test(promptText)) {
               wanted = value;
               break;
             }
           }
         }
-        // Some rounds ask for a numeral card instead of a picture group.
-        const numeral = promptText.match(/숫자\s*(\d+)/);
-        if (numeral) {
-          const value = numeral[1];
-          const card = [...stage.querySelectorAll("button:not([disabled])")].find((button) => {
+        // Some rounds ask for a numeral card. The prompt either names the digit
+        // ("숫자 3") or describes a count in words ("공이 세 개일 때 맞는 숫자"), so the
+        // wanted value comes from whichever appears.
+        const numeralCards = [...stage.querySelectorAll("button:not([disabled])")].filter((button) =>
+          (button.getAttribute("aria-label") || button.textContent || "").includes("숫자"),
+        );
+        if (numeralCards.length) {
+          const explicit = promptText.match(/숫자\s*(\d+)/);
+          const value = explicit ? Number(explicit[1]) : wanted;
+          if (value === null || value === undefined) {
+            return { ok: false, mode, taps, reason: `could not read a number from "${promptText}"` };
+          }
+          const card = numeralCards.find((button) => {
             const label = button.getAttribute("aria-label") || button.textContent || "";
-            return label.includes(`숫자 ${value}`) || label.trim() === value;
+            return new RegExp(`숫자\\s*${value}(?!\\d)`).test(label);
           });
           if (!card) return { ok: false, mode, taps, reason: `no numeral card for ${value}` };
           await tap(card, 280);
@@ -241,18 +275,34 @@ export const SOLVER = async (page) => {
         await sleep(240);
         const options = [...stage.querySelectorAll("[data-option-index]:not([disabled]), .quantity-select:not([disabled])")];
         if (!options.length) return { ok: false, mode, taps, reason: "no option became enabled" };
-        // Counted totals appear per group; the prompt asks for "더 많은" (the larger)
-        // or "더 적은" (the smaller) group's count.
         const counts = [...stage.querySelectorAll(".compare-count")].map((node) => Number(node.textContent) || 0);
         const promptText = document.querySelector("#play-prompt")?.textContent || "";
+        const labelOf = (option) => (option.getAttribute("aria-label") || option.textContent || "").trim();
+
+        // Two answer shapes: pick the count, or pick which side has more or fewer.
+        const relational = options.some((option) => /많|적|같/.test(labelOf(option)));
+        if (relational && counts.length >= 2) {
+          const [left, right] = counts;
+          // Choices are always phrased from the left group's point of view:
+          // "왼쪽이 더 많아요", "왼쪽이 더 적어요", "두 쪽이 같아요".
+          const match = options.find((option) => {
+            const label = labelOf(option);
+            if (left === right) return label.includes("같");
+            return left > right ? label.includes("많") : label.includes("적");
+          });
+          if (!match) {
+            const labels = options.map(labelOf).join(" / ");
+            return { ok: false, mode, taps, reason: `no relational option for [${counts}] among ${labels}` };
+          }
+          await tap(match, 280);
+          return { ok: true, mode, taps };
+        }
+
         let wanted = null;
         if (counts.length) {
           wanted = promptText.includes("적은") ? Math.min(...counts) : Math.max(...counts);
         }
-        const match = options.find((option) => {
-          const label = option.getAttribute("aria-label") || option.textContent || "";
-          return Number(label.trim()) === wanted;
-        });
+        const match = options.find((option) => Number(labelOf(option)) === wanted);
         if (wanted !== null && !match) {
           return { ok: false, mode, taps, reason: `no option equals ${wanted} of [${counts}]` };
         }
