@@ -1328,7 +1328,7 @@
     }
     playTimeChip.hidden = false;
     const total = playLimitMinutes + playExtensionMinutes;
-    playTimeChip.textContent = `잎 ${total}분 놀이 약속`;
+    playTimeChip.textContent = `${total}분 놀이 약속`;
     playTimeChip.setAttribute("aria-label", `보호자가 정한 놀이 시간 ${total}분`);
   }
 

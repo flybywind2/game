@@ -4,6 +4,7 @@ import { spawn } from "node:child_process";
 const steps = [
   ["데이터 검증", "tests/check-data.mjs"],
   ["핵심 게임 검증", "tests/check-core-games.mjs"],
+  ["문구 점검", "tests/check-copy.mjs"],
   ["출시 점검", "tests/check-release.mjs"],
   ["브라우저 놀이 점검", "tests/play-all.mjs"],
   ["실제 완주 점검", "tests/check-playthrough.mjs"],

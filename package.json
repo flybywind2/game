@@ -12,6 +12,7 @@
     "test": "node tests/run-all.mjs",
     "test:data": "node tests/check-data.mjs",
     "test:core": "node tests/check-core-games.mjs",
+    "test:copy": "node tests/check-copy.mjs",
     "test:games": "node tests/play-all.mjs",
     "test:playthrough": "node tests/check-playthrough.mjs",
     "test:playthrough:all": "node tests/check-playthrough.mjs --all",
