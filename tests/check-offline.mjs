@@ -92,6 +92,83 @@ if (!offlinePolicy.includes("개인정보")) {
   failures.push(`offline privacy.html served the wrong page ("${offlinePolicy}")`);
 }
 
+// The optional voice pack is what makes every line available without a network, so
+// download it and confirm a game can still speak with the F1 recording offline.
+await context.setOffline(false);
+const voicePage = await context.newPage();
+voicePage.on("dialog", (dialog) => dialog.accept());
+await voicePage.addInitScript(() => {
+  window.localStorage.setItem("mongle-welcome-v1", "done");
+  window.__voiceFiles = [];
+  window.__deviceVoice = [];
+  const NativeAudio = window.Audio;
+  window.Audio = function PatchedAudio(src) {
+    if (typeof src === "string" && src.includes("/audio/tts/")) window.__voiceFiles.push(src);
+    const audio = new NativeAudio(src);
+    audio.play = () => Promise.resolve();
+    return audio;
+  };
+  if (window.speechSynthesis) {
+    const original = window.speechSynthesis.speak.bind(window.speechSynthesis);
+    window.speechSynthesis.speak = (utterance) => {
+      window.__deviceVoice.push(utterance?.text || "");
+      try {
+        original(utterance);
+      } catch {
+        /* ignore */
+      }
+    };
+  }
+});
+await voicePage.goto(base, { waitUntil: "load" });
+await voicePage.waitForTimeout(1200);
+await voicePage.evaluate(() => document.querySelector("#parent-open")?.click());
+await voicePage.waitForTimeout(400);
+await voicePage.evaluate(() => {
+  const question = document.querySelector("#parent-gate-question")?.textContent || "";
+  const numbers = [...question.matchAll(/(\d+)/g)].map((match) => Number(match[1]));
+  const answer = numbers.length >= 2 ? numbers[0] + numbers[1] : null;
+  const choices = [...document.querySelectorAll("#parent-gate-choices button")];
+  (choices.find((button) => Number(button.textContent.trim()) === answer) || choices[0])?.click();
+});
+await voicePage.waitForTimeout(700);
+await voicePage.evaluate(() => document.querySelector("#download-offline-voice")?.click());
+
+const packReady = await voicePage
+  .waitForFunction(
+    () => {
+      const progress = document.querySelector("#offline-voice-progress");
+      return progress && Number(progress.value) >= Number(progress.max);
+    },
+    null,
+    { timeout: 120000 },
+  )
+  .then(() => true)
+  .catch(() => false);
+
+const packSize = await voicePage.evaluate(async () => {
+  const names = await caches.keys();
+  const voiceCache = names.find((name) => name.includes("voice"));
+  return voiceCache ? (await caches.open(voiceCache)).keys().then((keys) => keys.length) : 0;
+});
+console.log(`voice pack downloaded: ${packReady}, cached files: ${packSize}`);
+if (!packReady || packSize < 700) failures.push(`the offline voice pack did not finish (${packSize} files cached)`);
+
+// With the pack in place, a game must still use the F1 recording with no network.
+await context.setOffline(true);
+await voicePage.goto(`${base}#game/colors`, { waitUntil: "domcontentloaded" }).catch(() => {});
+await voicePage.waitForTimeout(1200);
+await voicePage.mouse.click(5, 5);
+await voicePage.waitForTimeout(900);
+const offlineVoice = await voicePage.evaluate(() => ({
+  files: window.__voiceFiles.length,
+  device: window.__deviceVoice.length,
+  prompt: document.querySelector("#play-prompt")?.textContent?.trim() || "",
+}));
+console.log(`offline narration: F1 files=${offlineVoice.files}, device voice=${offlineVoice.device}`);
+if (!offlineVoice.prompt) failures.push("a game could not be opened offline after the voice pack download");
+if (offlineVoice.device > 0) failures.push("the device voice was used offline despite the voice pack");
+
 await context.setOffline(false);
 await browser.close();
 server.close();
