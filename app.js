@@ -3815,11 +3815,51 @@
     stopBgm();
   });
 
+  // The play screen is aria-modal, so Tab must cycle inside it. Without this, focus
+  // walks out into the catalog behind the game and a keyboard or screen-reader user
+  // cannot tell which screen they are on.
+  function focusableWithin(container) {
+    const selector = [
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "canvas[tabindex]",
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(", ");
+    return [...container.querySelectorAll(selector)].filter((element) => {
+      if (element.hidden || element.getAttribute("aria-hidden") === "true") return false;
+      return element.offsetWidth > 0 || element.offsetHeight > 0 || element === document.activeElement;
+    });
+  }
+
   document.addEventListener("keydown", (event) => {
     if (event.key === "Tab") document.body.classList.add("is-keyboard-nav");
     if (event.key === "Escape" && shell.classList.contains("is-open")) {
       event.preventDefault();
       closeGame();
+      return;
+    }
+    if (event.key !== "Tab" || !shell.classList.contains("is-open")) return;
+
+    const stops = focusableWithin(shell);
+    if (!stops.length) return;
+    const first = stops[0];
+    const last = stops[stops.length - 1];
+    const active = document.activeElement;
+
+    if (!shell.contains(active)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+      return;
+    }
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus({ preventScroll: true });
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus({ preventScroll: true });
     }
   });
 

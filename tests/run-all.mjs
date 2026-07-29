@@ -9,6 +9,7 @@ const steps = [
   ["실제 완주 점검", "tests/check-playthrough.mjs"],
   ["F1 음성 점검", "tests/check-voice.mjs"],
   ["터치 영역 점검", "tests/check-touch.mjs"],
+  ["키보드 조작 점검", "tests/check-keyboard.mjs"],
   ["접근성 점검", "tests/check-a11y.mjs"],
   ["오프라인 점검", "tests/check-offline.mjs"],
   ["첫 로딩 용량 점검", "tests/check-perf.mjs"],
