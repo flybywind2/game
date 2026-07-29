@@ -16,6 +16,7 @@
     "test:games": "node tests/play-all.mjs",
     "test:playthrough": "node tests/check-playthrough.mjs",
     "test:playthrough:all": "node tests/check-playthrough.mjs --all",
+    "test:adaptive": "node tests/check-adaptive.mjs",
     "test:release": "node tests/check-release.mjs",
     "test:voice": "node tests/check-voice.mjs",
     "test:touch": "node tests/check-touch.mjs",

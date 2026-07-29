@@ -35,6 +35,7 @@ npm test
 | `npm run test:voice` | 105개 놀이를 3라운드까지 실제로 진행하며 모든 말소리가 F1 음원으로 재생되는지 확인, 기기 음성 대체 0건 |
 | `npm run test:core` | `app.js` 안의 핵심 12종 게임의 문구·진행 표시·모드별 조작 요소 검증 |
 | `npm run test:playthrough` | 16가지 놀이 방식마다 한 게임을 실제로 정답을 눌러 3라운드 끝까지 완주하고, 완주 화면·진도 저장·스티커 지급까지 확인 (`npm run test:playthrough:all`로 105종 전체) |
+| `npm run test:adaptive` | 최근 여섯 번 결과에 따라 지원·도전 단계가 바뀌고 세기 그림·기억 카드·빈칸 수가 실제로 달라지는지 확인 |
 | `npm run test:touch` | 105개 놀이의 모든 누를 거리를 360px 화면에서 측정, 44px 미만 또는 화면 밖 대상 0건 |
 | `npm run test:landscape` | 가로로 든 화면(720x360 ~ 1024x600)에서 질문이 보이고 누를 거리가 화면 밖으로 잘리지 않는지 확인 |
 | `npm run test:keyboard` | 키보드만으로 놀이 열기·정답 입력·Escape 종료, 놀이 화면에서 Tab이 밖으로 나가지 않는지, 보호자 창이 배경 버튼으로 새지 않는지 확인 |

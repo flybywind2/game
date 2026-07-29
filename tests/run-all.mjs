@@ -8,6 +8,7 @@ const steps = [
   ["출시 점검", "tests/check-release.mjs"],
   ["브라우저 놀이 점검", "tests/play-all.mjs"],
   ["실제 완주 점검", "tests/check-playthrough.mjs"],
+  ["난이도 조절 점검", "tests/check-adaptive.mjs"],
   ["F1 음성 점검", "tests/check-voice.mjs"],
   ["터치 영역 점검", "tests/check-touch.mjs"],
   ["가로 화면 점검", "tests/check-landscape.mjs"],
