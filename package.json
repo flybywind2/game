@@ -6,11 +6,13 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/build_extra_games.mjs",
+    "collect:voice-lines": "node scripts/collect_activity_phrases.mjs",
     "serve": "node tests/serve.mjs",
     "test": "node tests/run-all.mjs",
     "test:data": "node tests/check-data.mjs",
     "test:games": "node tests/play-all.mjs",
     "test:release": "node tests/check-release.mjs",
+    "test:voice": "node tests/check-voice.mjs",
     "test:a11y": "node tests/check-a11y.mjs",
     "test:live": "node tests/check-live.mjs"
   },

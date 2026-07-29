@@ -80,6 +80,15 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Extra game JSON chunks (default: data/extra-games-*.json)",
     )
     parser.add_argument(
+        "--activity-phrases",
+        type=Path,
+        default=PROJECT_DIR / "data" / "activity-phrases.json",
+        help=(
+            "Runtime lines built by interaction-engine.js, collected with "
+            "scripts/collect_activity_phrases.mjs (default: %(default)s)"
+        ),
+    )
+    parser.add_argument(
         "--output-dir",
         type=Path,
         default=PROJECT_DIR / "audio" / "tts",
@@ -243,9 +252,30 @@ def extract_extra_game_phrases(
     return phrases, titles
 
 
+def load_activity_phrases(activity_path: Path | None) -> list[str]:
+    """Return spoken lines that interaction-engine.js builds at runtime.
+
+    These cannot be scraped from ``app.js`` because the engine assembles them in the
+    browser. ``scripts/collect_activity_phrases.mjs`` records them from a real run.
+    """
+    if activity_path is None:
+        return []
+    resolved = activity_path.expanduser()
+    if not resolved.exists():
+        return []
+    try:
+        data = json.loads(resolved.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"Could not read activity phrases: {resolved}") from error
+    if not isinstance(data, list) or not all(isinstance(item, str) for item in data):
+        raise RuntimeError(f"Activity phrases must be a list of strings: {resolved}")
+    return [item for item in data if item.strip()]
+
+
 def extract_phrases(
     app_path: Path,
     extra_paths: Sequence[Path] = (),
+    activity_path: Path | None = None,
 ) -> tuple[list[str], list[str]]:
     """Return runtime ``(phrases, game_titles)`` from app and extra JSON."""
     try:
@@ -271,8 +301,15 @@ def extract_phrases(
     completion_phrases = [
         f"우와, 다 해냈어! {title} 놀이 끝!" for title in game_titles
     ]
+    activity_phrases = load_activity_phrases(activity_path)
     phrases = ordered_unique(
-        [*round_phrases, *story_phrases, *SHARED_PHRASES, *completion_phrases]
+        [
+            *round_phrases,
+            *story_phrases,
+            *activity_phrases,
+            *SHARED_PHRASES,
+            *completion_phrases,
+        ]
     )
     return phrases, game_titles
 
@@ -493,7 +530,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     manifest_path = args.manifest.expanduser().resolve()
 
     extra_paths = [path.expanduser().resolve() for path in args.extra_games]
-    phrases, game_titles = extract_phrases(app_path, extra_paths)
+    activity_path = args.activity_phrases.expanduser().resolve() if args.activity_phrases else None
+    phrases, game_titles = extract_phrases(app_path, extra_paths, activity_path)
     print(
         f"Found {len(phrases)} unique phrases across {len(game_titles)} games in {app_path}.",
         flush=True,

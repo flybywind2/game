@@ -5,6 +5,7 @@ const steps = [
   ["데이터 검증", "tests/check-data.mjs"],
   ["출시 점검", "tests/check-release.mjs"],
   ["브라우저 놀이 점검", "tests/play-all.mjs"],
+  ["F1 음성 점검", "tests/check-voice.mjs"],
   ["접근성 점검", "tests/check-a11y.mjs"],
 ];
 

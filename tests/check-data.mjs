@@ -81,7 +81,23 @@ if (!uniqueVoicePaths.length) fail("tts-manifest.js contains no voice entries");
 const missingVoices = uniqueVoicePaths.filter((path) => !existsSync(path.replace("./", "")));
 if (missingVoices.length) fail(`missing voice files: ${missingVoices.slice(0, 5).join(", ")}`);
 
+// Runtime activity prompts are spoken too, so each one needs a manifest entry.
+// Without this, a reworded prompt silently degrades to the device voice.
+let activityPhrases = [];
+try {
+  activityPhrases = JSON.parse(await readFile("data/activity-phrases.json", "utf8"));
+} catch {
+  fail("data/activity-phrases.json is missing; run scripts/collect_activity_phrases.mjs");
+}
+const unvoicedActivity = activityPhrases.filter((phrase) => !manifest.includes(JSON.stringify(phrase).slice(1, -1)));
+if (unvoicedActivity.length) {
+  fail(
+    `${unvoicedActivity.length} activity prompt(s) have no Supertonic entry, e.g. "${unvoicedActivity[0]}"`,
+  );
+}
+
 console.log(`data: ${keys.length} extra games, ${roundTotal} rounds, ${uniqueVoicePaths.length} voice files`);
+console.log(`activity prompts with voice files: ${activityPhrases.length - unvoicedActivity.length}/${activityPhrases.length}`);
 if (failures.length) {
   failures.forEach((message) => console.error(`FAIL ${message}`));
   process.exit(1);
