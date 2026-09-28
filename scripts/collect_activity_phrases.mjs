@@ -1,41 +1,34 @@
 /* Harvests every spoken line that interaction-engine.js builds at runtime.
 
-   For activity modes app.js speaks `activity.speech || activity.prompt`, which is
-   assembled in the browser. The Python generator only scans app.js and the game
-   JSON, so those lines had no Supertonic file and fell back to the device voice.
+   For activity modes app.js speaks `activity.speech || activity.prompt`, and some
+   formats also read card names aloud. Those lines are assembled in the browser, so
+   the Python generator cannot scrape them from app.js or the game JSON. Without a
+   matching Supertonic file they fall back to the device voice.
 
-   This drives the real UI: it opens every game, walks all three rounds by answering
-   correctly is not required, and records exactly what `speak()` receives. */
+   This drives the real UI: it opens every game, plays all three rounds with the same
+   solver the tests use, and records every line that reaches the device voice. */
 import { chromium } from "playwright";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { startStaticServer } from "../tests/static-server.mjs";
+import {
+  SOLVER,
+  UNSCRIPTABLE_MODES,
+  fastAudioInitScript,
+  roundState,
+  waitForAdvance,
+  waitForRound,
+} from "../tests/auto-player.mjs";
 
 const { server, base } = await startStaticServer(process.cwd());
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
-
-await page.addInitScript(() => {
-  window.localStorage.setItem("mongle-welcome-v1", "done");
-  window.__spoken = [];
-  // speak() reaches exactly one of these two paths for every line it plays.
-  const NativeAudio = window.Audio;
-  window.Audio = function PatchedAudio(src) {
-    const audio = new NativeAudio(src);
-    audio.play = () => Promise.resolve();
-    return audio;
-  };
-  if (window.speechSynthesis) {
-    const original = window.speechSynthesis.speak.bind(window.speechSynthesis);
-    window.speechSynthesis.speak = (utterance) => {
-      if (utterance?.text) window.__spoken.push(utterance.text);
-      try {
-        original(utterance);
-      } catch {
-        /* ignore */
-      }
-    };
-  }
-});
+await page.addInitScript(() => window.localStorage.setItem("mongle-welcome-v1", "done"));
+await page.addInitScript(fastAudioInitScript);
+// The manifest decides which lines already have a file. Hide it so every runtime
+// line is heard through the device path and recorded.
+await page.route("**/tts-manifest.js*", (route) =>
+  route.fulfill({ contentType: "text/javascript", body: "window.MONGLE_TTS_AUDIO = Object.freeze({});" }),
+);
 
 await page.goto(base, { waitUntil: "load" });
 await page.waitForTimeout(700);
@@ -44,36 +37,45 @@ const keys = await page.evaluate(() =>
   [...new Set([...document.querySelectorAll("[data-game]")].map((node) => node.dataset.game))],
 );
 
-const collected = new Set();
+const heard = new Set();
+const collect = async () => {
+  const lines = await page.evaluate(() => window.__deviceVoice.splice(0));
+  lines.filter(Boolean).forEach((line) => heard.add(line));
+};
+
 for (const key of keys) {
-  await page.evaluate((gameKey) => {
-    window.__spoken = [];
-    window.location.hash = `#game/${gameKey}`;
-  }, key);
-  await page.waitForTimeout(240);
-
-  // Walk all three rounds by clicking whatever the activity marks as correct.
+  await page.goto(`${base}#game/${key}`, { waitUntil: "domcontentloaded" });
   for (let round = 0; round < 3; round += 1) {
-    const advanced = await page.evaluate(() => {
-      const stage = document.querySelector("#answer-grid");
-      const target = stage?.querySelector('[data-target="true"]:not([disabled])');
-      if (!target) return false;
-      target.click();
-      return true;
-    });
-    if (!advanced) break;
-    await page.waitForTimeout(1600);
+    if (!(await waitForRound(page))) break;
+    await page.waitForTimeout(250);
+    await collect();
+    const mode = await page.evaluate(() => document.querySelector("#answer-grid")?.dataset.mode || "choice");
+    if (UNSCRIPTABLE_MODES.has(mode)) break;
+    const before = await roundState(page);
+    const result = await SOLVER(page);
+    if (!result.ok) break;
+    if (!(await waitForAdvance(page, before))) break;
   }
-
-  const lines = await page.evaluate(() => window.__spoken.slice());
-  lines.filter(Boolean).forEach((line) => collected.add(line));
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(160);
+  await page.waitForTimeout(400);
+  await collect();
 }
 
 await browser.close();
 server.close();
 
-const phrases = [...collected].sort();
+// The manifest holds everything the generator already voices: round lines it reads
+// from app.js and the game JSON, plus the previous runtime list. Keep a heard line
+// when it has no file yet or was a runtime line before; drop lines the app no longer
+// says so the offline voice pack does not carry unused files.
+let previous = [];
+try {
+  previous = JSON.parse(await readFile("data/activity-phrases.json", "utf8"));
+} catch {
+  previous = [];
+}
+const manifestSource = await readFile("tts-manifest.js", "utf8");
+const manifest = JSON.parse(manifestSource.slice(manifestSource.indexOf("(") + 1, manifestSource.indexOf(");")));
+const previousSet = new Set(previous);
+const phrases = [...heard].filter((line) => !(line in manifest) || previousSet.has(line)).sort();
 await writeFile("data/activity-phrases.json", `${JSON.stringify(phrases, null, 2)}\n`, "utf8");
-console.log(`wrote data/activity-phrases.json with ${phrases.length} runtime spoken lines`);
+console.log(`heard ${heard.size} runtime lines; wrote data/activity-phrases.json with ${phrases.length} lines`);

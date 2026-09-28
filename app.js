@@ -893,7 +893,7 @@
     } else {
       status.textContent = voicePackCachedCount
         ? `${voicePackCachedCount}/${voicePackTotal}개 준비됨 · 다시 누르면 이어받아요.`
-        : `전체 F1 음성 ${voicePackTotal}개 · 약 40MB · Wi-Fi에서 선택해 받아요.`;
+        : `전체 F1 음성 ${voicePackTotal}개 · 약 45MB · Wi-Fi에서 선택해 받아요.`;
       download.textContent = voicePackCachedCount ? "음성팩 이어받기" : "오프라인 음성팩 받기";
       download.disabled = false;
     }
@@ -907,7 +907,7 @@
       status.textContent = "음성팩을 받으려면 인터넷에 연결해 주세요.";
       return;
     }
-    if (!window.confirm(`F1 음성 ${voicePackTotal}개를 오프라인용으로 받을까요? 약 40MB의 저장 공간을 사용합니다.`)) return;
+    if (!window.confirm(`F1 음성 ${voicePackTotal}개를 오프라인용으로 받을까요? 약 45MB의 저장 공간을 사용합니다.`)) return;
     try {
       const estimate = await navigator.storage?.estimate?.();
       if (estimate?.quota && estimate?.usage && estimate.quota - estimate.usage < 50 * 1024 * 1024) {
@@ -1390,7 +1390,9 @@
   }
 
   function interactionModeFor(key) {
-    return window.MONGLE_INTERACTIONS?.resolveMode(key) || "choice";
+    // The home screen and daily course describe a game by its main multi-step
+    // activity, which is the third round of every plan.
+    return window.MONGLE_INTERACTIONS?.resolveRoundMode?.(key, 2) || window.MONGLE_INTERACTIONS?.resolveMode(key) || "choice";
   }
 
   function ensureDailyPlan() {
@@ -1444,7 +1446,7 @@
       const game = GAMES[key];
       const category = gameCategory(key);
       const done = Number(dailyProgress.completed[key]) > 0;
-      const mode = window.MONGLE_INTERACTIONS?.resolveMode(key) || "choice";
+      const mode = interactionModeFor(key);
       const modeLabel = window.MONGLE_INTERACTIONS?.metaFor(mode, key)?.label || "놀이";
       const button = document.createElement("button");
       button.type = "button";
@@ -1975,13 +1977,25 @@
       trace: "•—•",
       order: "◔",
       draw: "✎",
+      feed: "🧺",
+      pop: "🎈",
+      peek: "🌿",
+      shadow: "◑",
+      ox: "⭕",
+      numeral: "1·2·3",
       choice: "☝",
     }[mode] || "☝";
   }
 
   function speakRoundInstruction(round) {
     roundInstructionToken += 1;
-    speak(activeActivity?.speech || activeActivity?.prompt || round.speech || round.prompt);
+    const activity = activeActivity;
+    const followUp = activity?.afterInstruction;
+    const started = speak(activity?.speech || activity?.prompt || round.speech || round.prompt, {
+      onended: followUp ? () => { if (activeActivity === activity) followUp(); } : undefined,
+    });
+    // With sound off there is no "ended" event, so continue straight away.
+    if (!started && followUp) window.setTimeout(() => { if (activeActivity === activity) followUp(); }, 400);
   }
 
   function renderRound() {
@@ -2005,11 +2019,11 @@
     renderProgress(game.rounds.length, roundIndex);
 
     const engine = window.MONGLE_INTERACTIONS;
-    const mode = engine?.resolveMode(activeGameKey, game, round) || "choice";
+    const mode = engine?.resolveRoundMode?.(activeGameKey, roundIndex) || engine?.resolveMode(activeGameKey) || "choice";
     const modeMeta = engine?.metaFor(mode, activeGameKey) || { label: "골라 보기", instruction: "알맞은 그림을 골라요." };
     interactionHintElement.textContent = modeMeta.label + " · " + modeMeta.instruction;
     interactionHintElement.dataset.icon = interactionIcon(mode);
-    const ownsScene = ["count", "quantity", "add", "subtract", "countCompare", "compare", "connect", "memory", "pattern", "spot", "trace", "order", "sequence", "draw"].includes(mode);
+    const ownsScene = ["count", "quantity", "add", "subtract", "countCompare", "compare", "connect", "memory", "pattern", "spot", "trace", "order", "sequence", "draw", "numeral"].includes(mode);
     renderScene(ownsScene ? [] : round.scene);
 
     if (!engine || mode === "choice") {
@@ -2028,6 +2042,7 @@
         onMistake: reportRoundMistake,
         onProgress: playChime,
         announce: announceActivity,
+        speak: (line) => speak(line),
       });
       if (activeActivity?.prompt) promptElement.textContent = activeActivity.prompt;
       if (activeActivity?.helper) promptHelper.textContent = activeActivity.helper;
@@ -2050,6 +2065,9 @@
     items.forEach((item, index) => {
       const span = document.createElement("span");
       span.className = "scene-item";
+      const itemText = String(item).trim();
+      // Words such as "기준" or "왼쪽 ⭐ ⭐" read as a caption rather than one large glyph.
+      if (/^[가-힣\s]+$/u.test(itemText) || /^(?:왼쪽|오른쪽|기준)\s/u.test(itemText)) span.classList.add("is-word");
       span.textContent = item;
       span.setAttribute("aria-hidden", "true");
       span.style.animationDelay = `${index * 70}ms`;
@@ -2127,7 +2145,7 @@
     const gameKey = activeGameKey;
     const activeRound = roundIndex;
     const level = adaptiveLevelForGame(gameKey);
-    const delay = level === "support" ? 5000 : level === "challenge" ? 9000 : 7000;
+    const delay = (level === "support" ? 5000 : level === "challenge" ? 9000 : 7000) + (activeActivity?.idleDelay || 0);
     idleHintTimer = window.setTimeout(() => {
       if (
         document.hidden ||
@@ -2324,7 +2342,7 @@
       playMain.querySelector(".completion-home").addEventListener("click", closeGame);
       playMain.querySelector(".completion-course-next")?.addEventListener("click", () => startGame(dailyCourse.next));
       launchConfetti();
-      speak(dailyCourse.complete ? "오늘 코스 완성! 세 가지 놀이를 모두 해냈어!" : `${game.title} 완료! 다음 오늘 놀이도 만나 볼까?`);
+      speak(dailyCourse.complete ? "오늘 코스 완성! 세 가지 놀이를 모두 해냈어!" : "잘했어! 다음 오늘 놀이도 만나 볼까?");
       return;
     }
 
@@ -3287,7 +3305,7 @@
       });
     });
     launchConfetti();
-    speak(finishedRecord ? "세 가지 놀이를 모두 해냈어! 더 놀고 싶은 놀이를 직접 골라 볼까?" : `${game.title} 완료! 다음 관찰 놀이도 해 볼까?`);
+    speak(finishedRecord ? "세 가지 놀이를 모두 해냈어! 더 놀고 싶은 놀이를 직접 골라 볼까?" : "잘했어! 다음 관찰 놀이도 해 볼까?");
     return true;
   }
 

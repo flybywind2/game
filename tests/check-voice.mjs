@@ -7,6 +7,7 @@
    real playback paths (Audio + speechSynthesis) so that regression fails the build. */
 import { chromium } from "playwright";
 import { startStaticServer } from "./static-server.mjs";
+import { SOLVER, UNSCRIPTABLE_MODES, roundState, waitForAdvance, waitForRound } from "./auto-player.mjs";
 
 const { server, base } = await startStaticServer(process.cwd());
 const browser = await chromium.launch();
@@ -21,8 +22,12 @@ await page.addInitScript(() => {
   window.Audio = function PatchedAudio(src) {
     if (typeof src === "string" && src.includes("/audio/tts/")) window.__file.push(src);
     const audio = new NativeAudio(src);
-    // Autoplay of real media is unreliable in headless runs; keep the app flowing.
-    audio.play = () => Promise.resolve();
+    // Autoplay of real media is unreliable in headless runs; end each clip right away
+    // so the app moves on the way it does after a real line finishes.
+    audio.play = () => {
+      setTimeout(() => audio.onended?.(), 30);
+      return Promise.resolve();
+    };
     return audio;
   };
 
@@ -31,11 +36,7 @@ await page.addInitScript(() => {
     const speakOriginal = window.speechSynthesis.speak.bind(window.speechSynthesis);
     window.speechSynthesis.speak = (utterance) => {
       window.__device.push(utterance?.text || "");
-      try {
-        speakOriginal(utterance);
-      } catch {
-        /* ignore */
-      }
+      setTimeout(() => utterance?.onend?.(), 30);
     };
   }
 });
@@ -53,22 +54,20 @@ for (const key of keys) {
     window.__file = [];
     window.__device = [];
   });
-  await page.evaluate((gameKey) => {
-    window.location.hash = `#game/${gameKey}`;
-  }, key);
-  await page.waitForTimeout(260);
+  await page.goto(`${base}#game/${key}`, { waitUntil: "domcontentloaded" });
 
-  // Play through all three rounds so mid-game lines are covered too.
+  // Play all three rounds with the real solver, so every round format's lines,
+  // including card names read aloud and the completion line, are covered.
   for (let round = 0; round < 3; round += 1) {
-    const advanced = await page.evaluate(() => {
-      const target = document.querySelector('#answer-grid [data-target="true"]:not([disabled])');
-      if (!target) return false;
-      target.click();
-      return true;
-    });
-    if (!advanced) break;
-    await page.waitForTimeout(1500);
+    if (!(await waitForRound(page))) break;
+    const mode = await page.evaluate(() => document.querySelector("#answer-grid")?.dataset.mode || "choice");
+    if (UNSCRIPTABLE_MODES.has(mode)) break;
+    const before = await roundState(page);
+    const result = await SOLVER(page);
+    if (!result.ok) break;
+    if (!(await waitForAdvance(page, before))) break;
   }
+  await page.waitForTimeout(400);
 
   const row = await page.evaluate(() => ({
     mode: document.querySelector("#answer-grid")?.dataset.mode || "choice",
@@ -77,8 +76,6 @@ for (const key of keys) {
   }));
   rows.push({ key, ...row });
   row.device.filter(Boolean).forEach((line) => spokenViaDevice.add(line));
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(140);
 }
 
 const usedDevice = rows.filter((row) => row.device.length > 0);
@@ -93,9 +90,7 @@ if (usedDevice.length) {
   for (const line of [...spokenViaDevice].slice(0, 15)) {
     console.error(`  MISSING VOICE FILE: ${line}`);
   }
-  console.error(
-    "Run `node scripts/collect_activity_phrases.mjs` then the Supertonic generator to add them.",
-  );
+  console.error("Run `npm run collect:voice-lines` then the Supertonic generator to add them.");
 }
 
 // Autoplay is blocked until the page is interacted with. Opening a game link directly

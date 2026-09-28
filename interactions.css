@@ -2162,6 +2162,7 @@ button.pattern-cell {
 
 .drawing-color,
 .drawing-size {
+  flex: 0 0 auto;
   width: 46px;
   height: 46px;
   display: grid;
@@ -2499,8 +2500,8 @@ button.pattern-cell {
 
   .drawing-color,
   .drawing-size {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+    height: 46px;
   }
 
   .drawing-actions {

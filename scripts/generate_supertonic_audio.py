@@ -43,6 +43,14 @@ SHARED_PHRASES = (
     "괜찮아. 다시 한번 찾아볼까?",
     "정답 친구가 살짝 움직일 거야.",
     "소리를 켰어요.",
+    # Fixed lines app.js speaks outside a round: idle help, the daily course, the
+    # play-time limit and the guardian observation flow.
+    "반짝이는 곳부터 천천히 시작해 볼까?",
+    "잘했어! 다음 오늘 놀이도 만나 볼까?",
+    "오늘 코스 완성! 세 가지 놀이를 모두 해냈어!",
+    "놀이 약속 시간이 되었어. 몽글이와 눈과 몸을 쉬어 볼까?",
+    "잘했어! 다음 관찰 놀이도 해 볼까?",
+    "세 가지 놀이를 모두 해냈어! 더 놀고 싶은 놀이를 직접 골라 볼까?",
 )
 
 # The app's data uses JSON-compatible, double-quoted JavaScript strings. The

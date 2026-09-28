@@ -38,6 +38,8 @@ const sourceFiles = [
   "styles.css",
   "premium.css",
   "interactions.css",
+  "quick-rounds.css",
+  "landscape.css",
   "catalog.css",
   "enhancements.css",
   "page.css",

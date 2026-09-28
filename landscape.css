@@ -176,6 +176,103 @@
     padding-block: 4px;
   }
 
+  /* Quick round formats: short rows so a sideways phone keeps every choice visible. */
+  .pop-sky,
+  .peek-field,
+  .shadow-field,
+  .numeral-cards,
+  .ox-actions,
+  .ox-piles {
+    min-height: 0;
+    gap: 8px;
+  }
+
+  .pop-sky {
+    padding: 8px 6px 14px;
+  }
+
+  .activity-stage .pop-balloon,
+  .activity-stage .peek-spot,
+  .activity-stage .shadow-card,
+  .activity-stage .ox-card,
+  .activity-stage .numeral-card {
+    min-height: 62px;
+    max-height: 88px;
+    padding-block: 4px;
+  }
+
+  .activity-stage .pop-balloon {
+    padding-bottom: 12px;
+  }
+
+  .activity-stage .pop-balloon::after {
+    display: none;
+  }
+
+  .activity-stage .ox-answer {
+    min-height: 48px;
+  }
+
+  .activity-stage .ox-answer span,
+  .activity-stage .numeral-card {
+    font-size: 26px;
+  }
+
+  .activity-stage .feed-friend {
+    min-height: 70px;
+    padding-block: 6px;
+  }
+
+  .activity-stage .feed-face {
+    width: 52px;
+    height: 46px;
+  }
+
+  .activity-stage .feed-friend strong {
+    font-size: 13px;
+  }
+
+  .activity-stage .feed-basket {
+    width: 70px;
+    min-height: 26px;
+    margin-top: 0;
+  }
+
+  .activity-stage .peek-leaves {
+    font-size: 30px;
+  }
+
+  .activity-stage .numeral-piece,
+  .activity-stage .numeral-gone {
+    width: 46px;
+    height: 46px;
+    font-size: 24px;
+  }
+
+  .activity-stage .numeral-groups,
+  .activity-stage .quick-operation-clue {
+    min-height: 0;
+    padding: 6px;
+  }
+
+  .activity-stage .peek-note,
+  .activity-stage .ox-status,
+  .activity-stage .numeral-status {
+    padding-block: 3px;
+    font-size: 11px;
+  }
+
+  .activity-stage .ox-card-label {
+    font-size: 14px;
+  }
+
+  .activity-stage .pop-label,
+  .activity-stage .peek-name,
+  .activity-stage .shadow-name,
+  .activity-stage .ox-card-listen {
+    font-size: 10px;
+  }
+
   .activity-stage .activity-visual,
   .activity-stage .spot-tile,
   .activity-stage .count-piece {

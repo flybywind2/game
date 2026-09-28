@@ -71,6 +71,30 @@
       label: "자유 그림",
       instruction: "색과 굵기를 고르고 손가락으로 그림을 그려요.",
     },
+    feed: {
+      label: "몽글이에게 건네기",
+      instruction: "알맞은 그림을 몽글이 바구니로 끌어 주거나, 그림과 바구니를 차례로 눌러요.",
+    },
+    pop: {
+      label: "풍선 톡",
+      instruction: "둥실둥실 떠다니는 풍선 가운데 알맞은 풍선을 톡 눌러요.",
+    },
+    peek: {
+      label: "숨바꼭질 기억",
+      instruction: "그림이 숨는 자리를 잘 봐 두었다가, 알맞은 친구가 숨은 수풀을 눌러요.",
+    },
+    shadow: {
+      label: "그림자 탐정",
+      instruction: "까만 그림자만 보고 알맞은 친구를 찾아 눌러요.",
+    },
+    ox: {
+      label: "맞아요 · 아니에요",
+      instruction: "카드를 한 장씩 보고 맞으면 ⭕, 아니면 ❌를 눌러요.",
+    },
+    numeral: {
+      label: "세고 숫자 찾기",
+      instruction: "그림을 하나씩 눌러 센 다음 알맞은 숫자 카드를 골라요.",
+    },
   });
 
   const MODE_KEYS = Object.freeze({
@@ -251,6 +275,117 @@
     "extra088",
   ]);
 
+  // Each game plays three different ways. The first two rounds are quick, varied
+  // one-question formats; the third round is the game's own multi-step activity, which
+  // reviews the pictures from the earlier rounds.
+  const ROUND_PLANS = Object.freeze({
+    colors: ["spot", "feed", "pop"],
+    shapes: ["pop", "feed", "trace"],
+    counting: ["numeral", "pop", "count"],
+    sounds: ["feed", "peek", "connect"],
+    words: ["pop", "feed", "sort"],
+    emotions: ["feed", "spot", "connect"],
+    matching: ["shadow", "peek", "memory"],
+    sizes: ["feed", "pop", "order"],
+    patterns: ["feed", "peek", "pattern"],
+    more: ["feed", "pop", "compare"],
+    routines: ["feed", "pop", "sort"],
+    body: ["peek", "feed", "drag"],
+    extra001: ["feed", "peek", "pop"],
+    extra002: ["peek", "pop", "spot"],
+    extra003: ["pop", "feed", "spot"],
+    extra004: ["feed", "peek", "drag"],
+    extra005: ["spot", "pop", "trace"],
+    extra006: ["feed", "peek", "trace"],
+    extra007: ["pop", "spot", "trace"],
+    extra008: ["ox", "pop", "drag"],
+    extra009: ["shadow", "peek", "memory"],
+    extra010: ["peek", "shadow", "memory"],
+    extra011: ["shadow", "pop", "memory"],
+    extra012: ["feed", "peek", "order"],
+    extra013: ["peek", "pop", "order"],
+    extra014: ["pop", "feed", "order"],
+    extra015: ["feed", "spot", "sequence"],
+    extra016: ["pop", "quantity", "numeral"],
+    extra017: ["feed", "quantity", "numeral"],
+    extra018: ["quantity", "pop", "numeral"],
+    extra019: ["quantity", "feed", "numeral"],
+    extra020: ["pop", "feed", "numeral"],
+    extra021: ["feed", "pop", "countCompare"],
+    extra022: ["pop", "feed", "countCompare"],
+    extra023: ["ox", "feed", "compare"],
+    extra024: ["peek", "feed", "pattern"],
+    extra025: ["feed", "pop", "pattern"],
+    extra026: ["pop", "peek", "pattern"],
+    extra027: ["feed", "peek", "drag"],
+    extra028: ["ox", "pop", "drag"],
+    extra029: ["peek", "ox", "sort"],
+    extra030: ["spot", "feed", "sequence"],
+    extra031: ["shadow", "feed", "drag"],
+    extra032: ["peek", "spot", "drag"],
+    extra033: ["feed", "pop", "connect"],
+    extra034: ["pop", "feed", "drag"],
+    extra035: ["spot", "feed", "drag"],
+    extra036: ["pop", "shadow", "sort"],
+    extra037: ["spot", "shadow", "pop"],
+    extra038: ["shadow", "peek", "drag"],
+    extra039: ["peek", "pop", "connect"],
+    extra040: ["feed", "pop", "drag"],
+    extra041: ["peek", "feed", "drag"],
+    extra042: ["spot", "feed", "connect"],
+    extra043: ["pop", "shadow", "drag"],
+    extra044: ["shadow", "peek", "connect"],
+    extra045: ["pop", "feed", "connect"],
+    extra046: ["feed", "pop", "sort"],
+    extra047: ["peek", "spot", "sequence"],
+    extra048: ["shadow", "peek", "drag"],
+    extra049: ["ox", "pop", "drag"],
+    extra050: ["ox", "peek", "trace"],
+    extra051: ["feed", "pop", "drag"],
+    extra052: ["peek", "shadow", "drag"],
+    extra053: ["pop", "shadow", "drag"],
+    extra054: ["pop", "feed", "connect"],
+    extra055: ["pop", "shadow", "connect"],
+    extra056: ["peek", "feed", "connect"],
+    extra057: ["peek", "spot", "sort"],
+    extra058: ["feed", "pop", "connect"],
+    extra059: ["shadow", "peek", "sort"],
+    extra060: ["pop", "shadow", "sort"],
+    extra061: ["feed", "ox", "drag"],
+    extra062: ["ox", "feed", "sequence"],
+    extra063: ["ox", "feed", "sort"],
+    extra064: ["feed", "ox", "sequence"],
+    extra065: ["ox", "feed", "sort"],
+    extra066: ["ox", "feed", "sort"],
+    extra067: ["pop", "feed", "drag"],
+    extra068: ["pop", "feed", "sequence"],
+    extra069: ["peek", "ox", "sequence"],
+    extra070: ["ox", "feed", "sort"],
+    extra071: ["ox", "feed", "sort"],
+    extra072: ["ox", "feed", "sequence"],
+    extra073: ["feed", "ox", "sort"],
+    extra074: ["ox", "feed", "sequence"],
+    extra075: ["feed", "ox", "drag"],
+    extra076: ["feed", "ox", "drag"],
+    extra077: ["ox", "feed", "drag"],
+    extra078: ["feed", "ox", "drag"],
+    extra079: ["feed", "ox", "drag"],
+    extra080: ["feed", "ox", "drag"],
+    extra081: ["feed", "pop", "sort"],
+    extra082: ["feed", "ox", "sequence"],
+    extra083: ["peek", "ox", "sort"],
+    extra084: ["feed", "ox", "drag"],
+    extra085: ["feed", "peek", "drag"],
+    extra086: ["ox", "feed", "sort"],
+    extra087: ["feed", "ox", "sequence"],
+    extra088: ["ox", "feed", "sequence"],
+    extra089: ["draw", "draw", "draw"],
+    extra090: ["numeral", "pop", "add"],
+    extra091: ["pop", "numeral", "add"],
+    extra092: ["numeral", "feed", "subtract"],
+    extra093: ["feed", "numeral", "subtract"],
+  });
+
   let activeController = null;
 
   function metaFor(mode, gameKey) {
@@ -328,6 +463,19 @@
       if (keys.has(gameKey)) return mode;
     }
     return "choice";
+  }
+
+  function planFor(gameKey) {
+    const plan = ROUND_PLANS[gameKey];
+    if (plan) return [...plan];
+    const base = resolveMode(gameKey);
+    return [base, base, base];
+  }
+
+  function resolveRoundMode(gameKey, roundIndex = 0) {
+    const plan = planFor(gameKey);
+    const index = Math.max(0, Math.min(plan.length - 1, Number(roundIndex) || 0));
+    return plan[index] || "choice";
   }
 
   function allAssignments() {
@@ -413,6 +561,7 @@
         });
       } else {
         visual.textContent = value;
+        if (/^[가-힣\s]+$/u.test(value.trim())) visual.classList.add("is-word");
       }
     }
     return visual;
@@ -420,6 +569,16 @@
 
   function optionName(option) {
     return String(option?.label || option?.subtitle || option?.visual || "그림");
+  }
+
+  // Picks the Korean particle that fits the last syllable, e.g. 행동으로 / 그림으로 / 바구니로.
+  function withParticle(word, afterConsonant, afterVowel) {
+    const last = String(word || "").trim().slice(-1);
+    const code = last.charCodeAt(0) - 0xac00;
+    if (code < 0 || code > 11171) return afterVowel;
+    const finalConsonant = code % 28;
+    if (afterConsonant === "으로" && finalConsonant === 8) return afterVowel;
+    return finalConsonant ? afterConsonant : afterVowel;
   }
 
   function createToken(option, className = "activity-token") {
@@ -644,7 +803,7 @@
     const { controller, stage, mode, roundIndex } = context;
     const source = demo?.source;
     const target = demo?.target;
-    if (roundIndex !== 0 || !source || !target) return;
+    if (!source || !target) return;
 
     const storageKey = DEMO_SESSION_PREFIX + mode;
     try {
@@ -1460,10 +1619,10 @@
     announce("먼저 모든 그림을 보여줄게요. 천천히 기억하고 다 봤어요 시작 버튼을 눌러요.");
     return {
       requiredActions: pairOptions.length * 2,
-      completion: "같은 그림 " + pairOptions.length + "쌍을 모두 찾았어!",
+      completion: "같은 그림 짝을 모두 찾았어!",
       prompt: "먼저 보이는 그림과 자리를 기억해요!",
       helper: "시작하기 전에 모든 카드를 앞면으로 한 번 보여줘요.",
-      speech: "시작하기 전에 모든 그림을 한 번 보여줄게요. 어디에 있는지 천천히 기억한 뒤 카드 덮고 시작 버튼을 눌러요.",
+      speech: "먼저 그림을 모두 보여줄게. 자리를 잘 기억하고, 다 봤으면 시작 버튼을 눌러 줘.",
       hint: () => {
         const source = first || cardButtons.find((item) => !item.disabled);
         const match = source && cardButtons.find((item) => item !== source && !item.disabled && item.dataset.pair === source.dataset.pair);
@@ -1646,7 +1805,7 @@
     stage.append(track, tray);
     return {
       requiredActions: targets.length,
-      completion: "빠진 " + targets.length + "칸을 찾아 규칙을 완성했어!",
+      completion: "빠진 칸을 찾아 규칙을 완성했어!",
       demo: {
         source: sources.find((item) => item.dataset.targetIndex !== "extra"),
         target: targets.find((item) => item.dataset.activityDrop === sources.find((source) => source.dataset.targetIndex !== "extra")?.dataset.targetIndex),
@@ -1825,15 +1984,17 @@
     stage.append(task, counter, tray, bins);
     return {
       requiredActions: items.length,
-      completion: "그림 " + items.length + "개를 두 바구니에 모두 알맞게 나눴어!",
+      completion: "그림을 두 바구니에 모두 알맞게 나눴어!",
       demo: deckMode ? null : {
         source: sources[0],
         target: targets[sources[0]?.dataset.expected === "correct" ? 0 : 1],
         text: "그림을 누르고, 어울리는 바구니를 눌러요",
       },
       prompt: deckMode
-        ? "그림 카드가 한 장씩 나와요. 두 바구니 중 알맞은 곳을 골라 볼까?"
-        : deepLabels || roundLabels ? labels[0] + "과 ‘" + labels[1] + "’로 나눠 볼까?" : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
+        ? "그림 카드가 하나씩 나와요. 어느 바구니에 넣을지 골라 볼까?"
+        : deepLabels || roundLabels
+          ? labels[0] + withParticle(labels[0], "과", "와") + " ‘" + labels[1] + "’" + withParticle(labels[1], "으로", "로") + " 나눠 볼까?"
+          : "세 그림을 알맞은 두 바구니에 모두 나눠 볼까?",
       helper: deckMode ? "지금 보이는 그림을 보고 바구니를 바로 눌러요." : "그림 하나를 고른 뒤 알맞은 바구니를 눌러요.",
       hint: () => {
         const source = deckMode ? sources[currentDeckIndex] : sources.find((item) => !item.disabled);
@@ -2053,8 +2214,8 @@
     stage.append(board);
     return {
       requiredActions: pairCount,
-      completion: "말 단서 " + pairCount + "개를 차례로 모두 풀었어!",
-      prompt: gameKey === "sounds" ? "소리 단서를 한 장씩 듣고 동물 탐정이 되어 볼까?" : "말 단서를 한 장씩 열어 알맞은 그림을 찾아볼까?",
+      completion: "말 단서를 차례로 모두 풀었어!",
+      prompt: gameKey === "sounds" ? "소리 카드를 하나씩 보고 어떤 동물인지 찾아볼까?" : "단서 카드를 하나씩 보고 알맞은 그림을 찾아볼까?",
       helper: "가운데 단서를 보고 아래 그림 하나를 눌러요.",
       hint: () => pulse([clue, sources.find((source) => source.dataset.match === String(pairs[step]?.match))].filter(Boolean)),
       replay: () => pulse(clue, "is-replay"),
@@ -2176,20 +2337,20 @@
     });
     controller.on(window, "resize", drawConnections, { passive: true });
 
-    let prompt = "그림과 알맞은 말 단서를 선으로 모두 이어 볼까?";
+    let prompt = "그림과 어울리는 말을 선으로 이어 볼까?";
     let helper = "왼쪽 그림을 누르고 어울리는 오른쪽 말을 눌러요.";
     if (gameKey === "sounds") {
       prompt = "동물과 알맞은 소리 말을 선으로 이어 볼까?";
       helper = "동물 그림을 누르고 멍멍, 음메 같은 소리를 눌러요.";
     } else if (gameKey === "emotions") {
-      prompt = "마음 얼굴과 어울리는 상황을 선으로 이어 볼까?";
+      prompt = "마음 얼굴과 어울리는 이야기를 선으로 이어 볼까?";
       helper = "마음 얼굴을 누르고 어울리는 상황을 눌러요.";
     }
 
     stage.append(board);
     return {
       requiredActions: pairCount * 2,
-      completion: "그림과 말 단서 " + pairCount + "쌍을 선으로 모두 이었어!",
+      completion: "그림과 말 단서를 선으로 모두 이었어!",
       prompt,
       helper,
       hint: () => {
@@ -2297,10 +2458,10 @@
       announce,
     );
 
-    let relationPrompt = "단서 " + pairCount + "개와 알맞은 그림을 모두 연결해 볼까?";
+    let relationPrompt = "단서와 알맞은 그림을 모두 연결해 볼까?";
     let relationHelper = "단서를 하나씩 보고 어울리는 그림을 놓아요.";
     if (isSafetyJourney) {
-      relationPrompt = stepJourney ? "안전 길을 첫 칸부터 차례로 열어 볼까?" : "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?";
+      relationPrompt = stepJourney ? "안전 길을 첫 칸부터 하나씩 열어 볼까?" : "도움이 되는 행동을 알맞은 상황에 모두 연결해 볼까?";
       relationHelper = stepJourney ? "반짝이는 열린 상황부터 행동 그림을 놓아요." : pairCount + "가지 상황을 하나씩 읽고 행동 그림을 놓아요.";
     } else if (gameKey === "sounds") {
       relationPrompt = "소리 말과 동물 친구를 모두 연결해 볼까?";
@@ -2314,8 +2475,8 @@
     return {
       requiredActions: pairCount,
       completion: isSafetyJourney
-        ? "상황 " + pairCount + "개에 도움이 되는 행동을 모두 연결했어!"
-        : "단서 " + pairCount + "개와 알맞은 그림을 모두 연결했어!",
+        ? "상황마다 도움이 되는 행동을 모두 연결했어!"
+        : "단서와 알맞은 그림을 모두 연결했어!",
       demo: {
         source: stepJourney ? sources.find((item) => item.dataset.match === targets[0]?.dataset.activityDrop) : sources[0],
         target: stepJourney ? targets[0] : targets.find((item) => item.dataset.activityDrop === sources[0]?.dataset.match),
@@ -2442,9 +2603,9 @@
     stage.append(task, slots, tray);
     return {
       requiredActions: steps.length,
-      prompt: storyboard ? "그림 " + steps.length + "장으로 작은 이야기를 완성해 볼까?" : "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓아 볼까?",
+      prompt: storyboard ? "그림 카드로 작은 이야기를 완성해 볼까?" : "그림을 처음부터 마지막까지 순서대로 놓아 볼까?",
       helper: storyboard ? "이야기 시작 장면부터 액자에 하나씩 놓아요." : "먼저 할 그림부터 하나씩 번호 자리에 놓아요.",
-      completion: storyboard ? "처음·다음·마지막 장면으로 이야기를 완성했어!" : "그림 " + steps.length + "장을 처음부터 마지막까지 순서대로 놓았어!",
+      completion: storyboard ? "처음·다음·마지막 장면으로 이야기를 완성했어!" : "그림을 처음부터 마지막까지 순서대로 놓았어!",
       demo: {
         source: sources.find((item) => item.dataset.step === "0"),
         target: targets[0],
@@ -2621,7 +2782,7 @@
     stage.append(tray, slots);
     return {
       requiredActions: ordered.length,
-      completion: "그림 " + ordered.length + "개를 실제 크기 순서대로 잘 놓았어!",
+      completion: "실제 크기 순서대로 잘 놓았어!",
       demo: {
         source: sources.find((item) => item.dataset.rank === "0"),
         target: targets[0],
@@ -3241,6 +3402,7 @@
       const token = createToken(option);
       token.dataset.optionIndex = String(round.options.indexOf(option));
       token.dataset.label = optionName(option);
+      if (option.correct) token.dataset.correct = "true";
       tray.appendChild(token);
       return token;
     });
@@ -3658,6 +3820,578 @@
     };
   }
 
+  // ---- Quick round formats ------------------------------------------------------
+  // Rounds 1 and 2 of every game use one of these so a game never repeats the same
+  // gesture three times. They reuse the round's own question, voice line and answer.
+
+  const QUICK_PROMPTS = Object.freeze({
+    "sizes:0": {
+      prompt: "개미, 토끼, 코끼리 가운데 가장 큰 동물은 누구일까?",
+      helper: "셋 중에서 가장 큰 친구를 찾아요",
+    },
+    "sizes:1": {
+      prompt: "딸기, 사과, 수박 가운데 가장 작은 과일은 무엇일까?",
+      helper: "셋 중에서 가장 작은 과일을 찾아요",
+    },
+    "extra012:0": { prompt: "생쥐와 코끼리 중에 더 큰 동물은 누구일까?" },
+    "extra012:1": { prompt: "달팽이와 기린 중에 더 큰 친구는 누구일까?" },
+    "extra013:0": { prompt: "개미와 소 중에 더 작은 동물은 누구일까?" },
+    "extra013:1": { prompt: "무당벌레와 말 중에 더 작은 친구는 누구일까?" },
+    "extra014:0": { prompt: "세 동그라미 가운데 가장 큰 동그라미는 무엇일까?" },
+    "extra014:1": { prompt: "세 세모 가운데 가장 작은 세모는 무엇일까?" },
+  });
+
+  function quickResult(context, extra) {
+    const override = QUICK_PROMPTS[context.gameKey + ":" + context.roundIndex] || {};
+    return { requiredActions: 1, completion: context.round.success, ...override, ...extra };
+  }
+
+  function markMultiSymbol(element, option) {
+    if (option?.type !== "shape" && visualTokens(option?.visual).length > 1) {
+      element.classList.add("is-multi-symbol");
+    }
+  }
+
+  function clampNumber(value, minimum, maximum, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.max(minimum, Math.min(maximum, Math.round(number)));
+  }
+
+  // Arithmetic rounds carry no scene, so show the sum or the take-away as pictures.
+  function operationClue(round) {
+    const operation = round.operation;
+    if (!operation) return null;
+    const item = cleanVisual(operation.item || "⭐");
+    const clue = document.createElement("div");
+    clue.className = "quick-operation-clue";
+    clue.setAttribute("role", "img");
+    const addItems = (count, className = "") => {
+      const group = document.createElement("span");
+      group.className = "clue-group";
+      Array.from({ length: count }, () => {
+        const piece = document.createElement("span");
+        piece.className = "clue-piece" + (className ? " " + className : "");
+        piece.textContent = item;
+        group.appendChild(piece);
+      });
+      return group;
+    };
+    const sign = (text) => Object.assign(document.createElement("span"), { className: "clue-sign", textContent: text });
+    if (operation.type === "subtract") {
+      const start = clampNumber(operation.start, 1, 5, 2);
+      const take = clampNumber(operation.take, 1, start, 1);
+      const group = document.createElement("span");
+      group.className = "clue-group";
+      group.append(...addItems(start - take).childNodes, ...addItems(take, "is-leaving").childNodes);
+      clue.append(group);
+      clue.setAttribute("aria-label", "그림 " + start + "개 가운데 " + take + "개가 빠져요");
+    } else {
+      const left = clampNumber(operation.left, 1, 4, 1);
+      const right = clampNumber(operation.right, 1, 5 - left, 1);
+      clue.append(addItems(left), sign("+"), addItems(right));
+      clue.setAttribute("aria-label", "그림 " + left + "개와 " + right + "개");
+    }
+    clue.querySelectorAll(".clue-group, .clue-sign").forEach((node) => node.setAttribute("aria-hidden", "true"));
+    return clue;
+  }
+
+  function renderFeed(context) {
+    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const clue = operationClue(round);
+    const friend = document.createElement("button");
+    friend.type = "button";
+    friend.className = "feed-friend";
+    friend.dataset.activityDrop = "friend";
+    friend.setAttribute("aria-label", "몽글이 바구니, 고른 그림을 여기에 건네요");
+    const face = document.createElement("span");
+    face.className = "feed-face";
+    face.setAttribute("aria-hidden", "true");
+    face.innerHTML = '<span class="feed-eyes">•ᴗ•</span>';
+    const basket = document.createElement("span");
+    basket.className = "feed-basket";
+    basket.setAttribute("aria-hidden", "true");
+    const caption = document.createElement("strong");
+    caption.textContent = "몽글이 바구니에 쏙!";
+    friend.append(face, basket, caption);
+
+    const tray = document.createElement("div");
+    tray.className = "activity-tray feed-tray";
+    const sources = shuffled(round.options.map((option, index) => ({ option, index })), seed + ":feed").map(({ option, index }) => {
+      const token = createToken(option, "activity-token feed-token");
+      markMultiSymbol(token, option);
+      token.dataset.optionIndex = String(index);
+      token.dataset.label = optionName(option);
+      if (option === correct) token.dataset.correct = "true";
+      tray.appendChild(token);
+      return token;
+    });
+    const correctSource = sources.find((source) => source.dataset.correct === "true");
+
+    setupPickAndDrop(
+      controller,
+      sources,
+      [friend],
+      (source) => {
+        const option = round.options[Number(source.dataset.optionIndex)];
+        if (option !== correct) {
+          friend.classList.remove("is-refusing");
+          void friend.offsetWidth;
+          friend.classList.add("is-refusing");
+          onMistake(source, correctSource);
+          return false;
+        }
+        source.disabled = true;
+        source.classList.add("is-placed");
+        friend.classList.add("is-fed");
+        basket.replaceChildren(createVisual(option, "feed-bite"));
+        caption.textContent = "고마워, 딱 맞아!";
+        friend.setAttribute("aria-label", optionName(option) + " 그림을 몽글이에게 건넸어요");
+        friend.disabled = true;
+        onProgress("prompt");
+        announce(optionName(option) + " 그림을 몽글이에게 건넸어요.");
+        onComplete(friend);
+        return true;
+      },
+      announce,
+    );
+
+    if (clue) stage.append(clue);
+    stage.append(friend, tray);
+    return quickResult(context, {
+      requiredActions: 2,
+      demo: { source: sources[0], target: friend, text: "그림을 누르고, 몽글이를 눌러요" },
+      hint: () => pulse([correctSource, friend].filter(Boolean)),
+      replay: () => pulse(sources.filter((source) => !source.disabled), "is-replay"),
+    });
+  }
+
+  const BALLOON_COLORS = ["coral", "blue", "yellow", "mint", "purple"];
+
+  function renderPop(context) {
+    const { controller, stage, round, difficulty, seed, onComplete, onMistake, announce } = context;
+    const correct = correctOption(round);
+    const clue = operationClue(round);
+    const sky = document.createElement("div");
+    sky.className = "pop-sky";
+    sky.dataset.speed = difficulty || "standard";
+    const colorOffset = hashSeed(seed) % BALLOON_COLORS.length;
+    let correctBalloon = null;
+    const balloons = shuffled(round.options, seed + ":pop").map((option, index) => {
+      const balloon = document.createElement("button");
+      balloon.type = "button";
+      balloon.className = "pop-balloon balloon-" + BALLOON_COLORS[(index + colorOffset) % BALLOON_COLORS.length];
+      balloon.style.setProperty("--bob-delay", index * -0.9 + "s");
+      balloon.dataset.target = String(option === correct);
+      balloon.setAttribute("aria-label", optionName(option) + (option.subtitle ? ", " + option.subtitle : "") + " 풍선");
+      const label = document.createElement("span");
+      label.className = "pop-label";
+      label.textContent = optionName(option);
+      balloon.append(createVisual(option, "activity-visual pop-visual"), label);
+      markMultiSymbol(balloon, option);
+      if (option === correct) correctBalloon = balloon;
+      controller.on(balloon, "click", () => {
+        if (balloon.disabled) return;
+        if (option !== correct) {
+          onMistake(balloon, correctBalloon);
+          return;
+        }
+        balloon.disabled = true;
+        balloon.classList.add("is-popped");
+        announce(optionName(option) + " 풍선을 톡 터뜨렸어요.");
+        onComplete(balloon);
+      });
+      sky.appendChild(balloon);
+      return balloon;
+    });
+    if (clue) stage.append(clue);
+    stage.append(sky);
+    return quickResult(context, {
+      hint: () => pulse(correctBalloon),
+      replay: () => pulse(balloons.filter((balloon) => !balloon.disabled), "is-replay"),
+    });
+  }
+
+  function renderPeek(context) {
+    const { controller, stage, round, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const clue = operationClue(round);
+    const showFor = difficulty === "support" ? 4400 : difficulty === "challenge" ? 2500 : 3400;
+    const note = document.createElement("p");
+    note.className = "peek-note";
+    note.setAttribute("aria-live", "polite");
+    note.textContent = "친구들이 숨기 전에 잘 봐 두어요!";
+    const timer = document.createElement("span");
+    timer.className = "peek-timer";
+    timer.setAttribute("aria-hidden", "true");
+    const field = document.createElement("div");
+    field.className = "peek-field";
+    let hidden = false;
+    let countdownStarted = false;
+    let correctSpot = null;
+
+    const spots = shuffled(round.options, seed + ":peek").map((option, index) => {
+      const spot = document.createElement("button");
+      spot.type = "button";
+      spot.className = "peek-spot is-showing";
+      spot.disabled = true;
+      spot.dataset.target = String(option === correct);
+      const name = document.createElement("span");
+      name.className = "peek-name";
+      name.textContent = optionName(option);
+      const bush = document.createElement("span");
+      bush.className = "peek-bush";
+      bush.setAttribute("aria-hidden", "true");
+      bush.innerHTML = '<span class="peek-leaves">🌿</span><span class="peek-number">' + (index + 1) + "</span>";
+      spot.append(createVisual(option, "activity-visual peek-friend"), name, bush);
+      markMultiSymbol(spot, option);
+      spot.setAttribute("aria-label", index + 1 + "번 수풀, " + optionName(option) + " 친구가 숨으러 가요");
+      if (option === correct) correctSpot = spot;
+      controller.on(spot, "click", () => {
+        if (!hidden || spot.disabled) return;
+        spot.classList.add("is-open");
+        if (option !== correct) {
+          spot.disabled = true;
+          onMistake(spot, correctSpot);
+          controller.later(() => {
+            spot.classList.remove("is-open", "try-again");
+            spot.disabled = false;
+          }, 760);
+          return;
+        }
+        spot.disabled = true;
+        onProgress("prompt");
+        announce(index + 1 + "번 수풀에서 " + optionName(option) + " 친구를 찾았어요.");
+        onComplete(spot);
+      });
+      field.appendChild(spot);
+      return spot;
+    });
+
+    const hide = () => {
+      hidden = true;
+      field.classList.add("is-hidden");
+      timer.hidden = true;
+      spots.forEach((spot, index) => {
+        spot.classList.remove("is-showing");
+        spot.disabled = false;
+        spot.setAttribute("aria-label", index + 1 + "번 수풀");
+      });
+      note.textContent = "어느 수풀에 숨었을까? 눌러서 찾아요!";
+      announce("친구들이 수풀에 숨었어요. 알맞은 친구가 숨은 곳을 눌러요.");
+    };
+
+    const peekAgain = () => {
+      if (!hidden) return;
+      hidden = false;
+      spots.forEach((spot) => {
+        spot.disabled = true;
+        spot.classList.add("is-showing");
+      });
+      field.classList.remove("is-hidden");
+      note.textContent = "한 번 더 볼게요. 잘 기억해요!";
+      controller.later(hide, 1600);
+    };
+
+    // Start hiding only after the question has been heard, so the child is not asked
+    // to listen and memorise at the same time. The fallback covers muted sound.
+    const startCountdown = () => {
+      if (countdownStarted) return;
+      countdownStarted = true;
+      timer.classList.add("is-running");
+      controller.later(hide, showFor);
+    };
+    controller.later(startCountdown, 4600);
+    if (clue) stage.append(clue);
+    stage.append(note, timer, field);
+    stage.style.setProperty("--peek-time", showFor + "ms");
+    return quickResult(context, {
+      afterInstruction: startCountdown,
+      // The child is watching, not idle, while the pictures are still showing.
+      idleDelay: showFor + 4600,
+      hint: () => pulse(hidden ? correctSpot : field),
+      replay: peekAgain,
+    });
+  }
+
+  function renderShadow(context) {
+    const { controller, stage, round, difficulty, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const field = document.createElement("div");
+    field.className = "shadow-field";
+    if (difficulty === "support") field.classList.add("is-soft");
+    let correctCard = null;
+    const cards = shuffled(round.options, seed + ":shadow").map((option, index) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "shadow-card";
+      card.dataset.target = String(option === correct);
+      const name = document.createElement("span");
+      name.className = "shadow-name";
+      name.textContent = optionName(option);
+      card.append(createVisual(option, "activity-visual shadow-visual"), name);
+      card.setAttribute("aria-label", "그림자 " + (index + 1) + ", " + optionName(option));
+      if (option === correct) correctCard = card;
+      controller.on(card, "click", () => {
+        if (card.disabled) return;
+        card.classList.add("is-revealed");
+        if (option !== correct) {
+          card.disabled = true;
+          onMistake(card, correctCard);
+          controller.later(() => {
+            card.classList.remove("is-revealed", "try-again");
+            card.disabled = false;
+          }, 820);
+          return;
+        }
+        card.disabled = true;
+        onProgress("prompt");
+        announce("그림자의 주인은 " + optionName(option) + "였어요.");
+        onComplete(card);
+      });
+      field.appendChild(card);
+      return card;
+    });
+    stage.append(field);
+    return quickResult(context, {
+      hint: () => pulse(correctCard),
+      replay: () => pulse(cards.filter((card) => !card.disabled), "is-replay"),
+    });
+  }
+
+  function renderOx(context) {
+    const { controller, stage, round, difficulty, seed, onComplete, onMistake, onProgress, announce, speak } = context;
+    const correct = correctOption(round);
+    const wrongs = shuffled(round.options.filter((option) => option !== correct), seed + ":ox-wrong");
+    const deck = shuffled(difficulty === "support" ? [correct, wrongs[0]].filter(Boolean) : [correct, ...wrongs], seed + ":ox");
+    const board = document.createElement("div");
+    board.className = "ox-board";
+    const counter = createCounter("살펴본 카드", 0, deck.length);
+    const stack = document.createElement("div");
+    stack.className = "ox-stack";
+    const speakLabel = (option) => {
+      if (option && typeof speak === "function") speak(optionName(option));
+    };
+    const cards = deck.map((option, index) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "ox-card";
+      card.dataset.oxCard = option === correct ? "yes" : "no";
+      card.hidden = index !== 0;
+      const label = document.createElement("strong");
+      label.className = "ox-card-label";
+      label.textContent = optionName(option);
+      const listen = document.createElement("small");
+      listen.className = "ox-card-listen";
+      listen.textContent = "🔊 눌러서 다시 듣기";
+      card.append(createVisual(option, "activity-visual ox-visual"), label, listen);
+      markMultiSymbol(card, option);
+      card.setAttribute("aria-label", index + 1 + "번째 카드, " + optionName(option) + ". 누르면 다시 들려줘요");
+      controller.on(card, "click", () => speakLabel(option));
+      stack.appendChild(card);
+      return card;
+    });
+
+    const status = document.createElement("p");
+    status.className = "ox-status";
+    status.setAttribute("aria-live", "polite");
+    status.textContent = "질문에 맞는 카드면 ⭕, 아니면 ❌를 눌러요.";
+    const piles = document.createElement("div");
+    piles.className = "ox-piles";
+    piles.setAttribute("aria-hidden", "true");
+    const yesPile = Object.assign(document.createElement("span"), { className: "ox-pile ox-pile-yes", textContent: "⭕" });
+    const noPile = Object.assign(document.createElement("span"), { className: "ox-pile ox-pile-no", textContent: "❌" });
+    piles.append(yesPile, noPile);
+
+    const actions = document.createElement("div");
+    actions.className = "ox-actions";
+    const makeAnswer = (value, symbol, text) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ox-answer ox-" + value;
+      button.dataset.ox = value;
+      button.innerHTML = '<span aria-hidden="true">' + symbol + "</span><strong>" + text + "</strong>";
+      actions.appendChild(button);
+      return button;
+    };
+    const yes = makeAnswer("yes", "⭕", "맞아요");
+    const no = makeAnswer("no", "❌", "아니에요");
+    let current = 0;
+    let moving = false;
+
+    const judge = (answer, button) => {
+      if (moving || current >= deck.length) return;
+      const option = deck[current];
+      const expected = option === correct ? "yes" : "no";
+      if (answer !== expected) {
+        onMistake(button, expected === "yes" ? yes : no);
+        announce("카드를 다시 보고 생각해 봐요.");
+        return;
+      }
+      const card = cards[current];
+      card.classList.add(answer === "yes" ? "is-yes" : "is-no");
+      (answer === "yes" ? yesPile : noPile).appendChild(createVisual(option, "ox-pile-visual"));
+      status.textContent = (answer === "yes" ? "⭕ " : "❌ ") + (option.subtitle || optionName(option));
+      current += 1;
+      setCounter(counter, current, deck.length);
+      onProgress("prompt");
+      announce(optionName(option) + ", " + (answer === "yes" ? "맞아요" : "아니에요") + ".");
+      if (current === deck.length) {
+        onComplete(button);
+        return;
+      }
+      moving = true;
+      controller.later(() => {
+        card.hidden = true;
+        cards[current].hidden = false;
+        moving = false;
+        speakLabel(deck[current]);
+      }, 420);
+    };
+    controller.on(yes, "click", () => judge("yes", yes));
+    controller.on(no, "click", () => judge("no", no));
+
+    board.append(counter, stack, status, actions, piles);
+    stage.append(board);
+    return quickResult(context, {
+      requiredActions: deck.length,
+      afterInstruction: () => speakLabel(deck[current]),
+      hint: () => pulse(deck[current] === correct ? yes : no),
+      replay: () => pulse(cards[current], "is-replay"),
+    });
+  }
+
+  function numeralValue(option) {
+    const match = String(option?.visual ?? option?.label ?? "").match(/\d+/u);
+    return match ? Number(match[0]) : null;
+  }
+
+  function renderNumeral(context) {
+    const { controller, stage, round, seed, onComplete, onMistake, onProgress, announce } = context;
+    const correct = correctOption(round);
+    const answer = numeralValue(correct) || 1;
+    const operation = round.operation;
+    const groups = [];
+    let gone = 0;
+    let goneVisual = "";
+    if (operation?.type === "add") {
+      const item = cleanVisual(operation.item || "⭐");
+      const left = clampNumber(operation.left, 1, 4, 1);
+      const right = clampNumber(operation.right, 1, 5 - left, 1);
+      groups.push(Array(left).fill(item), Array(right).fill(item));
+    } else if (operation?.type === "subtract") {
+      const item = cleanVisual(operation.item || "⭐");
+      const start = clampNumber(operation.start, 1, 5, 2);
+      const take = clampNumber(operation.take, 1, start, 1);
+      groups.push(Array(start - take).fill(item));
+      gone = take;
+      goneVisual = item;
+    } else {
+      const scene = (round.scene || []).flatMap(visualTokens).map(cleanVisual).filter((visual) => visual !== "❓");
+      groups.push(scene.length ? scene : Array(answer).fill("⭐"));
+    }
+    // Never ask the child to count to a number the answer does not match.
+    const countable = groups.reduce((sum, group) => sum + group.length, 0);
+    if (countable !== answer) {
+      groups.splice(0, groups.length, Array(answer).fill(groups.flat()[0] || "⭐"));
+      gone = 0;
+    }
+    const total = answer;
+
+    const board = document.createElement("div");
+    board.className = "numeral-board";
+    const tray = document.createElement("div");
+    tray.className = "numeral-groups";
+    const status = document.createElement("p");
+    status.className = "numeral-status";
+    status.setAttribute("aria-live", "polite");
+    status.textContent = "그림을 하나씩 눌러 세어요.";
+    const pieces = [];
+    let counted = 0;
+    const cards = [];
+
+    groups.forEach((group, groupIndex) => {
+      if (groupIndex > 0) {
+        tray.appendChild(Object.assign(document.createElement("span"), { className: "numeral-sign", textContent: "+" }));
+      }
+      const row = document.createElement("span");
+      row.className = "numeral-group";
+      group.forEach((visual) => {
+        const piece = document.createElement("button");
+        piece.type = "button";
+        piece.className = "numeral-piece";
+        piece.textContent = visual;
+        piece.setAttribute("aria-label", "그림 " + (pieces.length + 1) + " 세기");
+        controller.on(piece, "click", () => {
+          if (piece.disabled) return;
+          piece.disabled = true;
+          counted += 1;
+          piece.classList.add("is-counted");
+          piece.dataset.count = String(counted);
+          onProgress("prompt");
+          announce(counted + ".");
+          status.textContent = counted + " / " + total + " 셌어요";
+          if (counted === total) {
+            cards.forEach((card) => { card.disabled = false; });
+            status.textContent = "모두 " + total + "! 알맞은 숫자를 골라요.";
+            announce("다 셌어요. 알맞은 숫자 카드를 골라요.");
+          }
+        });
+        pieces.push(piece);
+        row.appendChild(piece);
+      });
+      if (gone && groupIndex === groups.length - 1) {
+        Array.from({ length: gone }, () => {
+          const leaving = document.createElement("span");
+          leaving.className = "numeral-gone";
+          leaving.textContent = goneVisual;
+          leaving.setAttribute("aria-hidden", "true");
+          row.appendChild(leaving);
+        });
+      }
+      tray.appendChild(row);
+    });
+
+    const numbers = document.createElement("div");
+    numbers.className = "numeral-cards";
+    shuffled(round.options, seed + ":numeral").forEach((option) => {
+      const value = numeralValue(option);
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "numeral-card";
+      card.disabled = true;
+      card.dataset.target = String(option === correct);
+      card.textContent = value === null ? optionName(option) : String(value);
+      card.setAttribute("aria-label", "숫자 " + (value === null ? optionName(option) : value));
+      controller.on(card, "click", () => {
+        if (card.disabled) return;
+        if (option !== correct) {
+          onMistake(card, cards.find((item) => item.dataset.target === "true"));
+          return;
+        }
+        card.classList.add("is-correct");
+        onComplete(card);
+      });
+      cards.push(card);
+      numbers.appendChild(card);
+    });
+
+    board.append(tray, status, numbers);
+    stage.append(board);
+    const mathHelper = operation?.type === "subtract"
+      ? "남은 그림만 하나씩 세고 숫자를 골라요"
+      : operation?.type === "add"
+        ? "두 무리를 모두 세고 숫자를 골라요"
+        : null;
+    return quickResult(context, {
+      requiredActions: total + 1,
+      ...(mathHelper ? { helper: mathHelper } : {}),
+      hint: () => pulse(pieces.find((piece) => !piece.disabled) || cards.find((card) => card.dataset.target === "true")),
+      replay: () => pulse(pieces.filter((piece) => !piece.disabled), "is-replay"),
+    });
+  }
+
   const RENDERERS = Object.freeze({
     count: renderCount,
     quantity: renderQuantity,
@@ -3675,17 +4409,25 @@
     trace: renderTrace,
     order: renderOrder,
     draw: renderDraw,
+    feed: renderFeed,
+    pop: renderPop,
+    peek: renderPeek,
+    shadow: renderShadow,
+    ox: renderOx,
+    numeral: renderNumeral,
   });
 
   function render(config) {
     activeController?.destroy();
     const controller = createController();
     activeController = controller;
-    const mode = resolveMode(config.gameKey);
+    const mode = resolveRoundMode(config.gameKey, config.roundIndex);
     const stage = config.stage;
     stage.innerHTML = "";
+    stage.removeAttribute("style");
     stage.className = "activity-stage mode-" + mode;
     stage.dataset.mode = mode;
+    stage.dataset.round = String((Number(config.roundIndex) || 0) + 1);
     stage.dataset.difficulty = config.difficulty || "standard";
     stage.setAttribute("role", "group");
     stage.setAttribute("aria-label", metaFor(mode, config.gameKey).label);
@@ -3716,6 +4458,12 @@
       trace: 2,
       order: 2,
       draw: 3,
+      feed: 2,
+      pop: 1,
+      peek: 1,
+      shadow: 1,
+      ox: 2,
+      numeral: 2,
     };
     stage.dataset.requiredActions = String(activity?.requiredActions || minimumActions[mode] || 1);
 
@@ -3729,6 +4477,8 @@
       completion: activity?.completion || "",
       hint: activity?.hint || (() => {}),
       replay: activity?.replay || (() => {}),
+      afterInstruction: activity?.afterInstruction || null,
+      idleDelay: Number(activity?.idleDelay) || 0,
       destroy() {
         if (activeController === controller) activeController = null;
         controller.destroy();
@@ -3743,6 +4493,8 @@
 
   window.MONGLE_INTERACTIONS = Object.freeze({
     resolveMode,
+    resolveRoundMode,
+    planFor,
     metaFor,
     allAssignments,
     render,

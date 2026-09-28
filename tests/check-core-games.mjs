@@ -6,11 +6,13 @@
    invariants each interaction mode relies on. */
 import { chromium } from "playwright";
 import { startStaticServer } from "./static-server.mjs";
+import { fastAudioInitScript, playToRound } from "./auto-player.mjs";
 
 const { server, base } = await startStaticServer(process.cwd());
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
 await page.addInitScript(() => window.localStorage.setItem("mongle-welcome-v1", "done"));
+await page.addInitScript(fastAudioInitScript);
 await page.goto(base, { waitUntil: "load" });
 await page.waitForTimeout(600);
 
@@ -20,6 +22,12 @@ const failures = [];
 const SOLVABLE = {
   choice: 'button[data-index]',
   spot: '[data-target="true"]',
+  pop: '[data-target="true"]',
+  peek: '[data-target="true"]',
+  shadow: '[data-target="true"]',
+  feed: '[data-correct="true"]',
+  ox: "[data-ox-card]",
+  numeral: '.numeral-card[data-target="true"]',
   trace: "[data-activity-drop]",
   count: "[data-total]",
   quantity: "button",
@@ -52,23 +60,13 @@ for (const key of coreKeys) {
   // renderRound() is not reachable from outside, so step rounds via the replay of
   // the round index the app exposes through the progress dots.
   for (let round = 0; round < 3; round += 1) {
+    await page.goto(`${base}#game/${key}`, { waitUntil: "domcontentloaded" });
+    // Each game plays three different ways, so reach a round by solving the ones
+    // before it the way a child would.
+    const reached = await playToRound(page, round);
     const state = await page.evaluate(
-      async ({ gameKey, roundIndex, solvable }) => {
-        window.location.hash = "";
-        await new Promise((resolve) => setTimeout(resolve, 40));
-        window.location.hash = `#game/${gameKey}`;
-        await new Promise((resolve) => setTimeout(resolve, 220));
-
-        // Advance by finishing rounds the same way a child would where possible.
-        for (let step = 0; step < roundIndex; step += 1) {
-          const spot = document.querySelector('#answer-grid [data-target="true"]:not([disabled])');
-          const choice = document.querySelector("#answer-grid .answer-button");
-          const clickable = spot || choice;
-          if (!clickable) return { advanced: false, atRound: step };
-          clickable.click();
-          await new Promise((resolve) => setTimeout(resolve, 1750));
-        }
-
+      async ({ solvable, reachedRound }) => {
+        if (!reachedRound) return { advanced: false };
         const stage = document.querySelector("#answer-grid");
         const mode = stage.dataset.mode || "choice";
         const buttons = [...stage.querySelectorAll(".answer-button")];
@@ -86,12 +84,12 @@ for (const key of coreKeys) {
           requiredActions: Number(stage.dataset.requiredActions || 0),
         };
       },
-      { gameKey: key, roundIndex: round, solvable: SOLVABLE },
+      { solvable: SOLVABLE, reachedRound: reached },
     );
 
     const label = `${key}/round${round + 1}`;
     if (!state.advanced) {
-      // Modes that need drag-and-drop cannot be auto-advanced; round 1 still counts.
+      // Freehand tracing cannot be auto-advanced; the rounds before it still count.
       break;
     }
     roundsChecked += 1;
@@ -117,8 +115,6 @@ for (const key of coreKeys) {
       if (state.choiceLabels.some((text) => !text)) failures.push(`${label}: an option has no label`);
     }
   }
-  await page.keyboard.press("Escape");
-  await page.waitForTimeout(100);
 }
 
 console.log(`core games checked: ${coreKeys.length} (${coreKeys.join(", ")})`);

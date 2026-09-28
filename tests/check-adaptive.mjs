@@ -8,6 +8,7 @@
    Two seeded histories are used per game: six misses and six hits. */
 import { chromium } from "playwright";
 import { startStaticServer } from "./static-server.mjs";
+import { fastAudioInitScript, playToRound } from "./auto-player.mjs";
 
 // One game per adaptive mode. `words` is deliberately excluded: sort games only scale
 // their card count when they are in the deep-sort config, and `words` sorts the three
@@ -17,12 +18,15 @@ import { startStaticServer } from "./static-server.mjs";
 // not scale and are excluded: `words` sorts one round's three options rather than a
 // deck, and size ordering uses a fixed real-world sequence per round. Their level
 // still changes hint timing, which is covered by the level assertions below.
+// Every game plays three different ways, so each sample names the round whose
+// format is measured. The first rounds are solved first, as a child would.
 const GAMES = [
-  { key: "counting", countSelector: ".count-piece" },
-  { key: "matching", countSelector: "[data-pair]" },
-  { key: "colors", countSelector: ".spot-tile" },
-  { key: "patterns", countSelector: "[data-activity-drop]" },
-  { key: "routines", countSelector: "[data-expected]" },
+  { key: "counting", round: 2, countSelector: ".count-piece" },
+  { key: "matching", round: 2, countSelector: "[data-pair]" },
+  { key: "colors", round: 0, countSelector: ".spot-tile" },
+  { key: "patterns", round: 2, countSelector: "[data-activity-drop]" },
+  { key: "routines", round: 2, countSelector: "[data-expected]" },
+  { key: "extra061", round: 1, countSelector: ".ox-card" },
 ];
 
 // These must still report the right level even though their content is fixed.
@@ -32,8 +36,9 @@ const { server, base } = await startStaticServer(process.cwd());
 const browser = await chromium.launch();
 const failures = [];
 
-async function measure(key, selector, recent) {
+async function measure(key, selector, recent, round = 0) {
   const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
+  await page.addInitScript(fastAudioInitScript);
   await page.addInitScript(
     ({ gameKey, history }) => {
       window.localStorage.setItem("mongle-welcome-v1", "done");
@@ -62,6 +67,7 @@ async function measure(key, selector, recent) {
     { gameKey: key, history: recent },
   );
   await page.goto(`${base}#game/${key}`, { waitUntil: "domcontentloaded" });
+  if (round > 0) await playToRound(page, round);
   await page.waitForTimeout(650);
   const result = await page.evaluate((itemSelector) => {
     const stage = document.querySelector("#answer-grid");
@@ -75,9 +81,11 @@ async function measure(key, selector, recent) {
   return result;
 }
 
-for (const { key, countSelector } of GAMES) {
-  const struggling = await measure(key, countSelector, [false, false, false, false, false, false]);
-  const confident = await measure(key, countSelector, [true, true, true, true, true, true]);
+for (const { key, round, countSelector } of GAMES) {
+  // Solving earlier rounds adds correct answers, so the struggling history is long
+  // enough that two extra hits still keep it at the support level.
+  const struggling = await measure(key, countSelector, [false, false, false, false, false, false, false, false], round);
+  const confident = await measure(key, countSelector, [true, true, true, true, true, true], round);
 
   console.log(
     `${key.padEnd(9)} support=${struggling.difficulty}/${struggling.items} items, challenge=${confident.difficulty}/${confident.items} items`,

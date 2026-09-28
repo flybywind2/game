@@ -1,4 +1,4 @@
-const CACHE_VERSION = "mongle-premium-v74";
+const CACHE_VERSION = "mongle-premium-v75";
 const VOICE_PACK_CACHE = "mongle-voice-pack-v1";
 const APP_SHELL = [
   "./",
@@ -8,17 +8,18 @@ const APP_SHELL = [
   "./support.html",
   "./404.html",
   "./manifest.webmanifest",
-  "./styles.css?v=11",
+  "./styles.css?v=12",
   "./enhancements.css?v=1",
   "./catalog.css?v=1",
-  "./interactions.css?v=34",
+  "./interactions.css?v=35",
   "./premium.css?v=23",
-  "./landscape.css?v=1",
+  "./quick-rounds.css?v=1",
+  "./landscape.css?v=2",
   "./page.css?v=1",
   "./extra-games.js?v=7",
-  "./tts-manifest.js?v=7",
-  "./interaction-engine.js?v=40",
-  "./app.js?v=68",
+  "./tts-manifest.js?v=8",
+  "./interaction-engine.js?v=41",
+  "./app.js?v=69",
   "./assets/generated/favicon.png",
   "./assets/generated/app-icon-192.png",
   "./assets/generated/app-icon-512.png",

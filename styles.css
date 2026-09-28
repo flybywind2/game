@@ -1947,8 +1947,9 @@ body.is-keyboard-nav .daily-plan-item:focus {
 
 .completion-home {
   border: 0;
-  background: var(--coral);
-  box-shadow: 0 6px 0 #d95c45;
+  /* White text needs the darker coral to reach 4.5:1 contrast. */
+  background: var(--coral-dark);
+  box-shadow: 0 6px 0 #933020;
   color: white;
 }
 

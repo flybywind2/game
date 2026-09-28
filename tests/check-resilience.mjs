@@ -6,6 +6,7 @@
    is acceptable, a blank screen is not. */
 import { chromium } from "playwright";
 import { startStaticServer } from "./static-server.mjs";
+import { SOLVER, waitForRound } from "./auto-player.mjs";
 
 const { server, base } = await startStaticServer(process.cwd());
 const browser = await chromium.launch();
@@ -38,12 +39,7 @@ async function scenario(name, setup) {
   });
 
   // Answering must not throw even when the result cannot be saved.
-  const answered = await page.evaluate(() => {
-    const target = document.querySelector('#answer-grid [data-target="true"]:not([disabled])');
-    if (!target) return false;
-    target.click();
-    return true;
-  });
+  const answered = (await waitForRound(page)) && (await SOLVER(page)).ok;
   await page.waitForTimeout(1200);
   const feedback = await page.evaluate(() => document.querySelector("#feedback")?.textContent?.trim() || "");
 

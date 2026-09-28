@@ -1,6 +1,7 @@
 /* Opens every game and every round in a real browser, then checks the static pages. */
 import { chromium } from "playwright";
 import { startStaticServer } from "./static-server.mjs";
+import { fastAudioInitScript, playToRound } from "./auto-player.mjs";
 
 const { server, base } = await startStaticServer(process.cwd());
 const browser = await chromium.launch();
@@ -25,6 +26,7 @@ page.on("requestfailed", (req) => {
 await page.addInitScript(() => {
   window.localStorage.setItem("mongle-welcome-v1", "done");
 });
+await page.addInitScript(fastAudioInitScript);
 await page.goto(base, { waitUntil: "load" });
 await page.waitForTimeout(800);
 
@@ -77,34 +79,15 @@ for (const failure of failures.slice(0, 25)) {
 
 // A full game must be completable end to end through real clicks, all three rounds.
 const walkthrough = { key: "colors", rounds: 0, progressStamped: false, errors: [] };
-await page.goto(base, { waitUntil: "load" });
-await page.waitForTimeout(400);
-await page.evaluate(() => {
-  window.location.hash = "#game/colors";
-});
-await page.waitForTimeout(400);
-for (let round = 0; round < 3; round += 1) {
-  // Rounds advance on a timer after the celebration, so wait for a fresh, enabled target.
-  const ready = await page
-    .waitForFunction(() => {
-      const stage = document.querySelector("#answer-grid");
-      return Boolean(stage?.querySelector('[data-target="true"]:not([disabled])'));
-    }, null, { timeout: 8000 })
+await page.goto(`${base}#game/colors`, { waitUntil: "domcontentloaded" });
+// Solve all three rounds, which use three different formats, like a child would.
+if (!(await playToRound(page, 3))) {
+  const finished = await page
+    .waitForSelector("#play-main .completion-card", { timeout: 8000 })
     .then(() => true)
     .catch(() => false);
-  if (!ready) {
-    const debug = await page.evaluate(() => {
-      const stage = document.querySelector("#answer-grid");
-      return { mode: stage?.dataset.mode, html: stage?.innerHTML.slice(0, 200) };
-    });
-    walkthrough.errors.push(`round ${round + 1} never became ready: ${JSON.stringify(debug)}`);
-    break;
-  }
-  await page.evaluate(() => {
-    document.querySelector('#answer-grid [data-target="true"]:not([disabled])')?.click();
-  });
-  walkthrough.rounds += 1;
-  await page.waitForTimeout(400);
+  if (finished) walkthrough.rounds = 3;
+  else walkthrough.errors.push("colors could not be played to the end");
 }
 walkthrough.progressStamped = await page.evaluate(() => {
   const progress = window.localStorage.getItem("mongle-play-progress-v1") || "";

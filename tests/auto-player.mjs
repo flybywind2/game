@@ -56,6 +56,53 @@ export async function waitForAdvance(page, fromRound, timeout = 11000) {
     .catch(() => false);
 }
 
+// Returns the three per-round modes the engine plans for a game.
+export async function planOf(page, key) {
+  return page.evaluate((gameKey) => window.MONGLE_INTERACTIONS?.planFor?.(gameKey) || [], key);
+}
+
+// Freehand drawing and finger tracing have no scripted solution.
+export const UNSCRIPTABLE_MODES = new Set(["trace", "draw"]);
+
+// Solves rounds until the given round index is on screen. Returns false when a round
+// cannot be solved or does not advance.
+export async function playToRound(page, targetRound) {
+  for (let guard = 0; guard < 4; guard += 1) {
+    if (!(await waitForRound(page))) return false;
+    const state = await roundState(page);
+    if (state.completed) return false;
+    if (state.current >= targetRound) return true;
+    const result = await SOLVER(page);
+    if (!result.ok) return false;
+    if (!(await waitForAdvance(page, state))) return false;
+  }
+  return false;
+}
+
+// Audio never reports "ended" in a headless run, so a solved round waits for the
+// 7-second fallback. Call inside addInitScript to end each clip right away, which keeps
+// full sweeps fast while still recording which file or device voice was used.
+export function fastAudioInitScript() {
+  const NativeAudio = window.Audio;
+  window.__voiceFiles = [];
+  window.__deviceVoice = [];
+  window.Audio = function PatchedAudio(src) {
+    if (typeof src === "string" && src.includes("/audio/tts/")) window.__voiceFiles.push(src);
+    const audio = new NativeAudio(src);
+    audio.play = () => {
+      setTimeout(() => audio.onended?.(), 30);
+      return Promise.resolve();
+    };
+    return audio;
+  };
+  if (window.speechSynthesis) {
+    window.speechSynthesis.speak = (utterance) => {
+      window.__deviceVoice.push(utterance?.text || "");
+      setTimeout(() => utterance?.onend?.(), 30);
+    };
+  }
+}
+
 export const SOLVER = async (page) => {
   return page.evaluate(async () => {
     const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -96,6 +143,50 @@ export const SOLVER = async (page) => {
       }
       case "spot": {
         await tap(stage.querySelector('[data-target="true"]:not([disabled])'));
+        return { ok: true, mode, taps };
+      }
+      case "pop":
+      case "shadow": {
+        const target = stage.querySelector('[data-target="true"]:not([disabled])');
+        if (!target) return { ok: false, mode, taps, reason: "no correct choice to tap" };
+        await tap(target, 200);
+        return { ok: true, mode, taps };
+      }
+      case "peek": {
+        // Pictures are shown first, then hidden in the bushes; the spots unlock then.
+        for (let guard = 0; guard < 110; guard += 1) {
+          if (stage.querySelector('.peek-field.is-hidden [data-target="true"]:not([disabled])')) break;
+          await sleep(120);
+        }
+        const target = stage.querySelector('.peek-field.is-hidden [data-target="true"]:not([disabled])');
+        if (!target) return { ok: false, mode, taps, reason: "the pictures never hid" };
+        await tap(target, 200);
+        return { ok: true, mode, taps };
+      }
+      case "feed": {
+        const source = stage.querySelector('.feed-token[data-correct="true"]:not([disabled])');
+        const friend = stage.querySelector(".feed-friend:not([disabled])");
+        if (!source || !friend) return { ok: false, mode, taps, reason: "no picture or friend to feed" };
+        await tap(source);
+        await tap(friend, 240);
+        return { ok: true, mode, taps };
+      }
+      case "ox": {
+        // Judge each card: the correct answer gets "yes", every other card "no".
+        for (let guard = 0; guard < 8; guard += 1) {
+          const card = [...stage.querySelectorAll(".ox-card")].find((item) => !item.hidden && !/is-(yes|no)/.test(item.className));
+          if (!card) return { ok: true, mode, taps };
+          const answer = stage.querySelector(`.ox-answer[data-ox="${card.dataset.oxCard}"]`);
+          await tap(answer, 560);
+        }
+        return { ok: false, mode, taps, reason: "ox cards did not run out" };
+      }
+      case "numeral": {
+        for (const piece of [...stage.querySelectorAll(".numeral-piece:not([disabled])")]) await tap(piece, 60);
+        await sleep(160);
+        const card = stage.querySelector('.numeral-card[data-target="true"]:not([disabled])');
+        if (!card) return { ok: false, mode, taps, reason: "numeral cards never unlocked" };
+        await tap(card, 260);
         return { ok: true, mode, taps };
       }
       case "count": {

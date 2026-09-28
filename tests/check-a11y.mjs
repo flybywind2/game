@@ -2,6 +2,7 @@
 import { chromium } from "playwright";
 import { createRequire } from "node:module";
 import { startStaticServer } from "./static-server.mjs";
+import { fastAudioInitScript, playToRound } from "./auto-player.mjs";
 
 const require = createRequire(import.meta.url);
 let axePath;
@@ -18,6 +19,7 @@ const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
 await page.addInitScript(() => {
   window.localStorage.setItem("mongle-welcome-v1", "done");
 });
+await page.addInitScript(fastAudioInitScript);
 
 const violationsByView = [];
 
@@ -44,31 +46,41 @@ await scan("home", async () => {
   await page.waitForTimeout(700);
 });
 
-// One game per interaction mode, so a mode-specific widget cannot regress unnoticed.
+// One game per round format, so a format-specific widget cannot regress unnoticed.
+// Each game now plays three different ways, so a sample names the round to scan.
 const modeSamples = {
-  spot: "colors",
-  trace: "shapes",
-  count: "counting",
-  connect: "sounds",
-  sort: "words",
-  memory: "matching",
-  order: "sizes",
-  pattern: "patterns",
-  compare: "more",
-  drag: "body",
-  quantity: "extra016",
-  countCompare: "extra021",
-  sequence: "extra015",
-  add: "extra090",
-  subtract: "extra092",
-  draw: "extra089",
+  spot: ["colors", 0],
+  feed: ["colors", 1],
+  pop: ["colors", 2],
+  numeral: ["counting", 0],
+  count: ["counting", 2],
+  peek: ["sounds", 1],
+  connect: ["sounds", 2],
+  sort: ["words", 2],
+  shadow: ["matching", 0],
+  memory: ["matching", 2],
+  order: ["sizes", 2],
+  pattern: ["patterns", 2],
+  compare: ["more", 2],
+  drag: ["body", 2],
+  trace: ["shapes", 2],
+  ox: ["extra061", 1],
+  quantity: ["extra018", 0],
+  countCompare: ["extra021", 2],
+  sequence: ["extra015", 2],
+  add: ["extra090", 2],
+  subtract: ["extra092", 2],
+  draw: ["extra089", 0],
 };
-for (const [mode, key] of Object.entries(modeSamples)) {
-  await scan(`game ${mode} (${key})`, async () => {
-    await page.evaluate((gameKey) => {
-      window.location.hash = `#game/${gameKey}`;
-    }, key);
+for (const [mode, [key, round]] of Object.entries(modeSamples)) {
+  await scan(`game ${mode} (${key} round ${round + 1})`, async () => {
+    await page.goto(`${base}#game/${key}`, { waitUntil: "domcontentloaded" });
+    const reached = await playToRound(page, round);
     await page.waitForTimeout(500);
+    const shown = await page.evaluate(() => document.querySelector("#answer-grid")?.dataset.mode);
+    if (!reached || shown !== mode) {
+      violationsByView.push({ label: `${key} round ${round + 1}`, serious: [{ id: `expected ${mode}, saw ${shown}` }] });
+    }
   });
 }
 
@@ -120,21 +132,10 @@ await scan("parent dashboard", async () => {
 });
 
 await scan("game completion", async () => {
-  await page.evaluate(() => {
-    document.querySelector("#parent-close")?.click();
-    window.location.hash = "#game/colors";
-  });
-  await page.waitForTimeout(400);
-  for (let round = 0; round < 3; round += 1) {
-    const clicked = await page.evaluate(() => {
-      const target = document.querySelector('#answer-grid [data-target="true"]:not([disabled])');
-      if (!target) return false;
-      target.click();
-      return true;
-    });
-    if (!clicked) break;
-    await page.waitForTimeout(1700);
-  }
+  await page.evaluate(() => document.querySelector("#parent-close")?.click());
+  await page.goto(`${base}#game/colors`, { waitUntil: "domcontentloaded" });
+  await playToRound(page, 3);
+  await page.waitForSelector("#play-main .completion-card", { timeout: 9000 }).catch(() => {});
 });
 
 await browser.close();
